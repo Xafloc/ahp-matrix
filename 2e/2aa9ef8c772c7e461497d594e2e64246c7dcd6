@@ -1,0 +1,29 @@
+internal/model/scale.go
+  s_65743add7cce22::t_a587bb7418c90a 73-86
+internal/model/prepare.go
+  s_65743add7cce22::t_a587bb7418c90a 219-221
+  s_65743add7cce22::t_add3257a3a3863 58-60
+internal/server/projects.go
+  s_65743add7cce22::t_a587bb7418c90a 211,221
+internal/model/prepare_test.go
+  s_65743add7cce22::t_9f9d7256f55885 126-139
+  s_65743add7cce22::t_05fbf36c2243a6 140-144
+internal/server/projects_test.go
+  s_65743add7cce22::t_9f9d7256f55885 236-248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2e2aa9ef8c772c7e461497d594e2e64246c7dcd6",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
