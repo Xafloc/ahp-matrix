@@ -6,6 +6,7 @@ import (
 	"math"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -136,5 +137,27 @@ func TestWriteJSONNeverSendsAnEmptySuccess(t *testing.T) {
 	writeJSON(rec, http.StatusOK, map[string]float64{"score": math.NaN()})
 	if rec.Code != http.StatusInternalServerError || errorCode(t, rec) != "internal" {
 		t.Errorf("got %d %q, want a 500 JSON error", rec.Code, rec.Body.String())
+	}
+}
+
+func TestLANModeStillBlocksDNSRebinding(t *testing.T) {
+	st, _ := store.NewFileStore(t.TempDir())
+	h := New(Config{Store: st, UI: testUI, Host: "0.0.0.0"})
+	host, _ := os.Hostname()
+	cases := map[string]int{
+		"attacker.example:7777": http.StatusForbidden, // a rebinding page uses a domain name
+		"192.168.1.20:7777":     http.StatusOK,
+		"[fe80::1]:7777":        http.StatusOK,
+		host + ":7777":          http.StatusOK,
+		"localhost:7777":        http.StatusOK,
+	}
+	for hostHeader, want := range cases {
+		req := httptest.NewRequest("GET", "/api/version", nil)
+		req.Host = hostHeader
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		if rec.Code != want {
+			t.Errorf("Host %q: got %d, want %d", hostHeader, rec.Code, want)
+		}
 	}
 }
