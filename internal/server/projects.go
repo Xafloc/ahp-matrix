@@ -208,7 +208,7 @@ func (s *server) exportProject(w http.ResponseWriter, r *http.Request) {
 }
 
 // importProject accepts an .ahp.json file, as a multipart "file" field or as
-// the raw body. It keeps the file's project id unless that id is taken.
+// the raw body. It keeps the file's project id unless that id is taken or unsafe.
 func (s *server) importProject(w http.ResponseWriter, r *http.Request) {
 	data, ok := readUpload(w, r)
 	if !ok {
@@ -218,7 +218,7 @@ func (s *server) importProject(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	if p.ID == "" {
+	if !model.ValidID(p.ID) {
 		p.ID = model.NewProjectID()
 	} else if _, err := s.cfg.Store.Get(r.Context(), p.ID); err == nil {
 		p.ID = model.NewProjectID()

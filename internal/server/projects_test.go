@@ -233,3 +233,16 @@ func TestImportBesideAnUnreadableNewerFileGetsANewID(t *testing.T) {
 		t.Error("import overwrote the newer file")
 	}
 }
+
+func TestImportReplacesUnsafeIDs(t *testing.T) {
+	h, _ := newTestServer(t)
+	for _, bad := range []string{"x/abc", "a?b#c", "../../etc", strings.Repeat("a", 100)} {
+		p := model.New("Odd id")
+		p.ID = bad
+		rec := request(t, h, "POST", "/api/import/ahp", mustJSON(t, p))
+		got := decode[*model.Project](t, rec.Body.Bytes())
+		if rec.Code != http.StatusCreated || got.ID == bad || !model.ValidID(got.ID) {
+			t.Errorf("import id %q: %d, got id %q; want 201 with a fresh, valid id", bad, rec.Code, got.ID)
+		}
+	}
+}

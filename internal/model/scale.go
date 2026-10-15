@@ -70,6 +70,20 @@ func ParseContext(c string) (kind, id string, ok bool) {
 // NewProjectID returns a new, time-ordered ID for a project.
 func NewProjectID() string { return ulid.Make().String() }
 
+// ValidID reports whether id is safe to use as a project id: it ends up in
+// file names and URLs, so only letters, digits, '-' and '_' are allowed.
+func ValidID(id string) bool {
+	if id == "" || len(id) > 64 {
+		return false
+	}
+	for _, r := range id {
+		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '-' || r == '_') {
+			return false
+		}
+	}
+	return true
+}
+
 // NewID returns a short random ID for an item inside a project.
 func NewID() string {
 	var b [5]byte

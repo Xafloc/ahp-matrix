@@ -123,3 +123,22 @@ func TestValidateReportsProblems(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateRejectsUnsafeProjectIDs(t *testing.T) {
+	for _, bad := range []string{"x/abc", "a b", "a?b", "../../etc"} {
+		p := fixture()
+		p.ID = bad
+		var ve *ValidationError
+		if err := p.Prepare(); !errors.As(err, &ve) || ve.Problems[0].Field != "id" {
+			t.Errorf("id %q: err = %v, want a problem on field id", bad, err)
+		}
+	}
+	if !ValidID(NewProjectID()) {
+		t.Error("NewProjectID is not a ValidID")
+	}
+	p := fixture()
+	p.ID = ""
+	if err := p.Prepare(); err != nil || !ValidID(p.ID) {
+		t.Errorf("empty id: err = %v, id %q; want a generated id", err, p.ID)
+	}
+}

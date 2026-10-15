@@ -55,6 +55,9 @@ func (p *Project) childrenOf() map[string][]Criterion {
 
 func (p *Project) fillDefaults() {
 	p.SchemaVersion = SchemaVersion
+	if p.ID == "" {
+		p.ID = NewProjectID()
+	}
 	p.Name = strings.TrimSpace(p.Name)
 	if p.Scale == "" {
 		p.Scale = ScaleSaaty9
@@ -213,6 +216,9 @@ func (p *Project) Validate() error {
 	}
 	finite := func(v float64) bool { return !math.IsNaN(v) && !math.IsInf(v, 0) }
 
+	if !ValidID(p.ID) {
+		add("id", "must be 1–64 letters, digits, '-' or '_'")
+	}
 	if strings.TrimSpace(p.Name) == "" {
 		add("name", "is required")
 	}
