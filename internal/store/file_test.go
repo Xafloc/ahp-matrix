@@ -227,3 +227,38 @@ func TestListFlagsInvalidProjectsInsteadOfServingThem(t *testing.T) {
 		t.Errorf("Get of an invalid file: err = %v, want ErrNotFound", err)
 	}
 }
+
+func TestCreateNeverOverwritesAnUnreadableFile(t *testing.T) {
+	s := newStore(t)
+	p := model.New("Shared plan")
+	newer := []byte(`{"schemaVersion":2,"id":"` + p.ID + `","name":"Shared plan"}`)
+	path := filepath.Join(s.Dir(), "shared-plan-"+strings.ToLower(p.ID[len(p.ID)-6:])+".ahp.json")
+	if err := os.WriteFile(path, newer, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Create(ctx, p); !errors.Is(err, ErrExists) {
+		t.Errorf("Create over a newer build's file: err = %v, want ErrExists", err)
+	}
+	if got, _ := os.ReadFile(path); string(got) != string(newer) {
+		t.Error("the newer file was overwritten")
+	}
+}
+
+func TestCreateNeverOverwritesAnotherProjectWithTheSameFileName(t *testing.T) {
+	s := newStore(t)
+	first := model.New("Twin")
+	first.ID = "AAAAAAAAAAAAAAAAAAAA111111"
+	second := model.New("Twin")
+	second.ID = "BBBBBBBBBBBBBBBBBBBB111111" // same id suffix, so the same file name
+	if err := s.Create(ctx, first); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Create(ctx, second); err != nil {
+		t.Fatal(err)
+	}
+	for _, id := range []string{first.ID, second.ID} {
+		if _, err := s.Get(ctx, id); err != nil {
+			t.Errorf("Get(%s): %v", id, err)
+		}
+	}
+}

@@ -38,6 +38,21 @@ func NewFileStore(dir string) (*FileStore, error) {
 	return &FileStore{dir: dir, now: func() time.Time { return time.Now().UTC() }}, nil
 }
 
+// freePath returns <dir>/<slug>-<suffix>.ahp.json, or <slug>-2-<suffix> and
+// so on if that name is taken, so Create never replaces an existing file.
+func (s *FileStore) freePath(slug, suffix string) string {
+	for k := 1; ; k++ {
+		base := slug
+		if k > 1 {
+			base = fmt.Sprintf("%s-%d", slug, k)
+		}
+		path := filepath.Join(s.dir, base+"-"+suffix+ext)
+		if _, err := os.Lstat(path); errors.Is(err, fs.ErrNotExist) {
+			return path
+		}
+	}
+}
+
 // Dir returns the folder the store reads and writes.
 func (s *FileStore) Dir() string { return s.dir }
 
@@ -57,10 +72,20 @@ func (s *FileStore) Get(ctx context.Context, id string) (*model.Project, error) 
 func (s *FileStore) Create(ctx context.Context, p *model.Project) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, _, err := s.find(p.ID); err == nil {
-		return ErrExists
-	} else if !errors.Is(err, ErrNotFound) {
+	entries, err := s.scan()
+	if err != nil {
 		return err
+	}
+	suffix := idSuffix(p.ID)
+	for _, e := range entries {
+		if e.Project != nil && e.Project.ID == p.ID {
+			return ErrExists
+		}
+		// An unreadable file named for this id may be this very project,
+		// written by a newer build or damaged; never risk replacing it.
+		if e.Err != nil && strings.HasSuffix(e.File, "-"+suffix+ext) {
+			return ErrExists
+		}
 	}
 	next := *p
 	next.Version = 1
@@ -68,8 +93,7 @@ func (s *FileStore) Create(ctx context.Context, p *model.Project) error {
 	if next.CreatedAt.IsZero() {
 		next.CreatedAt = next.UpdatedAt
 	}
-	name := model.Slug(p.Name) + "-" + idSuffix(p.ID) + ext
-	if err := writeAtomic(filepath.Join(s.dir, name), &next); err != nil {
+	if err := writeAtomic(s.freePath(model.Slug(p.Name), suffix), &next); err != nil {
 		return err
 	}
 	*p = next

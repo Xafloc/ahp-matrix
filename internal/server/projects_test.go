@@ -215,3 +215,21 @@ func TestSaveAfterFileDeletedElsewhere(t *testing.T) {
 		t.Errorf("got %d %s, want 404 not-found", rec.Code, rec.Body.String())
 	}
 }
+
+func TestImportBesideAnUnreadableNewerFileGetsANewID(t *testing.T) {
+	h, st := newTestServer(t)
+	p := model.New("Shared plan")
+	newer := []byte(`{"schemaVersion":2,"id":"` + p.ID + `","name":"Shared plan"}`)
+	path := filepath.Join(st.Dir(), "shared-plan-"+strings.ToLower(p.ID[len(p.ID)-6:])+".ahp.json")
+	if err := os.WriteFile(path, newer, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	rec := request(t, h, "POST", "/api/import/ahp", mustJSON(t, p))
+	got := decode[*model.Project](t, rec.Body.Bytes())
+	if rec.Code != http.StatusCreated || got.ID == p.ID {
+		t.Errorf("import: %d, id %q; want 201 with a new id", rec.Code, got.ID)
+	}
+	if data, _ := os.ReadFile(path); string(data) != string(newer) {
+		t.Error("import overwrote the newer file")
+	}
+}

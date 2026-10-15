@@ -241,12 +241,19 @@ func (s *server) load(w http.ResponseWriter, r *http.Request) (*model.Project, b
 	return p, true
 }
 
-// createNew prepares and creates a new project, then writes it back with status.
+// createNew prepares and creates a new project, then writes it back with
+// status. If the id turns out to be taken (or might belong to a file this
+// build can't read), the project gets a fresh id instead.
 func (s *server) createNew(w http.ResponseWriter, r *http.Request, p *model.Project, status int) {
 	if !prepare(w, p) {
 		return
 	}
-	if err := s.cfg.Store.Create(r.Context(), p); err != nil {
+	err := s.cfg.Store.Create(r.Context(), p)
+	if errors.Is(err, store.ErrExists) {
+		p.ID = model.NewProjectID()
+		err = s.cfg.Store.Create(r.Context(), p)
+	}
+	if err != nil {
 		s.internalError(w, err)
 		return
 	}
