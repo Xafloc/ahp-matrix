@@ -1,9 +1,10 @@
 package model
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
+	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"testing"
@@ -105,8 +106,55 @@ func TestGoldenResults(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%v (run `go test ./internal/model -run Golden -update` to create it)", err)
 		}
-		if !bytes.Equal(got, want) {
-			t.Errorf("%s: results changed; if that is intended, run `go test ./internal/model -run Golden -update`", path)
+		if diff := goldenDiff(got, want); diff != "" {
+			t.Errorf("%s: results changed at %s; if that is intended, run `go test ./internal/model -run Golden -update`", path, diff)
 		}
 	}
+}
+
+// goldenDiff compares two JSON documents, allowing numbers to differ in their
+// last bits: CPUs round differently (arm64 fuses multiply-adds), so golden
+// files written on one machine must still pass on another. It returns the
+// path of the first difference, or "" if there is none.
+func goldenDiff(got, want []byte) string {
+	var g, w any
+	if json.Unmarshal(got, &g) != nil || json.Unmarshal(want, &w) != nil {
+		return "(invalid JSON)"
+	}
+	return jsonDiff("$", g, w)
+}
+
+func jsonDiff(path string, g, w any) string {
+	switch wv := w.(type) {
+	case float64:
+		gv, ok := g.(float64)
+		if !ok || math.Abs(gv-wv) > 1e-9*math.Max(1, math.Max(math.Abs(gv), math.Abs(wv))) {
+			return fmt.Sprintf("%s (%v, want %v)", path, g, w)
+		}
+	case map[string]any:
+		gv, ok := g.(map[string]any)
+		if !ok || len(gv) != len(wv) {
+			return path
+		}
+		for k := range wv {
+			if d := jsonDiff(path+"."+k, gv[k], wv[k]); d != "" {
+				return d
+			}
+		}
+	case []any:
+		gv, ok := g.([]any)
+		if !ok || len(gv) != len(wv) {
+			return path
+		}
+		for i := range wv {
+			if d := jsonDiff(fmt.Sprintf("%s[%d]", path, i), gv[i], wv[i]); d != "" {
+				return d
+			}
+		}
+	default:
+		if fmt.Sprint(g) != fmt.Sprint(w) {
+			return fmt.Sprintf("%s (%v, want %v)", path, g, w)
+		}
+	}
+	return ""
 }

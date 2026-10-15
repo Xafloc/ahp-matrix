@@ -31,7 +31,9 @@ func Suggestions(m Matrix, w []float64, allowed []float64, k int) []Suggestion {
 			out = append(out, Suggestion{I: i, J: j, Current: m[i][j], Suggested: suggested, Deviation: dev})
 		}
 	}
-	sort.SliceStable(out, func(a, b int) bool { return out[a].Deviation > out[b].Deviation })
+	// Deviations equal up to rounding count as ties and keep pair order, so
+	// every machine suggests the same pairs in the same order.
+	sort.SliceStable(out, func(a, b int) bool { return out[a].Deviation > out[b].Deviation+1e-9 })
 	if len(out) > k {
 		out = out[:k]
 	}

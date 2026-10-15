@@ -18,7 +18,7 @@ func TestSuggestionsFindsTheContradiction(t *testing.T) {
 	approx(t, "Suggested", top.Suggested, 1, 0)
 	approx(t, "Deviation", top.Deviation, 1.195483, 1e-6)
 	for i := 1; i < len(got); i++ {
-		if got[i].Deviation > got[i-1].Deviation {
+		if got[i].Deviation > got[i-1].Deviation+1e-9 { // ties within rounding keep pair order
 			t.Error("suggestions are not sorted by deviation")
 		}
 	}
@@ -56,6 +56,23 @@ func TestSuggestionsNeverProposeTheCurrentValue(t *testing.T) {
 	for _, s := range got {
 		if s.Suggested == s.Current {
 			t.Errorf("suggestion for (%d,%d) proposes the current value %v", s.I, s.J, s.Current)
+		}
+	}
+}
+
+func TestSuggestionsBreakTiesByPairOrder(t *testing.T) {
+	// In a three-item cycle every pair deviates by the same amount in exact
+	// arithmetic; the order must not depend on how a CPU rounds.
+	m := NewMatrix(3)
+	m.Set(0, 1, 3)
+	m.Set(1, 2, 3)
+	m.Set(0, 2, 1.0/3)
+	a := Analyze(m)
+	got := Suggestions(m, a.Weights, saaty9, 3)
+	want := [][2]int{{0, 1}, {0, 2}, {1, 2}}
+	for k, s := range got {
+		if [2]int{s.I, s.J} != want[k] {
+			t.Fatalf("order = %v, want %v", got, want)
 		}
 	}
 }
