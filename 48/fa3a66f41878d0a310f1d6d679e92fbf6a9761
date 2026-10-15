@@ -1,0 +1,28 @@
+web/src/lib/problems.test.ts
+  s_65743add7cce22::t_c5d0673cbb09d4 8
+  s_65743add7cce22::t_73b24ae2c73e15 1-7,9-29
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_c5d0673cbb09d4 69
+web/src/lib/session.test.ts
+  s_65743add7cce22::t_6088339f2ca3c5 109-121
+web/src/lib/session.svelte.ts
+  s_65743add7cce22::t_c5d0673cbb09d4 2,78-80
+web/src/lib/problems.ts
+  s_65743add7cce22::t_6088339f2ca3c5 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "48fa3a66f41878d0a310f1d6d679e92fbf6a9761",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
