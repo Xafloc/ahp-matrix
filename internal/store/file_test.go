@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -259,6 +260,36 @@ func TestCreateNeverOverwritesAnotherProjectWithTheSameFileName(t *testing.T) {
 	for _, id := range []string{first.ID, second.ID} {
 		if _, err := s.Get(ctx, id); err != nil {
 			t.Errorf("Get(%s): %v", id, err)
+		}
+	}
+}
+
+func TestProjectDataIsPrivateToTheUser(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Unix permission bits")
+	}
+	dir := filepath.Join(t.TempDir(), "data")
+	s, err := NewFileStore(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := create(t, s, "Private")
+	if err := s.Save(ctx, p, 1); err != nil {
+		t.Fatal(err)
+	}
+	entries, _ := s.List(ctx)
+	for path, want := range map[string]os.FileMode{
+		dir:                                 0o700,
+		filepath.Join(dir, "trash"):         0o700,
+		filepath.Join(dir, entries[0].File): 0o600,
+		filepath.Join(dir, entries[0].File) + ".bak": 0o600,
+	} {
+		info, err := os.Stat(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := info.Mode().Perm(); got != want {
+			t.Errorf("%s: mode %o, want %o", filepath.Base(path), got, want)
 		}
 	}
 }

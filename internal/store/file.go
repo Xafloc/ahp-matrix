@@ -32,7 +32,8 @@ type FileStore struct {
 
 // NewFileStore opens (creating if needed) a project folder.
 func NewFileStore(dir string) (*FileStore, error) {
-	if err := os.MkdirAll(filepath.Join(dir, trashDir), 0o755); err != nil {
+	// Decisions can be sensitive: keep the folder and files private to the user.
+	if err := os.MkdirAll(filepath.Join(dir, trashDir), 0o700); err != nil {
 		return nil, err
 	}
 	return &FileStore{dir: dir, now: func() time.Time { return time.Now().UTC() }}, nil
@@ -114,7 +115,7 @@ func (s *FileStore) Save(ctx context.Context, p *model.Project, expectedVersion 
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(path+".bak", old, 0o644); err != nil {
+	if err := os.WriteFile(path+".bak", old, 0o600); err != nil {
 		return err
 	}
 	next := *p
