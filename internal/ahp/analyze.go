@@ -6,8 +6,10 @@ import (
 )
 
 const (
-	powerTolerance = 1e-12
-	powerMaxIter   = 1000
+	bisectTolerance  = 1e-14 // relative width of the bracket around λmax
+	bisectMaxIter    = 200
+	inverseTolerance = 1e-15
+	inverseMaxIter   = 20
 )
 
 // saatyRI holds Saaty's random consistency indices, indexed by n.
@@ -87,39 +89,107 @@ func Analyze(m Matrix) Analysis {
 	return a
 }
 
-// principal returns the normalized principal eigenvector of a non-negative,
-// irreducible matrix with a positive diagonal, and its eigenvalue, using power
-// iteration.
+// principal returns the normalized principal (Perron) eigenvector of a
+// non-negative, irreducible matrix with a positive diagonal, and its
+// eigenvalue λmax.
+//
+// Plain power iteration stalls on sparse Harker matrices: their large
+// diagonals put the second eigenvalue close to λmax. Instead λmax is
+// bracketed by bisection, using the fact that μI−M is a nonsingular
+// M-matrix exactly when μ > λmax, which Gaussian elimination reveals through
+// its pivots. Inverse iteration with μ just above λmax then converges in a
+// step or two, whatever the eigenvalue gap.
 func principal(m Matrix) ([]float64, float64) {
 	n := m.N()
+	if n == 1 {
+		return []float64{1}, m[0][0]
+	}
+	// λmax lies between the smallest and largest row sums.
+	lo, hi := math.Inf(1), 0.0
+	for i := range m {
+		s := 0.0
+		for _, v := range m[i] {
+			s += v
+		}
+		lo, hi = math.Min(lo, s), math.Max(hi, s)
+	}
+	hi++ // strictly above λmax, so μI−M starts out nonsingular
+	for iter := 0; iter < bisectMaxIter && hi-lo > bisectTolerance*hi; iter++ {
+		mid := (lo + hi) / 2
+		if _, ok := shiftedSolve(m, mid, nil); ok {
+			hi = mid
+		} else {
+			lo = mid
+		}
+	}
+
 	w := make([]float64, n)
 	for i := range w {
 		w[i] = 1 / float64(n)
 	}
-	next := make([]float64, n)
-	lambda := 0.0
-	for iter := 0; iter < powerMaxIter; iter++ {
+	for iter := 0; iter < inverseMaxIter; iter++ {
+		x, _ := shiftedSolve(m, hi, w)
 		sum := 0.0
-		for i := 0; i < n; i++ {
-			s := 0.0
-			for j := 0; j < n; j++ {
-				s += m[i][j] * w[j]
-			}
-			next[i] = s
-			sum += s
+		for _, v := range x {
+			sum += v
 		}
-		lambda = sum // w sums to 1, so the sum of Mw estimates λmax
 		delta := 0.0
-		for i := range next {
-			next[i] /= sum
-			delta = math.Max(delta, math.Abs(next[i]-w[i]))
+		for i := range x {
+			x[i] /= sum
+			delta = math.Max(delta, math.Abs(x[i]-w[i]))
 		}
-		w, next = next, w
-		if delta < powerTolerance {
+		w = x
+		if delta < inverseTolerance {
 			break
 		}
 	}
+	lambda := 0.0 // w sums to 1, so the sum of Mw is λmax
+	for i := range m {
+		for j, v := range m[i] {
+			lambda += v * w[j]
+		}
+	}
 	return w, lambda
+}
+
+// shiftedSolve factors μI−M by Gaussian elimination without pivoting. ok is
+// false when a pivot is not positive, i.e. when μI−M is not a nonsingular
+// M-matrix (μ ≤ λmax). When ok and b is non-nil, it also solves (μI−M)x = b.
+func shiftedSolve(m Matrix, mu float64, b []float64) (x []float64, ok bool) {
+	n := m.N()
+	a := make([][]float64, n)
+	for i := range a {
+		a[i] = make([]float64, n)
+		for j := range a[i] {
+			a[i][j] = -m[i][j]
+		}
+		a[i][i] += mu
+	}
+	if b != nil {
+		x = append([]float64(nil), b...)
+	}
+	for k := 0; k < n; k++ {
+		if !(a[k][k] > 0) {
+			return nil, false
+		}
+		for i := k + 1; i < n; i++ {
+			f := a[i][k] / a[k][k]
+			for j := k; j < n; j++ {
+				a[i][j] -= f * a[k][j]
+			}
+			if x != nil {
+				x[i] -= f * x[k]
+			}
+		}
+	}
+	for i := n - 1; x != nil && i >= 0; i-- {
+		s := x[i]
+		for j := i + 1; j < n; j++ {
+			s -= a[i][j] * x[j]
+		}
+		x[i] = s / a[i][i]
+	}
+	return x, true
 }
 
 // components groups item indices that are linked by judgments. Each group is

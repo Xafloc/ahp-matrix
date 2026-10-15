@@ -106,3 +106,35 @@ func TestAnalyzeWeightsAlwaysSumToOne(t *testing.T) {
 		approx(t, "sum of weights", sum, 1, 1e-9)
 	}
 }
+
+// chain returns a consistent but sparse matrix: only neighbours i, i+1 are
+// judged. Harker's method recovers the exact weights, but its large diagonal
+// puts the second eigenvalue close to λmax, which stalls power iteration.
+func chain(w []float64) Matrix {
+	m := NewMatrix(len(w))
+	for i := 0; i+1 < len(w); i++ {
+		m.Set(i, i+1, w[i]/w[i+1])
+	}
+	return m
+}
+
+func TestAnalyzeSparseChainsAreExact(t *testing.T) {
+	for _, n := range []int{15, 25, 50} {
+		w := make([]float64, n)
+		sum := 0.0
+		for i := range w {
+			w[i] = math.Pow(1.3, float64(n-i))
+			sum += w[i]
+		}
+		for i := range w {
+			w[i] /= sum
+		}
+		a := Analyze(chain(w))
+		for i := range w {
+			if rel := math.Abs(a.Weights[i]/w[i] - 1); rel > 1e-8 {
+				t.Fatalf("n=%d: weight %d off by %.2g relative (got %v, want %v)", n, i, rel, a.Weights[i], w[i])
+			}
+		}
+		approx(t, "CR of a consistent chain", a.CR, 0, 1e-9)
+	}
+}

@@ -116,7 +116,7 @@ No CGO, so builds cross-compile cleanly. Releases use `goreleaser` (macOS, Linux
 
 ## 5. Math (`internal/ahp`)
 
-**Priority vector.** The principal eigenvector, computed by power iteration and normalized to sum to 1. It converges in a few dozen iterations for n ≤ 50 (tolerance 1e-10, iteration cap 1000).
+**Priority vector.** The principal eigenvector, normalized to sum to 1. λmax is found by bisection (μI − M is a nonsingular M-matrix exactly when μ > λmax), and then the vector by inverse iteration. Unlike power iteration, this stays exact on sparse incomplete matrices, whose second eigenvalue sits close to λmax.
 
 **Incomplete matrices.** Uses Harker's method:
 - missing entries are set to 0
