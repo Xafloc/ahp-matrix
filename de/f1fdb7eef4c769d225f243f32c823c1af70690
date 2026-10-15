@@ -1,0 +1,20 @@
+docs/superpowers/specs/2026-10-15-ahp-matrix-design.md
+  s_65743add7cce22::t_c89462222d0c9b 130,133
+  s_65743add7cce22::t_380d1e8c8f7f6b 1-129,131-132,134-308
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "def1fdb7eef4c769d225f243f32c823c1af70690",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
