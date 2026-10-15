@@ -1,0 +1,23 @@
+internal/ahp/aggregate.go
+  s_65743add7cce22::t_f10dd5296848d5 1-40
+internal/ahp/suggest.go
+  s_65743add7cce22::t_13702ec8bae696 1-37
+internal/ahp/suggest_test.go
+  s_65743add7cce22::t_80ced77b62cea4 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "19d3611f269fb2bdc49e1feffa6686c54e54699b",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
