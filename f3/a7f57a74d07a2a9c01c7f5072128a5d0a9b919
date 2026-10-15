@@ -1,0 +1,21 @@
+internal/model/compute.go
+  s_65743add7cce22::t_edc083ef07abef 1-473
+internal/model/compute_test.go
+  s_65743add7cce22::t_09b0b20737db07 1-243
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f3a7f57a74d07a2a9c01c7f5072128a5d0a9b919",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
