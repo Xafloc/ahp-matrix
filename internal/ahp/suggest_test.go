@@ -39,3 +39,23 @@ func TestMeans(t *testing.T) {
 	approx(t, "GeoStdDev agree", GeoStdDev([]Weighted{{7, 1}, {7, 1}}), 1, 1e-12)
 	approx(t, "GeoStdDev spread", GeoStdDev([]Weighted{{9, 1}, {1, 1}}), 3, 1e-12)
 }
+
+func TestSuggestionsNeverProposeTheCurrentValue(t *testing.T) {
+	// On the coarse legacy scale, A/B = B/C = A/C = 5 is inconsistent (A/C
+	// should be 25), but snapping the ideal ratio often lands on 5 again.
+	classic5 := []float64{0.1, 0.2, 1, 5, 10}
+	m := NewMatrix(3)
+	m.Set(0, 1, 5)
+	m.Set(1, 2, 5)
+	m.Set(0, 2, 5)
+	a := Analyze(m)
+	got := Suggestions(m, a.Weights, classic5, 3)
+	if len(got) == 0 {
+		t.Fatal("no suggestions for an inconsistent matrix")
+	}
+	for _, s := range got {
+		if s.Suggested == s.Current {
+			t.Errorf("suggestion for (%d,%d) proposes the current value %v", s.I, s.J, s.Current)
+		}
+	}
+}

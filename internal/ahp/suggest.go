@@ -14,7 +14,8 @@ type Suggestion struct {
 }
 
 // Suggestions returns up to k judged pairs whose judgments deviate most from
-// the weights w, most deviant first. Pairs with negligible deviation are left out.
+// the weights w, most deviant first. Pairs with negligible deviation, and
+// pairs whose nearest allowed value is the current one, are left out.
 func Suggestions(m Matrix, w []float64, allowed []float64, k int) []Suggestion {
 	var out []Suggestion
 	for i := 0; i < m.N(); i++ {
@@ -23,10 +24,11 @@ func Suggestions(m Matrix, w []float64, allowed []float64, k int) []Suggestion {
 				continue
 			}
 			dev := math.Abs(math.Log(m[i][j] * w[j] / w[i]))
-			if dev < 1e-9 {
-				continue
+			suggested := Snap(w[i]/w[j], allowed)
+			if dev < 1e-9 || suggested == m[i][j] {
+				continue // nothing to fix, or the scale has no better value to offer
 			}
-			out = append(out, Suggestion{I: i, J: j, Current: m[i][j], Suggested: Snap(w[i]/w[j], allowed), Deviation: dev})
+			out = append(out, Suggestion{I: i, J: j, Current: m[i][j], Suggested: suggested, Deviation: dev})
 		}
 	}
 	sort.SliceStable(out, func(a, b int) bool { return out[a].Deviation > out[b].Deviation })
