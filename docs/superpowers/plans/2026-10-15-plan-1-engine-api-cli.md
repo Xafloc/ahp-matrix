@@ -4779,7 +4779,7 @@ Terminal 2:
 ```bash
 B=127.0.0.1:7791
 curl -s $B/api/version                                    # {"version":"..."}
-ID=$(curl -s -X POST -H 'Content-Type: application/json' -d '{"name":"Smoke"}' $B/api/projects | sed -E 's/.*"id":"([^"]+)".*/\1/')
+ID=$(curl -s -X POST -H 'Content-Type: application/json' -d '{"name":"Smoke"}' $B/api/projects | sed -E 's/^\{"schemaVersion":[0-9]+,"id":"([^"]+)".*/\1/')   # the project id comes first; later "id"s are evaluators
 curl -s $B/api/projects/$ID/results                       # {"evaluator":"all","scores":[],...,"completeness":1,"consistent":true}
 curl -s $B/ | grep -o "doesn't include the web UI"        # placeholder page
 curl -s -H 'Host: evil.com' $B/api/version                # {"error":{"code":"bad-host",...}}
