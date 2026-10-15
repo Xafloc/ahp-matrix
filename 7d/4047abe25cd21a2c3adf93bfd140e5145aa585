@@ -1,0 +1,25 @@
+internal/ahp/suggest.go
+  s_65743add7cce22::t_4925e9df0e5c8a 34-36
+internal/model/golden_test.go
+  s_65743add7cce22::t_6fd771b2ed6f49 6-7,109-110,114-160
+internal/model/testdata/golden/wide.json
+  s_65743add7cce22::t_4925e9df0e5c8a 845-850,876-877,882-883
+internal/ahp/suggest_test.go
+  s_65743add7cce22::t_bc10abcc24caa5 21,62-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7d4047abe25cd21a2c3adf93bfd140e5145aa585",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
