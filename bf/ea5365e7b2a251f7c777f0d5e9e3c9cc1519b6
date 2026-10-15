@@ -1,0 +1,23 @@
+internal/server/projects_test.go
+  s_65743add7cce22::t_61e71463ee94a4 1-217
+internal/server/projects.go
+  s_65743add7cce22::t_6041aa826c8cc7 1-335
+internal/server/server.go
+  s_65743add7cce22::t_0b30aae16c7e9e 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bfea5365e7b2a251f7c777f0d5e9e3c9cc1519b6",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
