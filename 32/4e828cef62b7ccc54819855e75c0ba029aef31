@@ -1,0 +1,25 @@
+web/src/lib/pairs.test.ts
+  s_65743add7cce22::t_21fa1822acc831 1-14
+web/src/lib/pairs.ts
+  s_65743add7cce22::t_55cbe80e71c93a 1-23
+web/src/lib/progress.test.ts
+  s_65743add7cce22::t_44c83326d9fa96 1-16
+web/src/lib/progress.ts
+  s_65743add7cce22::t_db1c994adb947f 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "324e828cef62b7ccc54819855e75c0ba029aef31",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
