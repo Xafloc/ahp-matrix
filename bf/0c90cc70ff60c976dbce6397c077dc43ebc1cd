@@ -1,0 +1,27 @@
+web/src/components/charts/Contributions.svelte
+  s_65743add7cce22::t_baa9b883daba4d 1-108
+web/src/components/charts/LineChart.svelte
+  s_65743add7cce22::t_c8d123aea50927 1-186
+web/src/components/charts/PriorityBars.svelte
+  s_65743add7cce22::t_3237ffe90f5cc7 1-85
+web/src/components/charts/WeightTree.svelte
+  s_65743add7cce22::t_0bb72434f596b0 1-79
+web/src/components/charts/charts.test.ts
+  s_65743add7cce22::t_09e1fbdd9f2cda 1-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bf0c90cc70ff60c976dbce6397c077dc43ebc1cd",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
