@@ -214,8 +214,8 @@
     color: var(--ink-2);
   }
   .num.done {
-    background: var(--brass);
-    border-color: var(--brass);
+    background: var(--brass-ink);
+    border-color: var(--brass-ink);
     color: var(--paper);
   }
   .report {
