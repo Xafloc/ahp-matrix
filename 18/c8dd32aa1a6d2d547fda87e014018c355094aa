@@ -1,0 +1,29 @@
+go.mod
+  s_65743add7cce22::t_a8e9d05b8d303f 4-5
+go.sum
+  s_65743add7cce22::t_3682bd4824981a 1-3
+internal/model/decode.go
+  s_65743add7cce22::t_4df52dbb84c8fd 1-41
+internal/model/model_test.go
+  s_65743add7cce22::t_846636795251bc 1-92
+internal/model/project.go
+  s_65743add7cce22::t_928cbf684621fd 1-117
+internal/model/scale.go
+  s_65743add7cce22::t_41d45347abc249 1-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "18c8dd32aa1a6d2d547fda87e014018c355094aa",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
