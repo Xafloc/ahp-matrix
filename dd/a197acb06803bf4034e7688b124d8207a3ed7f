@@ -1,0 +1,25 @@
+cmd/ahp-matrix/browser.go
+  s_65743add7cce22::t_f4239c484ce41b 1-20
+cmd/ahp-matrix/main.go
+  s_65743add7cce22::t_32744e8c724ccc 1-135
+cmd/ahp-matrix/main_test.go
+  s_65743add7cce22::t_30df961a92d6fb 1-105
+web/embed.go
+  s_65743add7cce22::t_d4e938b73c6e68 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dda197acb06803bf4034e7688b124d8207a3ed7f",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
