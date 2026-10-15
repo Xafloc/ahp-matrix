@@ -66,7 +66,7 @@
     </div>
   {:else if session.saveState === 'error'}
     <div class="banner no-print" role="alert">
-      <span>Your last changes weren't saved: {session.error}</span>
+      <span><strong>Not saved.</strong> {session.error}</span>
       <button class="btn" onclick={() => session.retry()}>Try again</button>
     </div>
   {/if}

@@ -1,4 +1,5 @@
 import { ApiError, api, type Client } from './api';
+import { explain, type Problem } from './problems';
 import { ALL_EVALUATORS, type Project, type Results } from './types';
 
 export type SaveState = 'saved' | 'pending' | 'saving' | 'conflict' | 'error';
@@ -74,6 +75,9 @@ export class ProjectSession {
       if (e instanceof ApiError && e.code === 'conflict') {
         this.saveState = 'conflict';
         this.error = 'This project was changed in another window.';
+      } else if (e instanceof ApiError && e.code === 'invalid' && Array.isArray(e.details)) {
+        this.saveState = 'error';
+        this.error = `${explain(e.details as Problem[], this.project).join(' ')} Your changes will save as soon as that’s fixed.`;
       } else {
         this.saveState = 'error';
         this.error = e instanceof Error ? e.message : String(e);

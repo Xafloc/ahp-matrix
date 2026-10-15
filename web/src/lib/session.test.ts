@@ -106,3 +106,16 @@ test('when the server is unreachable, edits wait for a retry', async () => {
   expect(s.saveState).toBe('saved');
   expect(f.stored().name).toBe('Unsaved');
 });
+
+test('a rejected save explains what to fix in plain words', async () => {
+  const f = fakeClient();
+  f.client.saveProject = async () => {
+    throw new ApiError(422, 'invalid', 'invalid project: alternatives[0].name: is required', [{ field: 'alternatives[0].name', message: 'is required' }]);
+  };
+  const s = new ProjectSession(fixture(), f.client, 600);
+  s.project.alternatives[0].name = '';
+  s.changed();
+  await vi.advanceTimersByTimeAsync(600);
+  expect(s.saveState).toBe('error');
+  expect(s.error).toBe('Option 1 needs a name. Your changes will save as soon as that’s fixed.');
+});
