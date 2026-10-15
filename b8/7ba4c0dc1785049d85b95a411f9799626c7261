@@ -1,0 +1,27 @@
+web/src/lib/edits.test.ts
+  s_65743add7cce22::t_7243e6858993a1 1-105
+web/src/lib/edits.ts
+  s_65743add7cce22::t_cbba85e124e162 1-207
+web/src/lib/fixture.test-helper.ts
+  s_65743add7cce22::t_30cd847c094370 1-37
+web/src/lib/tree.test.ts
+  s_65743add7cce22::t_051ab90b21bb90 1-23
+web/src/lib/tree.ts
+  s_65743add7cce22::t_8e74df967a07d7 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b87ba4c0dc1785049d85b95a411f9799626c7261",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
