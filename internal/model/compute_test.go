@@ -241,3 +241,17 @@ func TestPrepareKeepsJudgmentsWhenALeafGainsChildren(t *testing.T) {
 		t.Errorf("Cost lost its values after un-nesting: %+v", r.Issues)
 	}
 }
+
+func TestComputeTinyLowerIsBetterValueStaysFinite(t *testing.T) {
+	p := fixture()
+	p.Values[0].Value = 1e-310 // valid input, but 1/v overflows to +Inf
+	r, _ := Compute(p, "e1")
+	if !hasIssue(r, IssueValuesInvalid) {
+		t.Errorf("issues = %+v, want %s", r.Issues, IssueValuesInvalid)
+	}
+	for _, s := range r.Scores {
+		if math.IsNaN(s.Score) || math.IsInf(s.Score, 0) {
+			t.Fatalf("score %v is not finite", s.Score)
+		}
+	}
+}

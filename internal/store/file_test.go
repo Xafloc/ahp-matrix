@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -204,5 +205,25 @@ func TestNonLatinNamesGetDistinctFiles(t *testing.T) {
 	entries, _ := s.List(ctx)
 	if len(entries) != 2 || entries[0].File == entries[1].File || entries[0].Err != nil || entries[1].Err != nil {
 		t.Errorf("entries = %+v, want two readable, distinct files", entries)
+	}
+}
+
+func TestListFlagsInvalidProjectsInsteadOfServingThem(t *testing.T) {
+	s := newStore(t)
+	p := model.New("Hand edited")
+	p.Alternatives = []model.Alternative{{ID: "a", Name: "A"}, {ID: "b", Name: "B"}}
+	p.Criteria = []model.Criterion{{ID: "c", Name: "C"}}
+	p.Pairwise = []model.PairwiseJudgment{{EvaluatorID: p.Evaluators[0].ID, Context: model.AltsContext("c"), A: "a", B: "b", Value: -2}}
+	data, _ := json.Marshal(p)
+	if err := os.WriteFile(filepath.Join(s.Dir(), "hand-edited.ahp.json"), data, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	entries, _ := s.List(ctx)
+	var ve *model.ValidationError
+	if len(entries) != 1 || entries[0].Project != nil || !errors.As(entries[0].Err, &ve) {
+		t.Errorf("entries = %+v, want one entry flagged with a validation error", entries)
+	}
+	if _, err := s.Get(ctx, p.ID); !errors.Is(err, ErrNotFound) {
+		t.Errorf("Get of an invalid file: err = %v, want ErrNotFound", err)
 	}
 }

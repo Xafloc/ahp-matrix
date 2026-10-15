@@ -120,7 +120,8 @@ func (s *FileStore) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-// scan reads every project file in the folder, sorted by file name.
+// scan reads and prepares every project file in the folder, sorted by file
+// name. Files that can't be decoded or don't validate come back with Err set.
 func (s *FileStore) scan() ([]Entry, error) {
 	names, err := filepath.Glob(filepath.Join(s.dir, "*"+ext))
 	if err != nil {
@@ -133,6 +134,13 @@ func (s *FileStore) scan() ([]Entry, error) {
 		data, err := os.ReadFile(name)
 		if err == nil {
 			e.Project, err = model.Decode(data)
+		}
+		if err == nil {
+			// Files can be edited by hand; never serve one that wouldn't save.
+			err = e.Project.Prepare()
+		}
+		if err != nil {
+			e.Project = nil
 		}
 		e.Err = err
 		entries = append(entries, e)

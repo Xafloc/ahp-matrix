@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"math"
 	"sort"
 
 	"github.com/Xafloc/ahp-matrix/internal/ahp"
@@ -400,7 +401,14 @@ func (c *computer) valuePriorities(cr Criterion) []float64 {
 			raw[a] = 1 / raw[a]
 		}
 	}
-	return normalize(raw)
+	out := normalize(raw)
+	for _, v := range out {
+		if math.IsNaN(v) || math.IsInf(v, 0) { // extreme magnitudes overflow
+			c.issue(Issue{Code: IssueValuesInvalid, CriterionID: cr.ID, Message: "These values are too extreme to compare; try different units."})
+			return uniform(len(raw))
+		}
+	}
+	return out
 }
 
 // fillMissing counts completeness for one leaf and gives alternatives without

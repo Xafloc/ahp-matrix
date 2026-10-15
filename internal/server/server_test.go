@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"io"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -127,5 +128,13 @@ func TestStaticPlaceholderWithoutUI(t *testing.T) {
 	rec := request(t, h, "GET", "/", nil)
 	if rec.Code != 200 || !strings.Contains(rec.Body.String(), "doesn't include the web UI") {
 		t.Errorf("got %d %q", rec.Code, rec.Body.String())
+	}
+}
+
+func TestWriteJSONNeverSendsAnEmptySuccess(t *testing.T) {
+	rec := httptest.NewRecorder()
+	writeJSON(rec, http.StatusOK, map[string]float64{"score": math.NaN()})
+	if rec.Code != http.StatusInternalServerError || errorCode(t, rec) != "internal" {
+		t.Errorf("got %d %q, want a 500 JSON error", rec.Code, rec.Body.String())
 	}
 }

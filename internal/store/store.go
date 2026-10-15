@@ -30,7 +30,7 @@ func (e *ConflictError) Error() string {
 func (e *ConflictError) Is(target error) bool { return target == ErrConflict }
 
 // Entry is one project found by List. Err is set, and Project is nil, when
-// the file could not be read.
+// the file could not be read or is not a valid project.
 type Entry struct {
 	Project *model.Project
 	File    string

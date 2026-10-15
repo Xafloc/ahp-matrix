@@ -45,10 +45,17 @@ type apiError struct {
 	Details any    `json:"details,omitempty"`
 }
 
+// writeJSON encodes v before sending any header, so a value that can't be
+// encoded (such as NaN) becomes a 500 error rather than an empty success.
 func writeJSON(w http.ResponseWriter, status int, v any) {
+	data, err := json.Marshal(v)
+	if err != nil {
+		status = http.StatusInternalServerError
+		data, _ = json.Marshal(map[string]apiError{"error": {Code: "internal", Message: "could not encode the response: " + err.Error()}})
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v)
+	_, _ = w.Write(append(data, '\n'))
 }
 
 // writeError sends {"error": {"code", "message", "details"}}.
