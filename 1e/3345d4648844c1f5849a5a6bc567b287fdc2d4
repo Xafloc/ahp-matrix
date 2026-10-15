@@ -1,0 +1,23 @@
+internal/server/guard.go
+  s_65743add7cce22::t_c532a8f329d7e1 8,16-17,56-58,64-73
+  s_65743add7cce22::t_aeacc855a4ee46 74-75
+internal/server/server_test.go
+  s_65743add7cce22::t_c532a8f329d7e1 9,142-162
+  s_65743add7cce22::t_0a9d9f3ababf86 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1e3345d4648844c1f5849a5a6bc567b287fdc2d4",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
