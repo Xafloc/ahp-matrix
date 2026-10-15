@@ -12,6 +12,11 @@ import (
 // maxBody caps request bodies, including uploads.
 const maxBody = 20 << 20
 
+// contentSecurityPolicy allows only this server's own scripts, styles, fonts
+// and API. Inline styles are allowed because Svelte sets style attributes.
+const contentSecurityPolicy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+	"img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+
 // guard protects a server that has no authentication and listens locally:
 //   - the Host header must name this machine (an IP address or this machine's
 //     own name when listening on every interface), which defeats DNS rebinding;
@@ -39,6 +44,10 @@ func (s *server) guard(next http.Handler) http.Handler {
 		}
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "no-referrer")
+		// The UI is served only to itself: no framing (clickjacking), and
+		// no scripts, styles or connections from anywhere else.
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Content-Security-Policy", contentSecurityPolicy)
 		next.ServeHTTP(w, r)
 	})
 }
