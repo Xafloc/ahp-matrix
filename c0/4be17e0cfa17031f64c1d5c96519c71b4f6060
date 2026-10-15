@@ -1,0 +1,39 @@
+.gitignore
+  s_65743add7cce22::t_d1a3556bbd1505 8-9
+web/package-lock.json
+  s_65743add7cce22::t_97143ef2a223b1 1-1954
+web/package.json
+  s_65743add7cce22::t_25c0b92b5ebf49 1-25
+web/src/lib/format.test.ts
+  s_65743add7cce22::t_f98bb6224d2af4 1-21
+web/src/lib/scale.test.ts
+  s_65743add7cce22::t_d0c6a669c3c911 1-34
+web/svelte.config.js
+  s_65743add7cce22::t_38ac3f64ac5e0b 1-5
+web/tsconfig.json
+  s_65743add7cce22::t_0160d0db11131d 1-25
+web/vite.config.ts
+  s_65743add7cce22::t_68bad4bc4248cd 1-11
+web/src/lib/format.ts
+  s_65743add7cce22::t_b9246c91764b19 1-25
+web/src/lib/scale.ts
+  s_65743add7cce22::t_cf9be9c917f12e 1-71
+web/src/lib/types.ts
+  s_65743add7cce22::t_771414cbcc0f37 1-154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c04be17e0cfa17031f64c1d5c96519c71b4f6060",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
