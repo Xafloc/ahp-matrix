@@ -161,3 +161,17 @@ func TestLANModeStillBlocksDNSRebinding(t *testing.T) {
 		}
 	}
 }
+
+func TestSecurityHeadersStopFramingAndForeignScripts(t *testing.T) {
+	h, _ := newTestServer(t)
+	rec := request(t, h, "GET", "/", nil)
+	if got := rec.Header().Get("X-Frame-Options"); got != "DENY" {
+		t.Errorf("X-Frame-Options = %q, want DENY", got)
+	}
+	csp := rec.Header().Get("Content-Security-Policy")
+	for _, want := range []string{"default-src 'self'", "frame-ancestors 'none'", "script-src 'self'"} {
+		if !strings.Contains(csp, want) {
+			t.Errorf("Content-Security-Policy %q lacks %q", csp, want)
+		}
+	}
+}

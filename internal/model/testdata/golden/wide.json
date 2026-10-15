@@ -1,0 +1,1108 @@
+{
+  "project": {
+    "schemaVersion": 1,
+    "id": "01GOLDENWIDE00000000000000",
+    "version": 0,
+    "name": "Wide",
+    "description": "",
+    "createdAt": "2026-10-15T12:00:00Z",
+    "updatedAt": "2026-10-15T12:00:00Z",
+    "scale": "saaty9",
+    "alternatives": [
+      {
+        "id": "a1",
+        "name": "Atlas",
+        "description": "",
+        "color": "series-1"
+      },
+      {
+        "id": "a2",
+        "name": "Birch",
+        "description": "",
+        "color": "series-2"
+      },
+      {
+        "id": "a3",
+        "name": "Cedar",
+        "description": "",
+        "color": "series-3"
+      },
+      {
+        "id": "a4",
+        "name": "Dune",
+        "description": "",
+        "color": "series-4"
+      },
+      {
+        "id": "a5",
+        "name": "Ember",
+        "description": "",
+        "color": "series-5"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "t",
+        "name": "Technical",
+        "description": "",
+        "notes": ""
+      },
+      {
+        "id": "t1",
+        "parentId": "t",
+        "name": "Speed",
+        "description": "",
+        "notes": "",
+        "method": "pairwise"
+      },
+      {
+        "id": "t2",
+        "parentId": "t",
+        "name": "Security",
+        "description": "",
+        "notes": "",
+        "method": "rating"
+      },
+      {
+        "id": "t3",
+        "parentId": "t",
+        "name": "Uptime",
+        "description": "",
+        "notes": "",
+        "method": "value",
+        "direction": "higher"
+      },
+      {
+        "id": "b",
+        "name": "Business",
+        "description": "",
+        "notes": ""
+      },
+      {
+        "id": "b1",
+        "parentId": "b",
+        "name": "Price",
+        "description": "",
+        "notes": "",
+        "method": "value",
+        "direction": "lower"
+      },
+      {
+        "id": "b2",
+        "parentId": "b",
+        "name": "Vendor",
+        "description": "",
+        "notes": "",
+        "method": "pairwise"
+      },
+      {
+        "id": "s",
+        "name": "Support",
+        "description": "",
+        "notes": "",
+        "method": "rating"
+      }
+    ],
+    "evaluators": [
+      {
+        "id": "e1",
+        "name": "Ann",
+        "weight": 1
+      },
+      {
+        "id": "e2",
+        "name": "Bob",
+        "weight": 2
+      }
+    ],
+    "pairwise": [
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "b",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "s",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:root",
+        "a": "b",
+        "b": "s",
+        "value": 0.5
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t2",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t3",
+        "value": 0.2
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:t",
+        "a": "t2",
+        "b": "t3",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:b",
+        "a": "b1",
+        "b": "b2",
+        "value": 0.125
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a2",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a3",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a4",
+        "value": 0.25
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a5",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.14285714285714285
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a4",
+        "value": 2
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a5",
+        "value": 9
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a4",
+        "value": 0.3333333333333333
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a5",
+        "value": 6
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.16666666666666666
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a2",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a3",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a4",
+        "value": 0.5
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a5",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.2
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a4",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a5",
+        "value": 0.125
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a4",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a5",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.25
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "b",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "s",
+        "value": 0.14285714285714285
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:root",
+        "a": "b",
+        "b": "s",
+        "value": 2
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t2",
+        "value": 9
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t3",
+        "value": 0.3333333333333333
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:t",
+        "a": "t2",
+        "b": "t3",
+        "value": 6
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:b",
+        "a": "b1",
+        "b": "b2",
+        "value": 0.16666666666666666
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a2",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a3",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a4",
+        "value": 0.5
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a5",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.2
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a4",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a5",
+        "value": 0.125
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a4",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a5",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.25
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a2",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a3",
+        "value": 0.14285714285714285
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a4",
+        "value": 2
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a5",
+        "value": 9
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.3333333333333333
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a4",
+        "value": 6
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a5",
+        "value": 0.16666666666666666
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a4",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a5",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.5
+      }
+    ],
+    "ratings": [
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a1",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a1",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a2",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a2",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a3",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a3",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a4",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a4",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a5",
+        "value": 10
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a5",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a1",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a1",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a2",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a2",
+        "value": 10
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a3",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a3",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a4",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a4",
+        "value": 10
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a5",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a5",
+        "value": 5
+      }
+    ],
+    "values": [
+      {
+        "criterionId": "t3",
+        "alternativeId": "a1",
+        "value": 99
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a1",
+        "value": 1000
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a2",
+        "value": 99.2
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a2",
+        "value": 1500
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a3",
+        "value": 99.4
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a3",
+        "value": 2000
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a4",
+        "value": 99.6
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a4",
+        "value": 1250
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a5",
+        "value": 99.8
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a5",
+        "value": 1750
+      }
+    ]
+  },
+  "results": {
+    "evaluator": "all",
+    "scores": [
+      {
+        "id": "a1",
+        "score": 0.20992648876734857,
+        "rank": 2
+      },
+      {
+        "id": "a2",
+        "score": 0.1860009580784578,
+        "rank": 5
+      },
+      {
+        "id": "a3",
+        "score": 0.22384229709037265,
+        "rank": 1
+      },
+      {
+        "id": "a4",
+        "score": 0.18941504691509886,
+        "rank": 4
+      },
+      {
+        "id": "a5",
+        "score": 0.19081520914872208,
+        "rank": 3
+      }
+    ],
+    "criteria": [
+      {
+        "id": "t",
+        "local": 0.24804967526822197,
+        "global": 0.24804967526822197,
+        "subtree": [
+          0.21297846810319462,
+          0.16631399946395137,
+          0.22958905208774422,
+          0.1815242034553911,
+          0.20959427688971863
+        ],
+        "stability": null
+      },
+      {
+        "id": "t1",
+        "parentId": "t",
+        "local": 0.43267861044853173,
+        "global": 0.1073257888172638,
+        "subtree": [
+          0.21432838089772926,
+          0.11431182008094025,
+          0.3493905978314802,
+          0.16513265482253478,
+          0.15683654636731553
+        ],
+        "stability": 0.26869394581451467
+      },
+      {
+        "id": "t2",
+        "parentId": "t",
+        "local": 0.28039251356844846,
+        "global": 0.06955127193829416,
+        "subtree": [
+          0.22499999999999998,
+          0.2125,
+          0.075,
+          0.1875,
+          0.3
+        ],
+        "stability": 0.2423052709257177
+      },
+      {
+        "id": "t3",
+        "parentId": "t",
+        "local": 0.2869288759830198,
+        "global": 0.07117261451266399,
+        "subtree": [
+          0.19919517102615691,
+          0.19959758551307846,
+          0.19999999999999998,
+          0.2004024144869215,
+          0.20080482897384302
+        ],
+        "stability": null
+      },
+      {
+        "id": "b",
+        "local": 0.20189830331883843,
+        "global": 0.20189830331883843,
+        "subtree": [
+          0.28770863403030233,
+          0.0903170521700362,
+          0.33622592317349953,
+          0.08853993310414507,
+          0.19720845752201696
+        ],
+        "stability": 0.12884089435490223
+      },
+      {
+        "id": "b1",
+        "parentId": "b",
+        "local": 0.13151224820132218,
+        "global": 0.02655209977749291,
+        "subtree": [
+          0.28263795423956933,
+          0.18842530282637956,
+          0.14131897711978467,
+          0.2261103633916555,
+          0.16150740242261105
+        ],
+        "stability": 0.31532636422078136
+      },
+      {
+        "id": "b2",
+        "parentId": "b",
+        "local": 0.8684877517986779,
+        "global": 0.17534620354134553,
+        "subtree": [
+          0.28847647041925223,
+          0.07546084195383797,
+          0.3657400419535185,
+          0.0677080946174606,
+          0.20261455105593074
+        ],
+        "stability": 0.31532636422078164
+      },
+      {
+        "id": "s",
+        "local": 0.5500520214129396,
+        "global": 0.5500520214129396,
+        "subtree": [
+          0.18,
+          0.22999999999999998,
+          0.18,
+          0.22999999999999998,
+          0.18
+        ],
+        "stability": 0.18347715450303947
+      }
+    ],
+    "matrices": [
+      {
+        "context": "criteria:root",
+        "items": [
+          "t",
+          "b",
+          "s"
+        ],
+        "weights": [
+          0.24804967526822197,
+          0.20189830331883843,
+          0.5500520214129396
+        ],
+        "cr": 1.486087003052455,
+        "threshold": 0.05,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 3,
+        "suggestions": [
+          {
+            "a": "t",
+            "b": "b",
+            "current": 4.217163326508746,
+            "suggested": 1
+          },
+          {
+            "a": "b",
+            "b": "s",
+            "current": 1.2599210498948732,
+            "suggested": 0.3333333333333333
+          },
+          {
+            "a": "t",
+            "b": "s",
+            "current": 0.13137734173243426,
+            "suggested": 0.5
+          }
+        ]
+      },
+      {
+        "context": "criteria:t",
+        "items": [
+          "t1",
+          "t2",
+          "t3"
+        ],
+        "weights": [
+          0.43267861044853173,
+          0.28039251356844846,
+          0.2869288759830198
+        ],
+        "cr": 3.060438791636445,
+        "threshold": 0.05,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 3,
+        "suggestions": [
+          {
+            "a": "t1",
+            "b": "t3",
+            "current": 0.2811442217672498,
+            "suggested": 2
+          },
+          {
+            "a": "t1",
+            "b": "t2",
+            "current": 8.276772529143365,
+            "suggested": 2
+          },
+          {
+            "a": "t2",
+            "b": "t3",
+            "current": 5.241482788417793,
+            "suggested": 1
+          }
+        ]
+      },
+      {
+        "context": "criteria:b",
+        "items": [
+          "b1",
+          "b2"
+        ],
+        "weights": [
+          0.13151224820132218,
+          0.8684877517986779
+        ],
+        "cr": 0,
+        "threshold": 0.1,
+        "consistent": true,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 1,
+        "suggestions": []
+      },
+      {
+        "context": "alts:t1",
+        "items": [
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5"
+        ],
+        "weights": [
+          0.21432838089772926,
+          0.11431182008094025,
+          0.3493905978314802,
+          0.16513265482253478,
+          0.15683654636731553
+        ],
+        "cr": 0.6132918359176361,
+        "threshold": 0.1,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 10,
+        "suggestions": [
+          {
+            "a": "a4",
+            "b": "a5",
+            "current": 0.21839511618407476,
+            "suggested": 1
+          },
+          {
+            "a": "a2",
+            "b": "a4",
+            "current": 3.1748021039363987,
+            "suggested": 0.5
+          },
+          {
+            "a": "a1",
+            "b": "a5",
+            "current": 6.257324745675973,
+            "suggested": 1
+          }
+        ]
+      },
+      {
+        "context": "alts:b2",
+        "items": [
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5"
+        ],
+        "weights": [
+          0.28847647041925223,
+          0.07546084195383797,
+          0.3657400419535185,
+          0.0677080946174606,
+          0.20261455105593074
+        ],
+        "cr": 0.7541746652711939,
+        "threshold": 0.1,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 10,
+        "suggestions": [
+          {
+            "a": "a1",
+            "b": "a3",
+            "current": 0.13137734173243426,
+            "suggested": 1
+          },
+          {
+            "a": "a1",
+            "b": "a5",
+            "current": 8.276772529143365,
+            "suggested": 2
+          },
+          {
+            "a": "a2",
+            "b": "a4",
+            "current": 5.241482788417793,
+            "suggested": 1
+          }
+        ]
+      }
+    ],
+    "issues": [],
+    "disagreements": [
+      {
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a5",
+        "spread": 7.508530261416905,
+        "values": {
+          "e1": 8,
+          "e2": 0.1111111111111111
+        }
+      },
+      {
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a3",
+        "spread": 7.508530261416905,
+        "values": {
+          "e1": 8,
+          "e2": 0.1111111111111111
+        }
+      },
+      {
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a5",
+        "spread": 7.508530261416905,
+        "values": {
+          "e1": 9,
+          "e2": 0.125
+        }
+      },
+      {
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a4",
+        "spread": 1.9222674042242458,
+        "values": {
+          "e1": 0.5,
+          "e2": 2
+        }
+      },
+      {
+        "context": "criteria:root",
+        "a": "b",
+        "b": "s",
+        "spread": 1.9222674042242458,
+        "values": {
+          "e1": 0.5,
+          "e2": 2
+        }
+      },
+      {
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a4",
+        "spread": 1.678483654908313,
+        "values": {
+          "e1": 0.3333333333333333,
+          "e2": 1
+        }
+      },
+      {
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a4",
+        "spread": 1.6784836549083129,
+        "values": {
+          "e1": 1,
+          "e2": 3
+        }
+      },
+      {
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a2",
+        "spread": 1.6784836549083129,
+        "values": {
+          "e1": 1,
+          "e2": 3
+        }
+      },
+      {
+        "context": "alts:b2",
+        "a": "a4",
+        "b": "a5",
+        "spread": 1.3864585836671233,
+        "values": {
+          "e1": 0.25,
+          "e2": 0.5
+        }
+      },
+      {
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a4",
+        "spread": 1.3864585836671233,
+        "values": {
+          "e1": 0.25,
+          "e2": 0.5
+        }
+      }
+    ],
+    "completeness": 1,
+    "consistent": false
+  }
+}

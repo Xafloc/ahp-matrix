@@ -5,3 +5,5 @@ web/dist/*
 !web/dist/.gitkeep
 coverage.out
 .DS_Store
+web/test-results/
+web/playwright-report/
