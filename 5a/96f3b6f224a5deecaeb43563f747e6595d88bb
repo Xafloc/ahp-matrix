@@ -1,0 +1,23 @@
+internal/store/file.go
+  s_65743add7cce22::t_04872c1998c686 1-210
+internal/store/file_test.go
+  s_65743add7cce22::t_52f6d3ebd869ec 1-208
+internal/store/store.go
+  s_65743add7cce22::t_df36dff6093fad 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5a96f3b6f224a5deecaeb43563f747e6595d88bb",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
