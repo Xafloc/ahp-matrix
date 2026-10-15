@@ -38,6 +38,11 @@ export class ProjectSession {
     return s;
   }
 
+  /** True while some edit hasn't reached the server: waiting, saving, rejected or in conflict. */
+  get unsaved(): boolean {
+    return this.saveState !== 'saved';
+  }
+
   /** Call after every edit to project. */
   changed(): void {
     if (this.saveState === 'conflict') return; // wait for the person to choose

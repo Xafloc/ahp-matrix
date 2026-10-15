@@ -61,7 +61,10 @@
   }
 
   function onKey(e: KeyboardEvent) {
-    if (mode !== 'focus' || (e.target as HTMLElement).closest('input,select,textarea')) return;
+    // Shortcuts apply on the balance itself (or with nothing focused); a
+    // focused link or button keeps its own Enter.
+    const t = e.target as HTMLElement;
+    if (mode !== 'focus' || (t !== document.body && !t.closest('[role=slider]'))) return;
     if (e.key === 'Enter') {
       e.preventDefault();
       next();

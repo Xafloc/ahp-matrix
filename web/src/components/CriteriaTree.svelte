@@ -1,6 +1,7 @@
 <script lang="ts">
   import { addCriterion, indent, moveCriterion, outdent, removeCriterion, setDirection, setMethod, shift, type Placement } from '../lib/edits';
   import { pairCount } from '../lib/pairs';
+  import { tick } from 'svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import { childrenOf, descendants, flatten, isLeaf } from '../lib/tree';
   import type { Direction, Method } from '../lib/types';
@@ -54,6 +55,8 @@
     if (move) {
       e.preventDefault();
       edit(move);
+      // Moving the row re-inserts it, which drops focus; put it back.
+      tick().then(() => document.querySelector<HTMLInputElement>(`[data-id="${CSS.escape(id)}"] input.name`)?.focus());
     }
   }
 
@@ -77,6 +80,7 @@
     {#each rows as { criterion: c, depth } (c.id)}
       {@const leaf = isLeaf(p, c.id)}
       <li
+        data-id={c.id}
         class="node"
         class:nested={depth > 0}
         class:dragging={dragging === c.id}

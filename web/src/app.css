@@ -252,6 +252,38 @@ textarea {
 }
 
 @media print {
+  /* Paper is white whatever the screen theme. The :not() keeps this at the
+     same specificity as the dark-theme rules above, so, coming later, it wins. */
+  :root:not([data-theme='never']) {
+    color-scheme: light;
+    --fog: #ffffff;
+    --paper: #ffffff;
+    --ink: #1e2a36;
+    --ink-2: #4a5866;
+    --ink-3: #5d6976;
+    --line: #d3dae1;
+    --line-strong: #b4bfca;
+    --brass: #a97a1f;
+    --brass-ink: #7a5610;
+    --brass-wash: #f4ecd9;
+    --rust: #b4441c;
+    --rust-wash: #f8e5dc;
+    --good: #2e7d4f;
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --series-5: #e87ba4;
+    --series-6: #008300;
+    --series-7: #6250d6;
+    --series-8: #e34948;
+    --series-none: #8a96a3;
+  }
+  /* Bars and dots are backgrounds, which browsers skip when printing by default. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   html,
   body {
     background: #fff;

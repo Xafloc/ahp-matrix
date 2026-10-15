@@ -246,8 +246,12 @@
     .report {
       display: none;
     }
-    .who {
-      display: none;
+    .bar {
+      flex-wrap: wrap;
+    }
+    .title {
+      flex: 1 1 10rem;
+      min-width: 0;
     }
   }
   @media print {
