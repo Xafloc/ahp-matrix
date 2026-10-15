@@ -1,0 +1,23 @@
+internal/model/fixture_test.go
+  s_65743add7cce22::t_8bbecf84dca40e 1-41
+internal/model/prepare.go
+  s_65743add7cce22::t_ae32169936d5f6 1-323
+internal/model/prepare_test.go
+  s_65743add7cce22::t_a5d1fc61fa6e82 1-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "280a7d702e9790b1d216f7f75e757645b7841ccb",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
