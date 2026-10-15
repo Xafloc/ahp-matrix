@@ -1,0 +1,112 @@
+package model
+
+import (
+	"bytes"
+	"encoding/json"
+	"flag"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+)
+
+var update = flag.Bool("update", false, "rewrite testdata/golden from the current code")
+
+// goldenProjects are computed by Go and replayed by the web UI's tests
+// (web/src/lib/sensitivity.test.ts), so the TypeScript copy of the
+// sensitivity math stays identical to internal/ahp.
+func goldenProjects() map[string]*Project {
+	fixed := time.Date(2026, 10, 15, 12, 0, 0, 0, time.UTC)
+
+	small := fixture()
+	small.ID = "01GOLDENFIXTURE0000000000A"
+
+	wide := New("Wide")
+	wide.ID = "01GOLDENWIDE00000000000000"
+	wide.Evaluators = []Evaluator{{ID: "e1", Name: "Ann", Weight: 1}, {ID: "e2", Name: "Bob", Weight: 2}}
+	for i, name := range []string{"Atlas", "Birch", "Cedar", "Dune", "Ember"} {
+		wide.Alternatives = append(wide.Alternatives, Alternative{ID: "a" + string(rune('1'+i)), Name: name, Color: "series-" + string(rune('1'+i))})
+	}
+	wide.Criteria = []Criterion{
+		{ID: "t", Name: "Technical"},
+		{ID: "t1", ParentID: "t", Name: "Speed", Method: MethodPairwise},
+		{ID: "t2", ParentID: "t", Name: "Security", Method: MethodRating},
+		{ID: "t3", ParentID: "t", Name: "Uptime", Method: MethodValue, Direction: DirHigher},
+		{ID: "b", Name: "Business"},
+		{ID: "b1", ParentID: "b", Name: "Price", Method: MethodValue, Direction: DirLower},
+		{ID: "b2", ParentID: "b", Name: "Vendor", Method: MethodPairwise},
+		{ID: "s", Name: "Support", Method: MethodRating},
+	}
+	scale := ScaleSaaty9.Allowed()
+	pick := func(k int) float64 { return scale[(k*7+3)%len(scale)] }
+	k := 0
+	judge := func(ev, ctx string, items []string) {
+		for i := range items {
+			for j := i + 1; j < len(items); j++ {
+				k++
+				wide.Pairwise = append(wide.Pairwise, PairwiseJudgment{EvaluatorID: ev, Context: ctx, A: items[i], B: items[j], Value: pick(k)})
+			}
+		}
+	}
+	alts := []string{"a1", "a2", "a3", "a4", "a5"}
+	for _, ev := range []string{"e1", "e2"} {
+		judge(ev, CriteriaContext(""), []string{"t", "b", "s"})
+		judge(ev, CriteriaContext("t"), []string{"t1", "t2", "t3"})
+		judge(ev, CriteriaContext("b"), []string{"b1", "b2"})
+		judge(ev, AltsContext("t1"), alts)
+		judge(ev, AltsContext("b2"), alts)
+		for i, a := range alts {
+			wide.Ratings = append(wide.Ratings,
+				Rating{EvaluatorID: ev, CriterionID: "t2", AlternativeID: a, Value: float64(1 + (i*3+k)%10)},
+				Rating{EvaluatorID: ev, CriterionID: "s", AlternativeID: a, Value: float64(1 + (i*5+k)%10)})
+		}
+	}
+	for i, a := range alts {
+		wide.Values = append(wide.Values,
+			Value{CriterionID: "t3", AlternativeID: a, Value: 99 + float64(i)*0.2},
+			Value{CriterionID: "b1", AlternativeID: a, Value: 1000 + float64((i*37)%5)*250})
+	}
+
+	out := map[string]*Project{"fixture": small, "wide": wide}
+	for _, p := range out {
+		p.CreatedAt, p.UpdatedAt = fixed, fixed
+		if err := p.Prepare(); err != nil {
+			panic(err)
+		}
+	}
+	return out
+}
+
+func TestGoldenResults(t *testing.T) {
+	for name, p := range goldenProjects() {
+		res, err := Compute(p, AllEvaluators)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got, err := json.MarshalIndent(struct {
+			Project *Project `json:"project"`
+			Results *Results `json:"results"`
+		}{p, res}, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		got = append(got, '\n')
+		path := filepath.Join("testdata", "golden", name+".json")
+		if *update {
+			if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(path, got, 0o644); err != nil {
+				t.Fatal(err)
+			}
+			continue
+		}
+		want, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("%v (run `go test ./internal/model -run Golden -update` to create it)", err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Errorf("%s: results changed; if that is intended, run `go test ./internal/model -run Golden -update`", path)
+		}
+	}
+}
