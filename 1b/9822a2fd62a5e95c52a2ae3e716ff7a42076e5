@@ -1,0 +1,23 @@
+web/src/lib/api.ts
+  s_65743add7cce22::t_d4101e21c6e864 1-63
+web/src/lib/session.svelte.ts
+  s_65743add7cce22::t_d6c8f5cf244735 1-129
+web/src/lib/session.test.ts
+  s_65743add7cce22::t_f421aaf50011d5 1-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1b9822a2fd62a5e95c52a2ae3e716ff7a42076e5",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
