@@ -1,7 +1,7 @@
 # AHP Matrix — Design Spec
 
 **Date:** 2026-10-15
-**Status:** Draft, awaiting review
+**Status:** Approved
 **Repo:** `github.com/Xafloc/ahp-matrix` (public, MIT)
 
 ## 1. Intent
@@ -302,7 +302,7 @@ Merge rules:
 - Undo/redo. Autosave and `.bak` files cover recovery.
 - Internationalization.
 
-## 13. Open items for review
+## 13. Resolved decisions
 
-- **Binary name:** `ahp-matrix` (matches the repo), or something shorter or brandable?
-- **License:** MIT is assumed.
+- **Binary name:** `ahp-matrix`.
+- **License:** MIT.
