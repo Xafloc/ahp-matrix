@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-10-15-plan-2-web-ui.md
+  s_65743add7cce22::t_ecbb0d75ba3ca2 6122-6123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f07d2eb4c19cb566d0b36c77e750f3e8a6a00ad6",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
