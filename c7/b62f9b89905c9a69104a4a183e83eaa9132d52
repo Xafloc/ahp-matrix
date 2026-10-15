@@ -1,0 +1,21 @@
+internal/ahp/suggest.go
+  s_65743add7cce22::t_39c629674cc930 17-18,27-29,31
+internal/ahp/suggest_test.go
+  s_65743add7cce22::t_980ed08e0efaee 42-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c7b62f9b89905c9a69104a4a183e83eaa9132d52",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
