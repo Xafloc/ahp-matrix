@@ -1,0 +1,33 @@
+web/src/components/CriteriaTree.svelte
+  s_65743add7cce22::t_57c2a853856105 4,58-59,83
+web/src/lib/session.svelte.ts
+  s_65743add7cce22::t_57c2a853856105 41-45
+web/vite.config.ts
+  s_65743add7cce22::t_57c2a853856105 8-10
+web/e2e/robustness.spec.ts
+  s_65743add7cce22::t_d8feee08b9d326 1-89
+web/src/app.css
+  s_65743add7cce22::t_57c2a853856105 255-286
+web/src/App.svelte
+  s_65743add7cce22::t_57c2a853856105 5,15-16,23,26-29,52-57,59,62,71-79,97-100
+web/src/components/PairCompare.svelte
+  s_65743add7cce22::t_57c2a853856105 64-67
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_57c2a853856105 249-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "88b06675b33567649bd5bbac15945888e877946a",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
