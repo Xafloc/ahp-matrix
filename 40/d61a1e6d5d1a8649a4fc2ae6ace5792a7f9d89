@@ -1,0 +1,59 @@
+web/e2e/decision.spec.ts
+  s_65743add7cce22::t_c4327f857e17cb 1-116
+web/e2e/helpers.ts
+  s_65743add7cce22::t_f4bf9ffbcca9d6 1-19
+web/e2e/library.spec.ts
+  s_65743add7cce22::t_8ffd9c632bd5fd 1-38
+web/index.html
+  s_65743add7cce22::t_bf9d0a55577ca3 1-14
+web/playwright.config.ts
+  s_65743add7cce22::t_d1127e61a4d557 1-23
+web/public/favicon.svg
+  s_65743add7cce22::t_dde84a93b3fac7 1
+web/src/App.svelte
+  s_65743add7cce22::t_37831b831391a9 1-83
+web/src/app.css
+  s_65743add7cce22::t_268239cd18b7f3 1-262
+web/src/components/CriteriaTree.svelte
+  s_65743add7cce22::t_1426f75df954d5 1-258
+web/src/components/Library.svelte
+  s_65743add7cce22::t_df105fdbc3be61 1-324
+web/src/components/Mark.svelte
+  s_65743add7cce22::t_a845f4812078ae 1-14
+web/src/components/Report.svelte
+  s_65743add7cce22::t_7b88b2c442e574 1-102
+web/src/components/Results.svelte
+  s_65743add7cce22::t_aa1d173a92b596 1-235
+web/src/components/Score.svelte
+  s_65743add7cce22::t_40c6dda8335c76 1-238
+web/src/components/Sensitivity.svelte
+  s_65743add7cce22::t_5d4a906e7868c6 1-181
+web/src/components/Setup.svelte
+  s_65743add7cce22::t_c482b2c5d3e593 1-255
+web/src/components/ThemeToggle.svelte
+  s_65743add7cce22::t_0aebef349dc9e0 1-30
+web/src/components/Weigh.svelte
+  s_65743add7cce22::t_f796445b426ab7 1-88
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_f8aa7b4b47f9aa 1-258
+web/src/lib/router.svelte.ts
+  s_65743add7cce22::t_205bec47a3af20 1-30
+web/src/main.ts
+  s_65743add7cce22::t_cb9f47e9d08547 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "40d61a1e6d5d1a8649a4fc2ae6ace5792a7f9d89",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
