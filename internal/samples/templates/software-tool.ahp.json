@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "id": "01TEMPLATESOFTWARETOOL0000",
+  "version": 1,
+  "name": "Software tool choice",
+  "description": "For choosing a library, SaaS product or internal tool.",
+  "createdAt": "2026-10-15T12:00:00Z",
+  "updatedAt": "2026-10-15T12:00:00Z",
+  "scale": "saaty9",
+  "alternatives": [],
+  "criteria": [
+    {
+      "id": "g1",
+      "name": "Capabilities",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g1c1",
+      "name": "Features we need",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c2",
+      "name": "Performance",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c3",
+      "name": "Integrations",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2",
+      "name": "Adoption",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g2c1",
+      "name": "Learning curve",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c2",
+      "name": "Documentation",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c3",
+      "name": "Community",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3",
+      "name": "Cost",
+      "description": "",
+      "notes": "",
+      "method": "pairwise"
+    },
+    {
+      "id": "g4",
+      "name": "Risk",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g4c1",
+      "name": "Vendor stability",
+      "description": "",
+      "notes": "",
+      "parentId": "g4",
+      "method": "pairwise"
+    },
+    {
+      "id": "g4c2",
+      "name": "Security",
+      "description": "",
+      "notes": "",
+      "parentId": "g4",
+      "method": "pairwise"
+    },
+    {
+      "id": "g4c3",
+      "name": "Lock-in",
+      "description": "",
+      "notes": "",
+      "parentId": "g4",
+      "method": "pairwise"
+    }
+  ],
+  "evaluators": [
+    {
+      "id": "e1",
+      "name": "Me",
+      "weight": 1
+    }
+  ],
+  "pairwise": [],
+  "ratings": [],
+  "values": []
+}

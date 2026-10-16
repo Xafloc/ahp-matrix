@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "id": "01SAMPLEHIRINGENGINEER0000",
+  "version": 1,
+  "name": "Hiring a senior engineer",
+  "description": "Three finalists for the payments team. The engineering lead and the product manager judged separately; see where they disagree.",
+  "createdAt": "2026-10-15T12:00:00Z",
+  "updatedAt": "2026-10-15T12:00:00Z",
+  "scale": "saaty9",
+  "alternatives": [
+    {
+      "id": "o1",
+      "name": "Amara",
+      "description": "",
+      "color": "series-1"
+    },
+    {
+      "id": "o2",
+      "name": "Ben",
+      "description": "",
+      "color": "series-2"
+    },
+    {
+      "id": "o3",
+      "name": "Chen",
+      "description": "",
+      "color": "series-3"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "depth",
+      "name": "Technical depth",
+      "description": "",
+      "notes": "",
+      "method": "pairwise"
+    },
+    {
+      "id": "design",
+      "name": "System design",
+      "description": "",
+      "notes": "",
+      "method": "pairwise"
+    },
+    {
+      "id": "comm",
+      "name": "Communication",
+      "description": "",
+      "notes": "",
+      "method": "pairwise"
+    },
+    {
+      "id": "fit",
+      "name": "Team fit",
+      "description": "",
+      "notes": "",
+      "method": "pairwise"
+    }
+  ],
+  "evaluators": [
+    {
+      "id": "lead",
+      "name": "Engineering lead",
+      "weight": 1
+    },
+    {
+      "id": "pm",
+      "name": "Product manager",
+      "weight": 1
+    }
+  ],
+  "pairwise": [
+    {
+      "evaluatorId": "lead",
+      "context": "criteria:root",
+      "a": "depth",
+      "b": "design",
+      "value": 1
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "criteria:root",
+      "a": "depth",
+      "b": "comm",
+      "value": 3
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "criteria:root",
+      "a": "depth",
+      "b": "fit",
+      "value": 3
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "criteria:root",
+      "a": "design",
+      "b": "comm",
+      "value": 2
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "criteria:root",
+      "a": "design",
+      "b": "fit",
+      "value": 2
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "criteria:root",
+      "a": "comm",
+      "b": "fit",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "criteria:root",
+      "a": "depth",
+      "b": "design",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "criteria:root",
+      "a": "depth",
+      "b": "comm",
+      "value": 0.3333333333333333
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "criteria:root",
+      "a": "depth",
+      "b": "fit",
+      "value": 0.5
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "criteria:root",
+      "a": "design",
+      "b": "comm",
+      "value": 0.5
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "criteria:root",
+      "a": "design",
+      "b": "fit",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "criteria:root",
+      "a": "comm",
+      "b": "fit",
+      "value": 2
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:depth",
+      "a": "o1",
+      "b": "o2",
+      "value": 2
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:depth",
+      "a": "o1",
+      "b": "o3",
+      "value": 3
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:depth",
+      "a": "o2",
+      "b": "o3",
+      "value": 2
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:depth",
+      "a": "o1",
+      "b": "o2",
+      "value": 2
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:depth",
+      "a": "o1",
+      "b": "o3",
+      "value": 2
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:depth",
+      "a": "o2",
+      "b": "o3",
+      "value": 1
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:design",
+      "a": "o1",
+      "b": "o2",
+      "value": 1
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:design",
+      "a": "o1",
+      "b": "o3",
+      "value": 2
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:design",
+      "a": "o2",
+      "b": "o3",
+      "value": 2
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:design",
+      "a": "o1",
+      "b": "o2",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:design",
+      "a": "o1",
+      "b": "o3",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:design",
+      "a": "o2",
+      "b": "o3",
+      "value": 1
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:comm",
+      "a": "o1",
+      "b": "o2",
+      "value": 2
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:comm",
+      "a": "o1",
+      "b": "o3",
+      "value": 0.5
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:comm",
+      "a": "o2",
+      "b": "o3",
+      "value": 0.3333333333333333
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:comm",
+      "a": "o1",
+      "b": "o2",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:comm",
+      "a": "o1",
+      "b": "o3",
+      "value": 0.3333333333333333
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:comm",
+      "a": "o2",
+      "b": "o3",
+      "value": 0.25
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:fit",
+      "a": "o1",
+      "b": "o2",
+      "value": 1
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:fit",
+      "a": "o1",
+      "b": "o3",
+      "value": 1
+    },
+    {
+      "evaluatorId": "lead",
+      "context": "alts:fit",
+      "a": "o2",
+      "b": "o3",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:fit",
+      "a": "o1",
+      "b": "o2",
+      "value": 1
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:fit",
+      "a": "o1",
+      "b": "o3",
+      "value": 0.5
+    },
+    {
+      "evaluatorId": "pm",
+      "context": "alts:fit",
+      "a": "o2",
+      "b": "o3",
+      "value": 0.5
+    }
+  ],
+  "ratings": [],
+  "values": []
+}

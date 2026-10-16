@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 1,
+  "id": "01SAMPLECLOUDPROVIDER00000",
+  "version": 1,
+  "name": "Choosing a cloud provider",
+  "description": "Where to run the new customer platform for the next three years. A sample: explore it, change it, or start your own.",
+  "createdAt": "2026-10-15T12:00:00Z",
+  "updatedAt": "2026-10-15T12:00:00Z",
+  "scale": "saaty9",
+  "alternatives": [
+    {
+      "id": "o1",
+      "name": "AWS",
+      "description": "",
+      "color": "series-1"
+    },
+    {
+      "id": "o2",
+      "name": "Google Cloud",
+      "description": "",
+      "color": "series-2"
+    },
+    {
+      "id": "o3",
+      "name": "Azure",
+      "description": "",
+      "color": "series-3"
+    },
+    {
+      "id": "o4",
+      "name": "Hetzner",
+      "description": "",
+      "color": "series-4"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "cost",
+      "name": "Monthly cost",
+      "description": "",
+      "notes": "Quotes for the reference architecture, with committed-use discounts.",
+      "method": "value",
+      "direction": "lower",
+      "unit": "USD"
+    },
+    {
+      "id": "tech",
+      "name": "Technical",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "perf",
+      "name": "Performance",
+      "description": "",
+      "notes": "Load-test results from the September trial.",
+      "parentId": "tech",
+      "method": "pairwise"
+    },
+    {
+      "id": "rel",
+      "name": "Reliability",
+      "description": "",
+      "notes": "",
+      "parentId": "tech",
+      "method": "rating"
+    },
+    {
+      "id": "eco",
+      "name": "Ecosystem",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "svc",
+      "name": "Managed services",
+      "description": "",
+      "notes": "",
+      "parentId": "eco",
+      "method": "rating"
+    },
+    {
+      "id": "hire",
+      "name": "Hiring market",
+      "description": "",
+      "notes": "How easy it is to hire engineers who already know the platform.",
+      "parentId": "eco",
+      "method": "pairwise"
+    },
+    {
+      "id": "support",
+      "name": "Support quality",
+      "description": "",
+      "notes": "",
+      "method": "rating"
+    }
+  ],
+  "evaluators": [
+    {
+      "id": "e1",
+      "name": "Platform team",
+      "weight": 1
+    }
+  ],
+  "pairwise": [
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "cost",
+      "b": "tech",
+      "value": 1
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "cost",
+      "b": "eco",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "cost",
+      "b": "support",
+      "value": 3
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "tech",
+      "b": "eco",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "tech",
+      "b": "support",
+      "value": 3
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "eco",
+      "b": "support",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:tech",
+      "a": "perf",
+      "b": "rel",
+      "value": 0.5
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:eco",
+      "a": "svc",
+      "b": "hire",
+      "value": 1
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:perf",
+      "a": "o1",
+      "b": "o2",
+      "value": 1
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:perf",
+      "a": "o1",
+      "b": "o3",
+      "value": 1
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:perf",
+      "a": "o1",
+      "b": "o4",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:perf",
+      "a": "o2",
+      "b": "o3",
+      "value": 1
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:perf",
+      "a": "o2",
+      "b": "o4",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:perf",
+      "a": "o3",
+      "b": "o4",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:hire",
+      "a": "o1",
+      "b": "o2",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:hire",
+      "a": "o1",
+      "b": "o3",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:hire",
+      "a": "o1",
+      "b": "o4",
+      "value": 9
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:hire",
+      "a": "o2",
+      "b": "o3",
+      "value": 0.5
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:hire",
+      "a": "o2",
+      "b": "o4",
+      "value": 4
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "alts:hire",
+      "a": "o3",
+      "b": "o4",
+      "value": 6
+    }
+  ],
+  "ratings": [
+    {
+      "evaluatorId": "e1",
+      "criterionId": "rel",
+      "alternativeId": "o1",
+      "value": 9
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "rel",
+      "alternativeId": "o2",
+      "value": 9
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "rel",
+      "alternativeId": "o3",
+      "value": 8
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "rel",
+      "alternativeId": "o4",
+      "value": 7
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "svc",
+      "alternativeId": "o1",
+      "value": 10
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "svc",
+      "alternativeId": "o2",
+      "value": 8
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "svc",
+      "alternativeId": "o3",
+      "value": 8
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "svc",
+      "alternativeId": "o4",
+      "value": 3
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "support",
+      "alternativeId": "o1",
+      "value": 7
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "support",
+      "alternativeId": "o2",
+      "value": 6
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "support",
+      "alternativeId": "o3",
+      "value": 7
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "support",
+      "alternativeId": "o4",
+      "value": 8
+    }
+  ],
+  "values": [
+    {
+      "criterionId": "cost",
+      "alternativeId": "o1",
+      "value": 18400
+    },
+    {
+      "criterionId": "cost",
+      "alternativeId": "o2",
+      "value": 16900
+    },
+    {
+      "criterionId": "cost",
+      "alternativeId": "o3",
+      "value": 17800
+    },
+    {
+      "criterionId": "cost",
+      "alternativeId": "o4",
+      "value": 6200
+    }
+  ]
+}

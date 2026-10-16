@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "id": "01SAMPLEFAMILYCAR000000000",
+  "version": 1,
+  "name": "Buying a family car",
+  "description": "A quick one: three cars, four criteria, mostly facts from the brochures.",
+  "createdAt": "2026-10-15T12:00:00Z",
+  "updatedAt": "2026-10-15T12:00:00Z",
+  "scale": "saaty9",
+  "alternatives": [
+    {
+      "id": "o1",
+      "name": "Toyota Corolla Touring",
+      "description": "",
+      "color": "series-1"
+    },
+    {
+      "id": "o2",
+      "name": "Skoda Octavia Estate",
+      "description": "",
+      "color": "series-2"
+    },
+    {
+      "id": "o3",
+      "name": "Kia Niro",
+      "description": "",
+      "color": "series-3"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "price",
+      "name": "Price",
+      "description": "",
+      "notes": "",
+      "method": "value",
+      "direction": "lower",
+      "unit": "EUR"
+    },
+    {
+      "id": "safety",
+      "name": "Safety",
+      "description": "",
+      "notes": "Euro NCAP adult occupant scores, mapped to 1–10.",
+      "method": "rating"
+    },
+    {
+      "id": "boot",
+      "name": "Boot space",
+      "description": "",
+      "notes": "",
+      "method": "value",
+      "direction": "higher",
+      "unit": "litres"
+    },
+    {
+      "id": "running",
+      "name": "Running cost",
+      "description": "",
+      "notes": "",
+      "method": "value",
+      "direction": "lower",
+      "unit": "EUR a year"
+    }
+  ],
+  "evaluators": [
+    {
+      "id": "e1",
+      "name": "Me",
+      "weight": 1
+    }
+  ],
+  "pairwise": [
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "price",
+      "b": "safety",
+      "value": 1
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "price",
+      "b": "boot",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "price",
+      "b": "running",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "safety",
+      "b": "boot",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "safety",
+      "b": "running",
+      "value": 2
+    },
+    {
+      "evaluatorId": "e1",
+      "context": "criteria:root",
+      "a": "boot",
+      "b": "running",
+      "value": 1
+    }
+  ],
+  "ratings": [
+    {
+      "evaluatorId": "e1",
+      "criterionId": "safety",
+      "alternativeId": "o1",
+      "value": 9
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "safety",
+      "alternativeId": "o2",
+      "value": 9
+    },
+    {
+      "evaluatorId": "e1",
+      "criterionId": "safety",
+      "alternativeId": "o3",
+      "value": 8
+    }
+  ],
+  "values": [
+    {
+      "criterionId": "price",
+      "alternativeId": "o1",
+      "value": 31990
+    },
+    {
+      "criterionId": "price",
+      "alternativeId": "o2",
+      "value": 32500
+    },
+    {
+      "criterionId": "price",
+      "alternativeId": "o3",
+      "value": 34990
+    },
+    {
+      "criterionId": "boot",
+      "alternativeId": "o1",
+      "value": 596
+    },
+    {
+      "criterionId": "boot",
+      "alternativeId": "o2",
+      "value": 640
+    },
+    {
+      "criterionId": "boot",
+      "alternativeId": "o3",
+      "value": 451
+    },
+    {
+      "criterionId": "running",
+      "alternativeId": "o1",
+      "value": 1450
+    },
+    {
+      "criterionId": "running",
+      "alternativeId": "o2",
+      "value": 1600
+    },
+    {
+      "criterionId": "running",
+      "alternativeId": "o3",
+      "value": 1150
+    }
+  ]
+}
