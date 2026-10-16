@@ -1,0 +1,25 @@
+internal/server/exchange.go
+  s_65743add7cce22::t_eb9ddfb58801ab 1-171
+internal/server/exchange_test.go
+  s_65743add7cce22::t_d32a9497bc121f 1-161
+internal/server/projects.go
+  s_65743add7cce22::t_5fc5f050e2cfc1 11,15,97-100,112-132,226-240,282-283,285-289,297,299,342-348,351-352,354,357,363,365
+internal/server/server.go
+  s_65743add7cce22::t_9534d056bb69a9 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3d17b8ccb99400436688a0c42ad153ac05fb2a2c",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
