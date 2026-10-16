@@ -125,39 +125,11 @@ func (p *Project) fillDefaults() {
 // nesting a criterion and un-nesting it again loses nothing; only leaves use
 // them. When the same pair, rating or value appears twice, the later one wins.
 func (p *Project) prune() {
-	evals := map[string]bool{}
-	for _, e := range p.Evaluators {
-		evals[e.ID] = true
-	}
-	alts := map[string]bool{}
-	for _, a := range p.Alternatives {
-		alts[a.ID] = true
-	}
-	crit := map[string]Criterion{}
-	for _, c := range p.Criteria {
-		crit[c.ID] = c
-	}
-	exists := func(id string) bool { _, ok := crit[id]; return ok }
-
-	belongs := func(j PairwiseJudgment) bool {
-		kind, id, ok := ParseContext(j.Context)
-		if !ok || !evals[j.EvaluatorID] || j.A == j.B {
-			return false
-		}
-		if kind == "alts" {
-			return exists(id) && alts[j.A] && alts[j.B]
-		}
-		if id != "" && !exists(id) {
-			return false
-		}
-		a, okA := crit[j.A]
-		b, okB := crit[j.B]
-		return okA && okB && a.ParentID == id && b.ParentID == id
-	}
+	k := p.known()
 	pairs := []PairwiseJudgment{}
 	pairAt := map[string]int{}
 	for _, j := range p.Pairwise {
-		if !belongs(j) {
+		if !k.pair(j) {
 			continue
 		}
 		lo, hi := j.A, j.B
@@ -177,7 +149,7 @@ func (p *Project) prune() {
 	ratings := []Rating{}
 	ratingAt := map[string]int{}
 	for _, r := range p.Ratings {
-		if !evals[r.EvaluatorID] || !exists(r.CriterionID) || !alts[r.AlternativeID] {
+		if !k.rating(r) {
 			continue
 		}
 		key := r.EvaluatorID + "\x00" + r.CriterionID + "\x00" + r.AlternativeID
@@ -193,7 +165,7 @@ func (p *Project) prune() {
 	values := []Value{}
 	valueAt := map[string]int{}
 	for _, v := range p.Values {
-		if !exists(v.CriterionID) || !alts[v.AlternativeID] {
+		if !k.crit[v.CriterionID] || !k.alts[v.AlternativeID] {
 			continue
 		}
 		key := v.CriterionID + "\x00" + v.AlternativeID
@@ -205,6 +177,47 @@ func (p *Project) prune() {
 		values = append(values, v)
 	}
 	p.Values = values
+}
+
+// known is a snapshot of a project's ids, for checking what judgments refer to.
+type known struct {
+	evals, alts, crit map[string]bool
+	parent            map[string]string
+}
+
+func (p *Project) known() known {
+	k := known{evals: map[string]bool{}, alts: map[string]bool{}, crit: map[string]bool{}, parent: map[string]string{}}
+	for _, e := range p.Evaluators {
+		k.evals[e.ID] = true
+	}
+	for _, a := range p.Alternatives {
+		k.alts[a.ID] = true
+	}
+	for _, c := range p.Criteria {
+		k.crit[c.ID] = true
+		k.parent[c.ID] = c.ParentID
+	}
+	return k
+}
+
+// pair reports whether a pairwise judgment refers to an existing evaluator
+// and to two different items of a context that exists.
+func (k known) pair(j PairwiseJudgment) bool {
+	kind, id, ok := ParseContext(j.Context)
+	if !ok || !k.evals[j.EvaluatorID] || j.A == j.B {
+		return false
+	}
+	if kind == "alts" {
+		return k.crit[id] && k.alts[j.A] && k.alts[j.B]
+	}
+	if id != "" && !k.crit[id] {
+		return false
+	}
+	return k.crit[j.A] && k.crit[j.B] && k.parent[j.A] == id && k.parent[j.B] == id
+}
+
+func (k known) rating(r Rating) bool {
+	return k.evals[r.EvaluatorID] && k.crit[r.CriterionID] && k.alts[r.AlternativeID]
 }
 
 // Validate reports every problem that prevents the project from being saved.
