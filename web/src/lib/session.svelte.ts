@@ -22,6 +22,7 @@ export class ProjectSession {
   private timer: ReturnType<typeof setTimeout> | undefined;
   private inFlight: Promise<void> | null = null;
   private watched = new Set<string>([ALL_EVALUATORS]);
+  private requests = new Map<string, number>(); // latest results request per evaluator
 
   constructor(
     project: Project,
@@ -103,8 +104,12 @@ export class ProjectSession {
       evaluators
         .filter((ev) => known.has(ev))
         .map(async (ev) => {
+          // Responses can arrive out of order; only the latest request may write.
+          const ticket = (this.requests.get(ev) ?? 0) + 1;
+          this.requests.set(ev, ticket);
           try {
-            this.results[ev] = await this.client.results(this.project.id, ev);
+            const r = await this.client.results(this.project.id, ev);
+            if (this.requests.get(ev) === ticket) this.results[ev] = r;
           } catch {
             // Results are advisory; the next save tries again.
           }

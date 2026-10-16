@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from 'vitest';
-import { at, crossovers, leaderAt, lineFor, stability } from './sensitivity';
+import { at, crossovers, leaderAt, lineFor, shiftLabel, stability } from './sensitivity';
 import type { Project, Results } from './types';
 
 // Golden files are written by `go test ./internal/model -run Golden -update`.
@@ -38,4 +38,11 @@ test('crossovers are where the leader changes', () => {
   expect(leaderAt(line, 0.4)).toBe(1);
   expect(leaderAt(line, 0.5)).toBe(0);
   expect(stability(line, 0.5)).toBeCloseTo(0.5 - 3 / 7, 12);
+});
+
+test('stability reads in whole points, never "0 points"', () => {
+  expect(shiftLabel(null)).toBe('Holds at any weight');
+  expect(shiftLabel(0.004)).toBe('Flips at less than 1 point');
+  expect(shiftLabel(0.124)).toBe('Flips at ±12 points');
+  expect(shiftLabel(0.01)).toBe('Flips at ±1 point');
 });

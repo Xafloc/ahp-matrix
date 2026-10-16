@@ -10,6 +10,7 @@ import {
   removeAlternative,
   removeCriterion,
   removeEvaluator,
+  setEvaluatorWeight,
   setJudgment,
   setRating,
   setValue,
@@ -102,4 +103,23 @@ test('changing the scale snaps judgments', () => {
   const p = fixture();
   changeScale(p, 'classic5');
   expect(p.pairwise.map((j) => j.value)).toEqual([5, 1, 1]);
+});
+
+test('re-judging a pair keeps its note', () => {
+  const p = fixture();
+  p.pairwise[2].note = 'Benchmarks from March';
+  setJudgment(p, 'e1', 'alts:c2', 'a2', 'a1', 4);
+  expect(p.pairwise.find((j) => j.context === 'alts:c2')?.note).toBe('Benchmarks from March');
+});
+
+test('a blank or zero weight counts as 1, as the server treats it', () => {
+  const p = fixture();
+  setEvaluatorWeight(p, 'e2', Number.NaN);
+  expect(p.evaluators[1].weight).toBe(1);
+  setEvaluatorWeight(p, 'e2', 0);
+  expect(p.evaluators[1].weight).toBe(1);
+  setEvaluatorWeight(p, 'e2', 2.5);
+  expect(p.evaluators[1].weight).toBe(2.5);
+  setEvaluatorWeight(p, 'e2', -1); // kept, so the save explains it
+  expect(p.evaluators[1].weight).toBe(-1);
 });

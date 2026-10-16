@@ -1,6 +1,6 @@
 <script lang="ts">
   // A one-page summary for printing or saving as PDF from the browser.
-  import { colorOf } from '../lib/format';
+  import { colorOf, count } from '../lib/format';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import { flatten } from '../lib/tree';
@@ -26,7 +26,7 @@
     <h1>{p.name}</h1>
     {#if p.description}<p>{p.description}</p>{/if}
     <p class="muted small">
-      {p.alternatives.length} options, {p.criteria.length} criteria, judged by {p.evaluators.map((e) => e.name).join(', ')}. Prepared {today}.
+      {count(p.alternatives.length, 'option')}, {count(p.criteria.length, 'criterion', 'criteria')}, judged by {p.evaluators.map((e) => e.name).join(', ')}. Prepared {today}.
     </p>
   </header>
 

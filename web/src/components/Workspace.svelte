@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { count } from '../lib/format';
   import { scoreProgress, weighProgress } from '../lib/progress';
   import { href, type Step } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
@@ -18,7 +19,7 @@
   const ready = $derived(p.alternatives.length >= 2 && p.criteria.length >= 1);
 
   const steps = $derived([
-    { id: 'setup' as Step, label: 'Set up', detail: `${p.alternatives.length} options, ${p.criteria.length} criteria`, done: ready },
+    { id: 'setup' as Step, label: 'Set up', detail: `${count(p.alternatives.length, 'option')}, ${count(p.criteria.length, 'criterion', 'criteria')}`, done: ready },
     { id: 'weigh' as Step, label: 'Weigh criteria', detail: weigh.total ? `${weigh.done} of ${weigh.total} compared` : 'Nothing to compare yet', done: weigh.total > 0 && weigh.done === weigh.total },
     { id: 'score' as Step, label: 'Score options', detail: score.total ? `${score.done} of ${score.total} judged` : 'Nothing to score yet', done: score.total > 0 && score.done === score.total },
     { id: 'results' as Step, label: 'Results', detail: '', done: false },

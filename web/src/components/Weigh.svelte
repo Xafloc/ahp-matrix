@@ -1,5 +1,6 @@
 <script lang="ts">
   import { criteriaContext } from '../lib/edits';
+  import { count } from '../lib/format';
   import { pairProgress } from '../lib/progress';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
@@ -26,7 +27,7 @@
         done: prog.done,
         total: prog.total,
         flag: !!report && report.connected && !report.consistent,
-        detail: `${g.items.length} criteria`,
+        detail: count(g.items.length, 'criterion', 'criteria'),
       };
     }),
   );

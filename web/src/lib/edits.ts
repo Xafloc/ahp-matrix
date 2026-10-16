@@ -3,7 +3,7 @@
 // server is about to drop.
 import { snap } from './scale';
 import { childrenOf, descendants } from './tree';
-import type { Alternative, Criterion, Direction, Evaluator, Method, Project, Scale } from './types';
+import type { Alternative, Criterion, Direction, Evaluator, Method, PairwiseJudgment, Project, Scale } from './types';
 
 export const SERIES_SLOTS = 8;
 
@@ -159,10 +159,11 @@ export function getJudgment(p: Project, evaluatorId: string, context: string, a:
 
 /** Records (or with undefined, clears) how strongly a is preferred over b. */
 export function setJudgment(p: Project, evaluatorId: string, context: string, a: string, b: string, value: number | undefined): void {
-  p.pairwise = p.pairwise.filter(
-    (j) => !(j.evaluatorId === evaluatorId && j.context === context && ((j.a === a && j.b === b) || (j.a === b && j.b === a))),
-  );
-  if (value !== undefined) p.pairwise.push({ evaluatorId, context, a, b, value });
+  const same = (j: PairwiseJudgment) =>
+    j.evaluatorId === evaluatorId && j.context === context && ((j.a === a && j.b === b) || (j.a === b && j.b === a));
+  const note = p.pairwise.find(same)?.note; // a new value keeps the reasoning behind the old one
+  p.pairwise = p.pairwise.filter((j) => !same(j));
+  if (value !== undefined) p.pairwise.push(note ? { evaluatorId, context, a, b, value, note } : { evaluatorId, context, a, b, value });
 }
 
 export function getRating(p: Project, evaluatorId: string, criterionId: string, alternativeId: string): number | undefined {
@@ -189,6 +190,15 @@ export function addEvaluator(p: Project, name: string): Evaluator {
   const e: Evaluator = { id: newId(), name: name.trim(), weight: 1 };
   p.evaluators.push(e);
   return e;
+}
+
+/**
+ * Sets a person's weight. Blank or zero counts as 1, as the server treats it;
+ * a negative weight is kept so the save can explain what's wrong.
+ */
+export function setEvaluatorWeight(p: Project, id: string, weight: number): void {
+  const e = p.evaluators.find((x) => x.id === id);
+  if (e) e.weight = Number.isFinite(weight) && weight !== 0 ? weight : 1;
 }
 
 /** Removes an evaluator and their judgments. The last evaluator can't be removed. */
