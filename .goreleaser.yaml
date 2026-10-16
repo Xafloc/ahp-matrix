@@ -1,0 +1,66 @@
+# Release builds: `git tag vX.Y.Z && git push --tags` runs .github/workflows/release.yml.
+# Try it locally with: go run github.com/goreleaser/goreleaser/v2@v2.18.3 release --snapshot --clean
+version: 2
+project_name: ahp-matrix
+
+before:
+  hooks:
+    - make web # the UI is embedded in the binary
+
+builds:
+  - main: ./cmd/ahp-matrix
+    binary: ahp-matrix
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  github:
+    owner: Xafloc
+    name: ahp-matrix
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs"
+      - "^test"
+      - "^Merge"
+
+# Homebrew: `brew install xafloc/tap/ahp-matrix`. Publishing needs a token with
+# write access to github.com/Xafloc/homebrew-tap in HOMEBREW_TAP_GITHUB_TOKEN;
+# without it, the release still happens and the cask upload is skipped.
+homebrew_casks:
+  - name: ahp-matrix
+    repository:
+      owner: Xafloc
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: https://github.com/Xafloc/ahp-matrix
+    description: Make better decisions with the Analytic Hierarchy Process, in a local web app.
+    license: MIT
+    skip_upload: '{{ if isEnvSet "HOMEBREW_TAP_GITHUB_TOKEN" }}false{{ else }}true{{ end }}'
+    hooks:
+      post:
+        # The binaries aren't notarized; let macOS run the one Homebrew installed.
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/ahp-matrix"]
+          end
