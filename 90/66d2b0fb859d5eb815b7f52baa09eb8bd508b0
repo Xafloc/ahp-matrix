@@ -1,0 +1,59 @@
+web/e2e/exchange.spec.ts
+  s_65743add7cce22::t_2a284f4fe0a96b 1-76
+web/e2e/robustness.spec.ts
+  s_65743add7cce22::t_884fb51052dbbf 9,19,28
+web/src/components/Balance.svelte
+  s_65743add7cce22::t_20e31fcc3bf1ea 46-48
+web/src/components/Library.svelte
+  s_65743add7cce22::t_2f859f5b0477bc 5-6,17-23,42,58-66,71-78,100-108,118-121,124-126,130-146,161-177,198,246-251,295,303-352
+web/src/components/Report.svelte
+  s_65743add7cce22::t_5d469776e95af6 3,29
+web/src/components/Results.svelte
+  s_65743add7cce22::t_2cd176209fc1d5 2,148-149,237
+web/src/components/Sensitivity.svelte
+  s_65743add7cce22::t_635eda7ad56213 4,38-42,63
+web/src/components/Setup.svelte
+  s_65743add7cce22::t_3acdce0962c504 2-4,16-53,150-151,154-156,175-205,299-306
+web/src/components/Weigh.svelte
+  s_65743add7cce22::t_ceb03e712e38e5 3,30
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_1103792f26d3b2 2,22
+web/src/components/charts/LineChart.svelte
+  s_65743add7cce22::t_bdb6a643227abf 30-31
+web/src/components/charts/charts.test.ts
+  s_65743add7cce22::t_dd82a6e22ba4f5 69-75
+web/src/lib/api.ts
+  s_65743add7cce22::t_d536684de0b175 1,34-41,44,50-55,58-63,68-69,76-78,80-83,86-95
+web/src/lib/edits.test.ts
+  s_65743add7cce22::t_2eb01c2ce8badd 13,107-125
+web/src/lib/edits.ts
+  s_65743add7cce22::t_1555036122cc59 6,162-166,195-203
+web/src/lib/format.test.ts
+  s_65743add7cce22::t_ec121ab4dc99a9 2,22-27
+web/src/lib/format.ts
+  s_65743add7cce22::t_787558e191ae08 4-6
+web/src/lib/sensitivity.test.ts
+  s_65743add7cce22::t_e32f0f57e75280 5,42-48
+web/src/lib/sensitivity.ts
+  s_65743add7cce22::t_df05c607f3a7b7 81-88
+web/src/lib/session.svelte.ts
+  s_65743add7cce22::t_2b5f01dd30c593 25,107-109,111-112
+web/src/lib/session.test.ts
+  s_65743add7cce22::t_3b3c599ea3766f 23-26,125-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9066d2b0fb859d5eb815b7f52baa09eb8bd508b0",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
