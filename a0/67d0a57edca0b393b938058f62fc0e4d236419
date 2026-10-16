@@ -1,0 +1,29 @@
+internal/model/compute.go
+  s_65743add7cce22::t_e5ea096cacc217 78-81,327
+internal/model/compute_test.go
+  s_65743add7cce22::t_4a77127ebda337 258-276
+internal/model/testdata/golden/fixture.json
+  s_65743add7cce22::t_328bb30e33d399 236-246,265-275,296-313
+internal/model/testdata/golden/wide.json
+  s_65743add7cce22::t_e2e097762d5393 852-868,909-925,945-955,999-1035,1080-1116
+web/src/components/compare.test.ts
+  s_65743add7cce22::t_080c7a0076af3f 41
+web/src/lib/types.ts
+  s_65743add7cce22::t_8704a9b7d3297c 106-107,156-181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a067d0a57edca0b393b938058f62fc0e4d236419",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
