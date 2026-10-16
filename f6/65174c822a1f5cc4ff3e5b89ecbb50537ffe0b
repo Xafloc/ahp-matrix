@@ -1,0 +1,52 @@
+internal/xlsx/export_test.go
+  s_65743add7cce22::t_4a4b80e77db2d8 109-148
+internal/model/project.go
+  s_65743add7cce22::t_b44cdbbbe946e7 29-32,36-46
+  s_65743add7cce22::t_a70c8bd5271b26 33-35
+internal/model/merge.go
+  s_65743add7cce22::t_a70c8bd5271b26 18,32,67,78-86,97-98
+  s_65743add7cce22::t_01d7543ea7339a 99
+internal/xlsx/legacy_test.go
+  s_65743add7cce22::t_4a4b80e77db2d8 146-175
+  s_65743add7cce22::t_73ffde997c56fb 176-184
+internal/server/exchange.go
+  s_65743add7cce22::t_73ffde997c56fb 75
+internal/server/exchange_test.go
+  s_65743add7cce22::t_73ffde997c56fb 162-188
+  s_65743add7cce22::t_3d6357a3382c8b 101
+internal/server/projects.go
+  s_65743add7cce22::t_73ffde997c56fb 258-262
+internal/model/merge_test.go
+  s_65743add7cce22::t_b44cdbbbe946e7 98,103
+  s_65743add7cce22::t_4a4b80e77db2d8 151-170
+web/e2e/exchange.spec.ts
+  s_65743add7cce22::t_a6407dec529708 1,78-116
+web/src/components/Setup.svelte
+  s_65743add7cce22::t_3740c199692eb2 48
+web/src/components/Library.svelte
+  s_65743add7cce22::t_3740c199692eb2 137
+internal/xlsx/legacy.go
+  s_65743add7cce22::t_a70c8bd5271b26 9,15,31-34,40,51,73-81,88-89,92-95,155-161
+  s_65743add7cce22::t_54147aa91c8f08 162
+internal/xlsx/export.go
+  s_65743add7cce22::t_a70c8bd5271b26 112-115,118-120,127-129,161-163,170-171,175,181-183,199-201,233-235,250-251,253-257,265-275
+  s_65743add7cce22::t_13a1395c74cf9c 276-277
+README.md
+  s_65743add7cce22::t_d28523a4c53588 22,25-26,29-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f665174c822a1f5cc4ff3e5b89ecbb50537ffe0b",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
