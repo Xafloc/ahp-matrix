@@ -77,11 +77,15 @@ func ValidID(id string) bool {
 		return false
 	}
 	for _, r := range id {
-		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '-' || r == '_') {
+		if !isIDRune(r) {
 			return false
 		}
 	}
 	return true
+}
+
+func isIDRune(r rune) bool {
+	return r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '-' || r == '_'
 }
 
 // NewID returns a short random ID for an item inside a project.

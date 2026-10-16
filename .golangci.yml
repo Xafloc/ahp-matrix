@@ -1,0 +1,35 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - errorlint
+    - gocritic
+    - misspell
+    - nilerr
+    - unconvert
+  settings:
+    errcheck:
+      # Closing files we only read, or temporary files on an error path, can't
+      # fail in a way that loses data.
+      exclude-functions:
+        - (*os.File).Close
+        - (mime/multipart.File).Close
+        - (*github.com/xuri/excelize/v2.File).Close
+        - os.Remove
+        # The startup banner goes to the terminal; there's nothing to do if that fails.
+        - fmt.Fprintf
+        - fmt.Fprintln
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+
+formatters:
+  enable:
+    - gofmt
