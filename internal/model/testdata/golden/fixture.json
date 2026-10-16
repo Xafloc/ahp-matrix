@@ -233,7 +233,17 @@
         "connected": true,
         "missing": 0,
         "pairs": 1,
-        "suggestions": []
+        "suggestions": [],
+        "matrix": [
+          [
+            1,
+            2.9999999999999996
+          ],
+          [
+            0.33333333333333337,
+            1
+          ]
+        ]
       },
       {
         "context": "criteria:c1",
@@ -252,7 +262,17 @@
         "connected": true,
         "missing": 0,
         "pairs": 1,
-        "suggestions": []
+        "suggestions": [],
+        "matrix": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
       },
       {
         "context": "alts:c2",
@@ -273,7 +293,24 @@
         "connected": true,
         "missing": 0,
         "pairs": 3,
-        "suggestions": []
+        "suggestions": [],
+        "matrix": [
+          [
+            1,
+            2,
+            4
+          ],
+          [
+            0.5,
+            1,
+            2
+          ],
+          [
+            0.25,
+            0.5,
+            1
+          ]
+        ]
       }
     ],
     "issues": [],

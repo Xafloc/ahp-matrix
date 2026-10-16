@@ -103,6 +103,8 @@ export interface MatrixReport {
   pairs: number;
   components?: string[][];
   suggestions: PairSuggestion[];
+  /** Combined matrix in items order: matrix[i][j] is how strongly item i is preferred over j; 0 if unjudged. */
+  matrix: number[][];
 }
 
 export interface Issue {
@@ -149,6 +151,32 @@ export interface ProjectSummary {
   completeness: number;
   consistent: boolean;
   error?: string;
+}
+
+/** A bundled sample decision or template (internal/samples). */
+export interface StarterEntry {
+  id: string;
+  name: string;
+  description: string;
+  alternatives: number;
+  criteria: number;
+}
+
+/** What importing a legacy workbook found (internal/xlsx). */
+export interface ImportReport {
+  alternatives: number;
+  criteria: number;
+  judgments: number;
+  skipped: string[];
+}
+
+/** What merging a returned file did (model.MergeReport). */
+export interface MergeReport {
+  added: string[];
+  replaced: string[];
+  skipped: string[];
+  judgments: number;
+  dropped: number;
 }
 
 export const ALL_EVALUATORS = 'all';

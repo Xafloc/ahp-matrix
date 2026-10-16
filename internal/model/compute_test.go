@@ -255,3 +255,22 @@ func TestComputeTinyLowerIsBetterValueStaysFinite(t *testing.T) {
 		}
 	}
 }
+
+func TestComputeReportsTheCombinedMatrix(t *testing.T) {
+	p := fixture()
+	p.Pairwise = append(p.Pairwise, PairwiseJudgment{EvaluatorID: "e2", Context: CriteriaContext(""), A: "c4", B: "c1", Value: 3})
+	r, _ := Compute(p, AllEvaluators)
+	m := r.Matrices[0].Matrix // root: Technical vs Cost; Ann 3, Bob 1/3 → geometric mean 1
+	if len(m) != 2 || m[0][0] != 1 {
+		t.Fatalf("matrix = %v", m)
+	}
+	approx(t, "combined", m[0][1], 1, 1e-12)
+	perf := r.Matrices[2].Matrix // Performance: a1/a2 = 2, a1/a3 = 4, a2/a3 = 2
+	approx(t, "a3 over a1", perf[2][0], 0.25, 1e-12)
+
+	p.Pairwise = p.Pairwise[:4] // leave Beta vs Gamma unjudged
+	r, _ = Compute(p, "e1")
+	if got := r.Matrices[2].Matrix[1][2]; got != 0 {
+		t.Errorf("unjudged cell = %v, want 0", got)
+	}
+}
