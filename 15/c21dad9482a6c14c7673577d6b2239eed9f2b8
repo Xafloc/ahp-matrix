@@ -1,0 +1,25 @@
+go.mod
+  s_65743add7cce22::t_1894f72344cb3a 3,5-19
+go.sum
+  s_65743add7cce22::t_a85bf8450fcea1 1-2,6-31
+internal/xlsx/legacy.go
+  s_65743add7cce22::t_2e460114771ccd 1-138
+internal/xlsx/legacy_test.go
+  s_65743add7cce22::t_54ad25ab8841c7 1-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "15c21dad9482a6c14c7673577d6b2239eed9f2b8",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
