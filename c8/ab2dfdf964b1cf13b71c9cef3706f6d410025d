@@ -1,0 +1,21 @@
+internal/xlsx/export.go
+  s_65743add7cce22::t_9da42f9886dee8 1-289
+internal/xlsx/export_test.go
+  s_65743add7cce22::t_55144036708c59 1-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c8ab2dfdf964b1cf13b71c9cef3706f6d410025d",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
