@@ -45,6 +45,7 @@
       if (e instanceof ApiError && e.code === 'evaluator-exists') {
         mergeConflict = (e.details as { evaluators: string[] }).evaluators;
       } else {
+        mergeConflict = []; // the question no longer applies
         mergeError = `${file.name} couldn't be merged: ${e instanceof Error ? e.message : e}`;
         mergeFile = null;
       }

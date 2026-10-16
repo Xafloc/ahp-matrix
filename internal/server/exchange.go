@@ -72,6 +72,7 @@ func (s *server) exportCSV(w http.ResponseWriter, r *http.Request) {
 	}
 	header, rows := xlsx.ResultsTable(p, res)
 	attachment(w, model.Slug(p.Name)+".csv", "text/csv; charset=utf-8")
+	_, _ = w.Write([]byte("\xEF\xBB\xBF")) // byte-order mark: Excel then reads the file as UTF-8
 	cw := csv.NewWriter(w)
 	_ = cw.Write(header)
 	for _, row := range rows {

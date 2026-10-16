@@ -255,6 +255,11 @@ func (s *server) importProject(w http.ResponseWriter, r *http.Request) {
 	if !model.ValidID(p.ID) {
 		p.ID = model.NewProjectID()
 	} else if _, err := s.cfg.Store.Get(r.Context(), p.ID); err == nil {
+		// Already have it (say, a second copy for remote judging): keep both,
+		// and remember the original so judgments made here can merge back.
+		if p.Origin == "" {
+			p.Origin = p.ID
+		}
 		p.ID = model.NewProjectID()
 	}
 	p.CreatedAt = time.Time{}

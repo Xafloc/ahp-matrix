@@ -95,11 +95,12 @@ func TestMergeAsksBeforeReplacingSomeone(t *testing.T) {
 
 func TestMergeSkipKeepsTheCurrentJudgments(t *testing.T) {
 	owner := fixture()
+	owner.Pairwise = append(owner.Pairwise, PairwiseJudgment{EvaluatorID: "e2", Context: CriteriaContext(""), A: "c1", B: "c4", Value: 2})
 	rep, err := Merge(owner, returned(t, owner), MergeSkip)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pairs, ratings := countFor(owner, "e2"); pairs+ratings != 0 || len(rep.Skipped) != 1 {
+	if pairs, ratings := countFor(owner, "e2"); pairs != 1 || ratings != 0 || len(rep.Skipped) != 1 {
 		t.Errorf("skip changed Bob's judgments (%d, %d), report %+v", pairs, ratings, rep)
 	}
 }
@@ -145,5 +146,25 @@ func TestAFailedMergeChangesNothing(t *testing.T) {
 	}
 	if len(owner.Evaluators) != len(before.Evaluators) || len(owner.Pairwise) != len(before.Pairwise) || len(owner.Ratings) != len(before.Ratings) {
 		t.Error("a failed merge changed the project")
+	}
+}
+
+func TestMergeDoesNotAskAboutSomeoneWithNoJudgmentsYet(t *testing.T) {
+	owner := fixture() // Bob (e2) exists but has judged nothing: his copy is coming back for the first time
+	rep, err := Merge(owner, returned(t, owner), MergeAsk)
+	if err != nil {
+		t.Fatalf("err = %v, want a silent merge", err)
+	}
+	if pairs, ratings := countFor(owner, "e2"); pairs != 2 || ratings != 1 || len(rep.Added) != 1 || rep.Added[0] != "Bob" {
+		t.Errorf("Bob has %d judgments and %d ratings, report %+v", pairs, ratings, rep)
+	}
+}
+
+func TestMergeAcceptsACopyImportedUnderANewID(t *testing.T) {
+	owner := fixture()
+	pk := returned(t, owner)
+	pk.ID, pk.Origin = NewProjectID(), owner.ID // the colleague already had a copy, so the import got a new id
+	if _, err := Merge(owner, pk, MergeReplace); err != nil {
+		t.Errorf("err = %v, want the copy to merge via its origin", err)
 	}
 }

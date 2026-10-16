@@ -98,7 +98,7 @@ func TestExportWorkbookAndCSV(t *testing.T) {
 	}
 
 	rec = request(t, h, "GET", "/api/projects/"+p.ID+"/export.csv", nil)
-	rows, err := csv.NewReader(rec.Body).ReadAll()
+	rows, err := csv.NewReader(bytes.NewReader(bytes.TrimPrefix(rec.Body.Bytes(), []byte("\xEF\xBB\xBF")))).ReadAll()
 	if err != nil || len(rows) != 4 || rows[0][0] != "Rank" || rows[1][0] != "1" {
 		t.Errorf("csv: %v %v", rows, err)
 	}
@@ -158,4 +158,31 @@ func readAll(t *testing.T, r io.Reader) []byte {
 		t.Fatal(err)
 	}
 	return data
+}
+
+func TestSecondRoundOfRemoteJudgingStillMerges(t *testing.T) {
+	h, _ := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	packet := readAll(t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body)
+
+	// The colleague (here, the same machine) already has a copy from round one,
+	// so importing round two's copy gets a new id.
+	copy := decode[*model.Project](t, upload(t, h, "/api/import/ahp", "round-2.ahp.json", packet).Body.Bytes())
+	if copy.ID == owner.ID || copy.Origin != owner.ID {
+		t.Fatalf("re-imported copy: id %q, origin %q; want a new id that remembers %q", copy.ID, copy.Origin, owner.ID)
+	}
+	back := readAll(t, request(t, h, "GET", "/api/projects/"+copy.ID+"/export.ahp.json", nil).Body)
+	rec := upload(t, h, "/api/projects/"+owner.ID+"/merge?existing=replace", "back.ahp.json", back)
+	if rec.Code != http.StatusOK {
+		t.Errorf("merging the copy back: %d %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestCSVOpensCleanlyInExcel(t *testing.T) {
+	h, _ := newTestServer(t)
+	p := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"cloud-provider"}`)).Body.Bytes())
+	body := request(t, h, "GET", "/api/projects/"+p.ID+"/export.csv", nil).Body.Bytes()
+	if !bytes.HasPrefix(body, []byte("\xEF\xBB\xBF")) {
+		t.Error("CSV lacks the UTF-8 byte-order mark Excel needs to read “›” and accents")
+	}
 }

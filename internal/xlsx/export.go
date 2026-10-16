@@ -109,14 +109,24 @@ func Export(w io.Writer, p *model.Project, r *model.Results) error {
 	for _, e := range p.Evaluators {
 		people[e.ID] = e.Name
 	}
+	// A workbook of one person's results holds only their judgments.
+	mine := func(evaluatorID string) bool {
+		return r.Evaluator == model.AllEvaluators || evaluatorID == r.Evaluator
+	}
 	judged := [][]any{}
 	for _, j := range p.Pairwise {
+		if !mine(j.EvaluatorID) {
+			continue
+		}
 		judged = append(judged, []any{people[j.EvaluatorID], labels.context(j.Context), labels.item(j.A), labels.item(j.B), j.Value, j.Note})
 	}
 	x.sheet("Judgments", []string{"Person", "Comparison", "First", "Second", "How strongly the first is preferred", "Note"}, judged)
 
 	scored := [][]any{}
 	for _, rt := range p.Ratings {
+		if !mine(rt.EvaluatorID) {
+			continue
+		}
 		scored = append(scored, []any{labels.criterion(rt.CriterionID), labels.item(rt.AlternativeID), people[rt.EvaluatorID], rt.Value})
 	}
 	for _, v := range p.Values {
@@ -148,22 +158,29 @@ func Export(w io.Writer, p *model.Project, r *model.Results) error {
 		x.percentColumns(title, len(names)+2, len(names)+2, len(grid))
 	}
 
+	if x.err != nil {
+		return x.err
+	}
 	if err := f.DeleteSheet("Sheet1"); err != nil {
 		return err
 	}
 	return f.Write(w)
 }
 
-// book writes sheets with unique, valid names.
+// book writes sheets with unique, valid names. The first error sticks and
+// is returned by Export.
 type book struct {
 	f    *excelize.File
 	used map[string]bool
+	err  error
 }
 
 // sheet adds a sheet with an optional bold header row and returns its name.
 func (b *book) sheet(name string, header []string, rows [][]any) string {
 	name = sheetName(b.used, name)
-	_, _ = b.f.NewSheet(name)
+	if _, err := b.f.NewSheet(name); err != nil && b.err == nil {
+		b.err = fmt.Errorf("sheet %q: %w", name, err)
+	}
 	start := 1
 	if header != nil {
 		hs := make([]any, len(header))
@@ -179,7 +196,9 @@ func (b *book) sheet(name string, header []string, rows [][]any) string {
 	}
 	for i, row := range rows {
 		cell, _ := excelize.CoordinatesToCellName(1, start+i)
-		_ = b.f.SetSheetRow(name, cell, &row)
+		if err := b.f.SetSheetRow(name, cell, &row); err != nil && b.err == nil {
+			b.err = fmt.Errorf("sheet %q: %w", name, err)
+		}
 	}
 	_ = b.f.SetColWidth(name, "A", "A", 34)
 	return name
@@ -211,8 +230,9 @@ func (b *book) percentColumns(sheet string, from, to, rows int) {
 	_ = b.f.SetCellStyle(sheet, first, last, style)
 }
 
-// sheetName makes name a valid Excel sheet name (at most 31 characters, none
-// of []:*?/\) that hasn't been used yet.
+// sheetName makes name a valid Excel sheet name that hasn't been used yet:
+// at most 31 UTF-16 code units, none of []:*?/\, and no apostrophe at
+// either end.
 func sheetName(used map[string]bool, name string) string {
 	name = strings.Map(func(r rune) rune {
 		if strings.ContainsRune(`[]:*?/\`, r) {
@@ -226,17 +246,33 @@ func sheetName(used map[string]bool, name string) string {
 		if k > 1 {
 			suffix = fmt.Sprintf(" (%d)", k)
 		}
-		limit := 31 - len(suffix)
 		cut := base
-		if len(cut) > limit {
-			cut = cut[:limit]
+		for utf16Len(cut)+len(suffix) > 31 {
+			cut = cut[:len(cut)-1]
 		}
-		candidate := strings.TrimSpace(string(cut)) + suffix
+		candidate := strings.Trim(strings.TrimSpace(string(cut)), "' ")
+		if candidate == "" {
+			candidate = "Sheet"
+		}
+		candidate += suffix
 		if !used[candidate] {
 			used[candidate] = true
 			return candidate
 		}
 	}
+}
+
+// utf16Len is a string's length as Excel counts it.
+func utf16Len(rs []rune) int {
+	n := 0
+	for _, r := range rs {
+		if r >= 0x10000 {
+			n += 2
+		} else {
+			n++
+		}
+	}
+	return n
 }
 
 // names turns ids and contexts into the words the UI uses.

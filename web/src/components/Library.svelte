@@ -134,7 +134,7 @@
         {count(imported.report.criteria, 'criterion', 'criteria')} and {count(imported.report.judgments, 'comparison')}.
       </p>
       {#if imported.report.skipped.length}
-        <p class="small">Some cells couldn't be used and were left out:</p>
+        <p class="small">Some cells needed attention:</p>
         <ul class="small">{#each imported.report.skipped as s}<li>{s}</li>{/each}</ul>
       {/if}
       <div class="actions">

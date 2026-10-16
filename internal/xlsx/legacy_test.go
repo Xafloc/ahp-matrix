@@ -143,3 +143,42 @@ func TestImportLegacyRejectsOtherFiles(t *testing.T) {
 		t.Errorf("blank workbook: err = %v, want ErrNotTemplate", err)
 	}
 }
+
+func TestImportLegacySkipsOddNumbersAndReportsRounding(t *testing.T) {
+	f := excelize.NewFile()
+	_ = f.SetSheetName("Sheet1", "Summary")
+	_, _ = f.NewSheet("Criteria Summary")
+	_, _ = f.NewSheet("Criterion 1")
+	for k, n := range []string{"A", "B", "C", "D"} {
+		_ = f.SetCellValue("Summary", fmt.Sprintf("C%d", 19+k), n)
+	}
+	_ = f.SetCellValue("Summary", "D7", "Only")
+	_ = f.SetCellValue("Criterion 1", "D6", "NaN")
+	_ = f.SetCellValue("Criterion 1", "D7", "Inf")
+	_ = f.SetCellValue("Criterion 1", "D8", 3) // off the 10/5/1 scale: rounded to 5, and said so
+	var buf bytes.Buffer
+	_ = f.Write(&buf)
+	p, rep, err := ImportLegacy(&buf, "Odd")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := p.Prepare(); err != nil {
+		t.Fatalf("import produced an invalid project: %v", err)
+	}
+	if len(p.Pairwise) != 1 || p.Pairwise[0].Value != 5 {
+		t.Errorf("judgments = %+v", p.Pairwise)
+	}
+	want := []string{"Criterion 1!D6: “NaN” is not a number", "Criterion 1!D7: “Inf” is not a number", "Criterion 1!D8: 3 isn't on the 10, 5, 1, 1/5, 1/10 scale, so it was rounded to 5"}
+	if fmt.Sprint(rep.Skipped) != fmt.Sprint(want) {
+		t.Errorf("skipped = %q\nwant      %q", rep.Skipped, want)
+	}
+}
+
+func TestImportLegacyCapsUnzippedSize(t *testing.T) {
+	old := maxUnzipped
+	maxUnzipped = 1 << 10 // far smaller than any real workbook
+	defer func() { maxUnzipped = old }()
+	if _, _, err := ImportLegacy(legacyWorkbook(t), "x"); !errors.Is(err, ErrNotWorkbook) {
+		t.Errorf("err = %v, want ErrNotWorkbook for a workbook over the size cap", err)
+	}
+}

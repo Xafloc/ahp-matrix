@@ -15,7 +15,7 @@ var ErrDifferentProject = errors.New("this file is a different decision; only fi
 type MergePolicy string
 
 const (
-	MergeAsk     MergePolicy = ""        // refuse with *EvaluatorConflictError so the person can choose
+	MergeAsk     MergePolicy = ""        // refuse with *EvaluatorConflictError (only for people who have judged) so the person can choose
 	MergeReplace MergePolicy = "replace" // the file's judgments replace theirs
 	MergeSkip    MergePolicy = "skip"    // keep theirs and ignore the file's
 )
@@ -29,7 +29,7 @@ func (e *EvaluatorConflictError) Error() string {
 
 // MergeReport says what a merge did.
 type MergeReport struct {
-	Added     []string `json:"added"`     // people new to the project
+	Added     []string `json:"added"`     // people whose judgments arrived for the first time
 	Replaced  []string `json:"replaced"`  // people whose judgments were replaced
 	Skipped   []string `json:"skipped"`   // people left as they were
 	Judgments int      `json:"judgments"` // judgments brought in
@@ -64,7 +64,7 @@ func Packet(p *Project, evaluatorID string) (*Project, error) {
 // items the owner no longer has are dropped and counted. On error, owner is
 // unchanged.
 func Merge(owner, packet *Project, policy MergePolicy) (*MergeReport, error) {
-	if packet.ID != owner.ID {
+	if packet.ID != owner.ID && packet.Origin != owner.ID {
 		return nil, ErrDifferentProject
 	}
 	next, err := clone(owner)
@@ -75,6 +75,15 @@ func Merge(owner, packet *Project, policy MergePolicy) (*MergeReport, error) {
 	for _, e := range next.Evaluators {
 		existing[e.ID] = e.Name
 	}
+	// Only people who have judged something can conflict; someone whose copy
+	// is coming back for the first time just gets their judgments.
+	judged := map[string]bool{}
+	for _, j := range next.Pairwise {
+		judged[j.EvaluatorID] = true
+	}
+	for _, r := range next.Ratings {
+		judged[r.EvaluatorID] = true
+	}
 	rep := &MergeReport{Added: []string{}, Replaced: []string{}, Skipped: []string{}}
 	var conflicts []string
 	incoming := map[string]bool{}
@@ -84,6 +93,9 @@ func Merge(owner, packet *Project, policy MergePolicy) (*MergeReport, error) {
 		case !ok:
 			next.Evaluators = append(next.Evaluators, e)
 			rep.Added = append(rep.Added, e.Name)
+			incoming[e.ID] = true
+		case !judged[e.ID]:
+			rep.Added = append(rep.Added, name)
 			incoming[e.ID] = true
 		case policy == MergeAsk:
 			conflicts = append(conflicts, name)

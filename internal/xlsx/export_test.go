@@ -106,3 +106,43 @@ func TestSheetNamesAreValidAndUnique(t *testing.T) {
 		t.Errorf("sheet names %q and %q", a, b)
 	}
 }
+
+func TestOddCriterionNamesStillGetTheirMatrixSheets(t *testing.T) {
+	p, _ := imported(t)
+	p.Criteria[0].Name = "Owner's cost xx'"
+	p.Criteria[1].Name = strings.Repeat("😀", 20)
+	p.Criteria[2].Name = "'Quoted'"
+	r, _ := model.Compute(p, model.AllEvaluators)
+	var buf bytes.Buffer
+	if err := Export(&buf, p, r); err != nil {
+		t.Fatal(err)
+	}
+	f, _ := excelize.OpenReader(&buf)
+	n := 0
+	for _, s := range f.GetSheetList() {
+		if strings.HasPrefix(s, "M") {
+			n++
+		}
+	}
+	if n != len(r.Matrices) {
+		t.Errorf("got %d matrix sheets, want %d: %q", n, len(r.Matrices), f.GetSheetList())
+	}
+}
+
+func TestOnePersonsWorkbookHoldsOnlyTheirJudgments(t *testing.T) {
+	p, _ := imported(t)
+	p.Evaluators = append(p.Evaluators, model.Evaluator{ID: "e2", Name: "Bob", Weight: 1})
+	p.Pairwise = append(p.Pairwise, model.PairwiseJudgment{EvaluatorID: "e2", Context: p.Pairwise[0].Context, A: p.Pairwise[0].A, B: p.Pairwise[0].B, Value: 1, Note: "Bob's private note"})
+	r, _ := model.Compute(p, p.Evaluators[0].ID)
+	var buf bytes.Buffer
+	if err := Export(&buf, p, r); err != nil {
+		t.Fatal(err)
+	}
+	f, _ := excelize.OpenReader(&buf)
+	rows, _ := f.GetRows("Judgments")
+	for _, row := range rows {
+		if row[0] == "Bob" {
+			t.Fatalf("Imported's workbook includes Bob's judgment: %q", row)
+		}
+	}
+}

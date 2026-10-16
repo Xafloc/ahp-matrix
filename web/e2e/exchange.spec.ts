@@ -1,3 +1,4 @@
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { addAll, createDecision, saved } from './helpers';
@@ -73,4 +74,43 @@ test('↑ and ↓ move the balance like → and ←', async ({ page }) => {
   await slider.press('ArrowDown');
   await slider.press('ArrowDown');
   await expect(page.getByText('Left matters slightly more than Right')).toBeVisible();
+});
+
+test("someone's first returned copy merges without asking", async ({ page }, info) => {
+  await createDecision(page, 'First return');
+  await addAll(page, 'New option', ['X', 'Y']);
+  await addAll(page, 'New criterion', ['Only']);
+  await addAll(page, 'New person', ['Carol']);
+  await saved(page);
+  const download = page.waitForEvent('download');
+  await page.getByRole('listitem').filter({ has: page.getByRole('button', { name: 'Remove Carol' }) }).getByRole('link', { name: 'Send their copy' }).click();
+  const path = info.outputPath('carol.ahp.json');
+  await (await download).saveAs(path);
+  // Carol fills in her one comparison.
+  const copy = JSON.parse(readFileSync(path, 'utf8'));
+  const carol = copy.evaluators[0].id;
+  copy.pairwise.push({ evaluatorId: carol, context: `alts:${copy.criteria[0].id}`, a: copy.alternatives[0].id, b: copy.alternatives[1].id, value: 3 });
+  writeFileSync(path, JSON.stringify(copy));
+
+  await page.getByLabel('Returned decision file to merge').setInputFiles(path);
+  await expect(page.getByRole('status')).toContainText('Merged 1 judgment from Carol.');
+  await expect(page.getByText('already has judgments here')).toHaveCount(0);
+});
+
+test('a returned file that fails to merge clears the question and says why', async ({ page }, info) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
+  await page.getByRole('link', { name: /Set up/ }).click();
+  const download = page.waitForEvent('download');
+  await page.getByRole('listitem').filter({ has: page.getByRole('button', { name: 'Remove Product manager' }) }).getByRole('link', { name: 'Send their copy' }).click();
+  const path = info.outputPath('pm.ahp.json');
+  await (await download).saveAs(path);
+  const copy = JSON.parse(readFileSync(path, 'utf8'));
+  copy.pairwise[0].value = -3; // corrupted on the way back
+  writeFileSync(path, JSON.stringify(copy));
+
+  await page.getByLabel('Returned decision file to merge').setInputFiles(path);
+  await page.getByRole('button', { name: 'Replace' }).click();
+  await expect(page.getByRole('alert')).toContainText("pm.ahp.json couldn't be merged");
+  await expect(page.getByRole('button', { name: 'Replace' })).toHaveCount(0);
 });

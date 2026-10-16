@@ -19,26 +19,22 @@ AHP Matrix is a single binary that runs a local web app. Your projects stay on y
 
 ## Install
 
-Download the archive for your system from [Releases](https://github.com/Xafloc/ahp-matrix/releases), unpack it, and run `ahp-matrix`.
-It starts on http://127.0.0.1:7777 and opens your browser. On macOS, Homebrew works too:
+Build it from source. You need Go 1.24+ and Node 20.19+.
 
 ```sh
-brew install xafloc/tap/ahp-matrix
+git clone https://github.com/Xafloc/ahp-matrix && cd ahp-matrix
+make run    # builds the UI and the binary, starts it on http://127.0.0.1:7777 and opens your browser
 ```
+
+Ready-made downloads for macOS, Linux and Windows, and `brew install xafloc/tap/ahp-matrix`, start with the
+first tagged release on the [Releases](https://github.com/Xafloc/ahp-matrix/releases) page. The macOS binaries
+aren't notarized: if a downloaded copy is blocked, run `xattr -d com.apple.quarantine ahp-matrix` once, or allow
+it under System Settings › Privacy & Security. Homebrew does this for you.
 
 `ahp-matrix --help` lists the flags (`--port`, `--host`, `--data-dir`, `--no-open`).
 Projects are stored in `~/Library/Application Support/ahp-matrix` (macOS),
 `%AppData%\ahp-matrix` (Windows) or `~/.local/share/ahp-matrix` (Linux) unless `--data-dir` is given.
 Each decision is one `.ahp.json` file; deleted ones move to a `trash` folder there.
-
-### Build from source
-
-Requires Go 1.24+ and Node 20.19+.
-
-```sh
-git clone https://github.com/Xafloc/ahp-matrix && cd ahp-matrix
-make run    # builds the UI and the binary, then starts it
-```
 
 ## Development
 
