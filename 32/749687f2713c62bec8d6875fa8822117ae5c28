@@ -1,0 +1,23 @@
+internal/model/merge.go
+  s_65743add7cce22::t_edf54239e1376a 1-163
+internal/model/merge_test.go
+  s_65743add7cce22::t_b3e8556133feea 1-149
+internal/model/prepare.go
+  s_65743add7cce22::t_4ca6b7890d85b4 128,132,152,168,182-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "32749687f2713c62bec8d6875fa8822117ae5c28",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
