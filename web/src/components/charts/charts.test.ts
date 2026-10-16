@@ -66,3 +66,10 @@ test('past eight options the colors run out, but every bar keeps its name', () =
   for (const n of names) expect(text(body)).toContain(n);
   expect(body).toContain('var(--series-none)');
 });
+
+test('the line chart labels up to eight lines directly', () => {
+  const names = Array.from({ length: 8 }, (_, i) => `Option ${i + 1}`);
+  const line = { intercept: names.map((_, i) => i / 10), slope: names.map(() => 0) };
+  const { body } = render(LineChart, { props: { line, names, colors: names.map(() => 'red'), current: 0.5, x: 0.5 } });
+  expect(body.match(/class="label/g)).toHaveLength(8);
+});

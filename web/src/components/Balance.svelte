@@ -43,6 +43,9 @@
     const moves: Record<string, () => void> = {
       ArrowLeft: () => set(index < 0 ? middle - 1 : from - 1),
       ArrowRight: () => set(index < 0 ? middle + 1 : from + 1),
+      // A slider's ↑/↓ raise and lower its value, here toward the right-hand side.
+      ArrowUp: () => set(index < 0 ? middle + 1 : from + 1),
+      ArrowDown: () => set(index < 0 ? middle - 1 : from - 1),
       Home: () => set(0),
       End: () => set(positions.length - 1),
       '=': () => set(middle),

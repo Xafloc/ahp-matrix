@@ -27,7 +27,8 @@
   const sy = $derived((v: number) => pad.t + (1 - (v - lo) / (hi - lo || 1)) * ih);
   const ticks = $derived(Array.from({ length: 5 }, (_, k) => lo + ((hi - lo) * k) / 4));
   const cross = $derived(crossovers(line));
-  const direct = $derived(names.length <= 4);
+  // Direct labels while they fit (up to eight lines); the legend is always there too.
+  const direct = $derived(names.length <= 8);
 
   // Direct labels at the right end, nudged apart so they don't collide.
   const labels = $derived.by(() => {

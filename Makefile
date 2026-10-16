@@ -1,7 +1,7 @@
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X main.version=$(VERSION)
 
-.PHONY: test lint build run web web-check e2e
+.PHONY: test lint build run web web-check e2e snapshot
 
 test:
 	go test -race ./...
@@ -29,3 +29,6 @@ web-check: web/node_modules
 
 e2e: web/node_modules
 	cd web && npm run e2e
+
+snapshot:
+	go run github.com/goreleaser/goreleaser/v2@v2.18.3 release --snapshot --clean

@@ -2,7 +2,8 @@
   import { api, exportUrl } from '../lib/api';
   import { colorOf, percent, relativeTime } from '../lib/format';
   import { href, router } from '../lib/router.svelte';
-  import type { ProjectSummary } from '../lib/types';
+  import { count } from '../lib/format';
+  import type { ImportReport, ProjectSummary, StarterEntry } from '../lib/types';
   import Mark from './Mark.svelte';
   import ThemeToggle from './ThemeToggle.svelte';
 
@@ -13,6 +14,13 @@
   let confirmDelete = $state('');
   let query = $state('');
   let fileInput = $state<HTMLInputElement | undefined>();
+  let startFrom = $state('');
+  let templates = $state<StarterEntry[]>([]);
+  let examples = $state<StarterEntry[]>([]);
+  let imported = $state<{ id: string; name: string; report: ImportReport } | null>(null);
+
+  api.templates().then((t) => (templates = t), () => {});
+  api.samples().then((s) => (examples = s), () => {});
 
   const shown = $derived(
     (projects ?? []).filter((p) => !query.trim() || p.name.toLowerCase().includes(query.trim().toLowerCase())),
@@ -31,7 +39,7 @@
   async function create(e: SubmitEvent) {
     e.preventDefault();
     try {
-      const p = await api.createProject(newName.trim());
+      const p = await api.createProject(newName.trim(), startFrom ? { template: startFrom } : {});
       router.go(href(p.id, 'setup'));
     } catch (err) {
       error = err instanceof Error ? err.message : String(err);
@@ -47,12 +55,27 @@
     }
   }
 
+  async function openExample(id: string) {
+    try {
+      const p = await api.createProject('', { sample: id });
+      router.go(href(p.id, 'results'));
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e);
+    }
+  }
+
   async function importChosen() {
     const file = fileInput?.files?.[0];
     if (!file) return;
     try {
-      const p = await api.importFile(file);
-      router.go(href(p.id, 'results'));
+      const { project, report } = await api.importFile(file);
+      if (report) {
+        // A spreadsheet: say what came across before opening it.
+        imported = { id: project.id, name: project.name, report };
+        await load();
+      } else {
+        router.go(href(project.id, 'results'));
+      }
     } catch (e) {
       error = `${file.name} couldn't be imported: ${e instanceof Error ? e.message : e}`;
     }
@@ -74,7 +97,15 @@
     <h1>Decisions</h1>
     <div class="actions">
       <button class="btn" onclick={() => fileInput?.click()}>Import file</button>
-      <input bind:this={fileInput} type="file" accept=".json,application/json" class="sr-only" onchange={importChosen} tabindex="-1" />
+      <input
+        bind:this={fileInput}
+        type="file"
+        accept=".json,application/json,.xlsx"
+        class="sr-only"
+        onchange={importChosen}
+        tabindex="-1"
+        aria-label="Import a decision file or Priority Matrix spreadsheet"
+      />
       <button class="btn primary" onclick={() => (creating = true)}>New decision</button>
     </div>
   </div>
@@ -84,9 +115,33 @@
       <label for="new-name">What are you deciding?</label>
       <!-- svelte-ignore a11y_autofocus -->
       <input id="new-name" class="field" bind:value={newName} placeholder="Choose a CRM vendor" autofocus />
+      <select class="field start" bind:value={startFrom} aria-label="Start from">
+        <option value="">Start blank</option>
+        {#each templates as t (t.id)}<option value={t.id}>Template: {t.name}</option>{/each}
+      </select>
       <button class="btn primary" type="submit">Create</button>
       <button class="btn quiet" type="button" onclick={() => (creating = false)}>Cancel</button>
+      {#if startFrom}
+        <p class="small muted hint">{templates.find((t) => t.id === startFrom)?.description}</p>
+      {/if}
     </form>
+  {/if}
+
+  {#if imported}
+    <section class="notice panel" role="status">
+      <p>
+        Imported <strong>{imported.name}</strong>: {count(imported.report.alternatives, 'option')},
+        {count(imported.report.criteria, 'criterion', 'criteria')} and {count(imported.report.judgments, 'comparison')}.
+      </p>
+      {#if imported.report.skipped.length}
+        <p class="small">Some cells needed attention:</p>
+        <ul class="small">{#each imported.report.skipped as s}<li>{s}</li>{/each}</ul>
+      {/if}
+      <div class="actions">
+        <a class="btn primary" href={href(imported.id, 'results')}>Open it</a>
+        <button class="btn quiet" onclick={() => (imported = null)}>Dismiss</button>
+      </div>
+    </section>
   {/if}
 
   {#if error}
@@ -103,7 +158,23 @@
         List the options, decide what matters, and compare them two at a time. AHP Matrix turns those comparisons into a
         ranking, and tells you when your answers contradict each other.
       </p>
-      <button class="btn primary" onclick={() => (creating = true)}>New decision</button>
+      <div class="actions">
+        <button class="btn primary" onclick={() => (creating = true)}>New decision</button>
+        <button class="btn" onclick={() => fileInput?.click()}>Import a Priority Matrix spreadsheet</button>
+      </div>
+      {#if examples.length}
+        <h3>Or explore an example</h3>
+        <ul class="examples">
+          {#each examples as ex (ex.id)}
+            <li>
+              <button class="example" onclick={() => openExample(ex.id)}>
+                <strong>{ex.name}</strong>
+                <span class="small muted">{ex.description}</span>
+              </button>
+            </li>
+          {/each}
+        </ul>
+      {/if}
     </section>
   {:else}
     {#if projects.length > 6}
@@ -124,7 +195,7 @@
                 {#if p.ranking.length && p.alternatives >= 2 && p.criteria > 0}
                   {p.ranking[0].name} leads with {percent(p.ranking[0].score, 0)}
                 {:else}
-                  {p.alternatives} options, {p.criteria} criteria
+                  {count(p.alternatives, 'option')}, {count(p.criteria, 'criterion', 'criteria')}
                 {/if}
               </span>
             </a>
@@ -172,6 +243,12 @@
       {/each}
     </ul>
     {#if shown.length === 0}<p class="muted">No decision matches “{query}”.</p>{/if}
+    {#if examples.length}
+      <p class="small muted more-examples">
+        Examples:
+        {#each examples as ex, i (ex.id)}{#if i > 0}, {/if}<button class="link" onclick={() => openExample(ex.id)}>{ex.name}</button>{/each}
+      </p>
+    {/if}
   {/if}
 </main>
 
@@ -215,13 +292,63 @@
   }
   .new {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto auto auto;
     align-items: center;
     gap: 0.6rem;
     padding: 0.9rem 1rem;
   }
   .new label {
     font-weight: 600;
+  }
+  .start {
+    width: auto;
+  }
+  .hint {
+    grid-column: 1 / -1;
+  }
+  .notice {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1rem 1.2rem;
+  }
+  .notice ul {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+  .examples {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .example {
+    display: grid;
+    gap: 0.15rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    cursor: pointer;
+  }
+  .example:hover {
+    border-color: var(--brass);
+  }
+  .link {
+    border: 0;
+    background: none;
+    padding: 0;
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    font: inherit;
+  }
+  .more-examples {
+    margin-top: 0.5rem;
   }
   .error {
     color: var(--rust);

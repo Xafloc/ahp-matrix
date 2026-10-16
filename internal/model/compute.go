@@ -75,6 +75,10 @@ type MatrixReport struct {
 	Pairs       int              `json:"pairs"`
 	Components  [][]string       `json:"components,omitempty"` // linked groups, when not connected
 	Suggestions []PairSuggestion `json:"suggestions"`
+	// Matrix is the combined comparison matrix, rows and columns in Items
+	// order: Matrix[i][j] is how strongly item i is preferred over item j,
+	// 0 where the pair hasn't been judged.
+	Matrix [][]float64 `json:"matrix"`
 }
 
 // PairSuggestion proposes a value for a judgment that contradicts the others.
@@ -320,7 +324,7 @@ func (c *computer) compare(context string, items []string, code, criterionID str
 	rep := MatrixReport{
 		Context: context, Items: items, Weights: a.Weights, CR: a.CR, Threshold: a.Threshold,
 		Consistent: a.Consistent, Complete: a.Complete, Connected: a.Connected,
-		Missing: a.Missing, Pairs: pairs, Suggestions: []PairSuggestion{},
+		Missing: a.Missing, Pairs: pairs, Suggestions: []PairSuggestion{}, Matrix: m,
 	}
 	if !a.Connected {
 		for _, g := range a.Components {

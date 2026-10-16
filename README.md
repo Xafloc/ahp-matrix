@@ -10,25 +10,31 @@ AHP Matrix is a single binary that runs a local web app. Your projects stay on y
 - **Rate or measure where pairs are overkill.** Each criterion can be compared in pairs, rated 1–10, or given measured values such as price ("lower is better").
 - **Group criteria** into a hierarchy, so you only compare criteria that belong together.
 - **Catch contradictions.** Every set of comparisons gets a consistency ratio, and the app points out the answers that disagree with the rest, with a one-click fix.
-- **Several people.** Everyone judges separately, the results combine them (weighted), and the app shows where people disagree most.
+- **Several people.** Everyone judges separately, the results combine them (weighted), and the app shows where people disagree most. Send someone their own copy, then merge it back when they return it.
 - **What if?** Drag a criterion's weight and watch the ranking change. Each criterion shows how far it can move before the winner changes.
+- **Bring your spreadsheet.** Import workbooks made with the classic "Priority Matrix" Excel template, and export results to Excel or CSV.
+- **Start from an example or a template**, including vendor selection with the template's 23 criteria, grouped.
 
 ![Results for a laptop decision](docs/images/results.jpg)
 
-> **Status:** early development. Excel import/export, sample projects and release binaries are next.
+## Install
 
-## Run it
-
-Requires Go 1.24+ and Node 20.19+ to build from source.
+Build it from source. You need Go 1.24+ and Node 20.19+.
 
 ```sh
 git clone https://github.com/Xafloc/ahp-matrix && cd ahp-matrix
-make run    # builds the UI and the binary, starts on http://127.0.0.1:7777 and opens your browser
+make run    # builds the UI and the binary, starts it on http://127.0.0.1:7777 and opens your browser
 ```
 
-`bin/ahp-matrix --help` lists the flags (`--port`, `--host`, `--data-dir`, `--no-open`).
+Ready-made downloads for macOS, Linux and Windows, and `brew install xafloc/tap/ahp-matrix`, start with the
+first tagged release on the [Releases](https://github.com/Xafloc/ahp-matrix/releases) page. The macOS binaries
+aren't notarized: if a downloaded copy is blocked, run `xattr -d com.apple.quarantine ahp-matrix` once, or allow
+it under System Settings › Privacy & Security. Homebrew does this for you.
+
+`ahp-matrix --help` lists the flags (`--port`, `--host`, `--data-dir`, `--no-open`).
 Projects are stored in `~/Library/Application Support/ahp-matrix` (macOS),
 `%AppData%\ahp-matrix` (Windows) or `~/.local/share/ahp-matrix` (Linux) unless `--data-dir` is given.
+Each decision is one `.ahp.json` file; deleted ones move to a `trash` folder there.
 
 ## Development
 
@@ -37,7 +43,10 @@ make test        # Go tests (race detector)
 make lint        # gofmt + go vet
 make web-check   # type-check and unit-test the UI
 make e2e         # end-to-end browser tests against the real binary
+make snapshot    # build release archives for every platform into dist/
 ```
+
+Releases are cut by pushing a `v*` tag; `.github/workflows/release.yml` runs GoReleaser.
 
 For live-reloading UI work, run the API in one terminal (`make build && bin/ahp-matrix --no-open`)
 and `cd web && npm run dev` in another, then open http://localhost:5173.

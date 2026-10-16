@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { exportUrl } from '../lib/api';
   import { colorOf, percent } from '../lib/format';
   import { href } from '../lib/router.svelte';
   import { fraction } from '../lib/scale';
@@ -144,6 +145,8 @@
     <div class="foot no-print">
       <a class="btn" href={href(p.id, 'sensitivity')}>Test how robust this is</a>
       <a class="btn quiet" href={href(p.id, 'report')}>Printable report</a>
+      <a class="btn quiet" href={exportUrl(p.id, 'xlsx', viewing)} download>Download Excel</a>
+      <a class="btn quiet" href={exportUrl(p.id, 'csv', viewing)} download>Download CSV</a>
     </div>
   {/if}
 </div>
@@ -231,5 +234,6 @@
   .foot {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 </style>

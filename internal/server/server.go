@@ -32,6 +32,7 @@ func New(cfg Config) http.Handler {
 func (s *server) routes() {
 	s.mux.HandleFunc("GET /api/version", s.handleVersion)
 	s.projectRoutes()
+	s.exchangeRoutes()
 	s.mux.Handle("GET /", s.static())
 }
 

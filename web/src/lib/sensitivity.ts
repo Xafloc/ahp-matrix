@@ -78,5 +78,13 @@ export function stability(l: Line, w: number): number | null {
   return best;
 }
 
+/** How far a criterion's weight can move before the leader changes, in words. */
+export function shiftLabel(stability: number | null): string {
+  if (stability === null) return 'Holds at any weight';
+  const points = Math.round(stability * 100);
+  if (points < 1) return 'Flips at less than 1 point';
+  return `Flips at ±${points} point${points === 1 ? '' : 's'}`;
+}
+
 /** The index of the leading alternative at weight x. */
 export const leaderAt = (l: Line, x: number) => argmax(at(l, x));

@@ -26,20 +26,24 @@ const (
 
 // Project is one decision: alternatives scored against weighted criteria.
 type Project struct {
-	SchemaVersion int                `json:"schemaVersion"`
-	ID            string             `json:"id"`
-	Version       int                `json:"version"` // incremented on every save
-	Name          string             `json:"name"`
-	Description   string             `json:"description"`
-	CreatedAt     time.Time          `json:"createdAt"`
-	UpdatedAt     time.Time          `json:"updatedAt"`
-	Scale         Scale              `json:"scale"`
-	Alternatives  []Alternative      `json:"alternatives"`
-	Criteria      []Criterion        `json:"criteria"`
-	Evaluators    []Evaluator        `json:"evaluators"`
-	Pairwise      []PairwiseJudgment `json:"pairwise"`
-	Ratings       []Rating           `json:"ratings"`
-	Values        []Value            `json:"values"`
+	SchemaVersion int    `json:"schemaVersion"`
+	ID            string `json:"id"`
+	Version       int    `json:"version"` // incremented on every save
+	Name          string `json:"name"`
+	// Origin is the id of the decision this file was copied from when it was
+	// imported under a new id (its own id was taken), so judgments made in the
+	// copy can still be merged back into the original.
+	Origin       string             `json:"origin,omitempty"`
+	Description  string             `json:"description"`
+	CreatedAt    time.Time          `json:"createdAt"`
+	UpdatedAt    time.Time          `json:"updatedAt"`
+	Scale        Scale              `json:"scale"`
+	Alternatives []Alternative      `json:"alternatives"`
+	Criteria     []Criterion        `json:"criteria"`
+	Evaluators   []Evaluator        `json:"evaluators"`
+	Pairwise     []PairwiseJudgment `json:"pairwise"`
+	Ratings      []Rating           `json:"ratings"`
+	Values       []Value            `json:"values"`
 }
 
 // Alternative is one option being chosen between.

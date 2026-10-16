@@ -8,9 +8,11 @@ import (
 	"mime"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/Xafloc/ahp-matrix/internal/model"
+	"github.com/Xafloc/ahp-matrix/internal/samples"
 	"github.com/Xafloc/ahp-matrix/internal/store"
 )
 
@@ -92,8 +94,10 @@ func summarize(e store.Entry) projectSummary {
 
 func (s *server) createProject(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Name        string `json:"name"`
-		Description string `json:"description"`
+		Name         string `json:"name"`
+		Description  string `json:"description"`
+		FromSample   string `json:"fromSample"`
+		FromTemplate string `json:"fromTemplate"`
 	}
 	if r.ContentLength != 0 {
 		data, ok := readBody(w, r)
@@ -105,11 +109,28 @@ func (s *server) createProject(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if req.Name == "" {
-		req.Name = "Untitled decision"
+	var p *model.Project
+	var err error
+	switch {
+	case req.FromSample != "":
+		p, err = samples.Sample(req.FromSample)
+	case req.FromTemplate != "":
+		p, err = samples.Template(req.FromTemplate, strings.TrimSpace(req.Name))
+	default:
+		name := strings.TrimSpace(req.Name)
+		if name == "" {
+			name = "Untitled decision"
+		}
+		p = model.New(name)
+		p.Description = req.Description
 	}
-	p := model.New(req.Name)
-	p.Description = req.Description
+	if errors.Is(err, samples.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "not-found", err.Error(), nil)
+		return
+	} else if err != nil {
+		s.internalError(w, err)
+		return
+	}
 	s.createNew(w, r, p, http.StatusCreated)
 }
 
@@ -202,8 +223,21 @@ func (s *server) exportProject(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	name := mime.FormatMediaType("attachment", map[string]string{"filename": model.Slug(p.Name) + ".ahp.json"})
-	w.Header().Set("Content-Disposition", name)
+	filename := model.Slug(p.Name) + ".ahp.json"
+	// ?evaluator= exports that person's packet: everything but other people's judgments.
+	if ev := r.URL.Query().Get("evaluator"); ev != "" {
+		packet, err := model.Packet(p, ev)
+		if errors.Is(err, model.ErrUnknownEvaluator) {
+			writeError(w, http.StatusBadRequest, "unknown-evaluator", err.Error(), nil)
+			return
+		} else if err != nil {
+			s.internalError(w, err)
+			return
+		}
+		filename = model.Slug(p.Name) + "-for-" + model.Slug(packet.Evaluators[0].Name) + ".ahp.json"
+		p = packet
+	}
+	w.Header().Set("Content-Disposition", mime.FormatMediaType("attachment", map[string]string{"filename": filename}))
 	writeJSON(w, http.StatusOK, p)
 }
 
@@ -221,6 +255,11 @@ func (s *server) importProject(w http.ResponseWriter, r *http.Request) {
 	if !model.ValidID(p.ID) {
 		p.ID = model.NewProjectID()
 	} else if _, err := s.cfg.Store.Get(r.Context(), p.ID); err == nil {
+		// Already have it (say, a second copy for remote judging): keep both,
+		// and remember the original so judgments made here can merge back.
+		if p.Origin == "" {
+			p.Origin = p.ID
+		}
 		p.ID = model.NewProjectID()
 	}
 	p.CreatedAt = time.Time{}
@@ -245,9 +284,14 @@ func (s *server) load(w http.ResponseWriter, r *http.Request) (*model.Project, b
 // status. If the id turns out to be taken (or might belong to a file this
 // build can't read), the project gets a fresh id instead.
 func (s *server) createNew(w http.ResponseWriter, r *http.Request, p *model.Project, status int) {
-	if !prepare(w, p) {
-		return
+	if prepare(w, p) && s.create(w, r, p) {
+		writeJSON(w, status, p)
 	}
+}
+
+// create stores a prepared new project, writing an error response and
+// returning false if it can't.
+func (s *server) create(w http.ResponseWriter, r *http.Request, p *model.Project) bool {
 	err := s.cfg.Store.Create(r.Context(), p)
 	if errors.Is(err, store.ErrExists) {
 		p.ID = model.NewProjectID()
@@ -255,9 +299,9 @@ func (s *server) createNew(w http.ResponseWriter, r *http.Request, p *model.Proj
 	}
 	if err != nil {
 		s.internalError(w, err)
-		return
+		return false
 	}
-	writeJSON(w, status, p)
+	return true
 }
 
 func prepare(w http.ResponseWriter, p *model.Project) bool {
@@ -300,22 +344,30 @@ func readBody(w http.ResponseWriter, r *http.Request) ([]byte, bool) {
 
 // readUpload returns the multipart "file" field, or the raw body otherwise.
 func readUpload(w http.ResponseWriter, r *http.Request) ([]byte, bool) {
+	data, _, ok := readUploadNamed(w, r)
+	return data, ok
+}
+
+// readUploadNamed is readUpload that also returns the uploaded file's name
+// ("" for a raw body).
+func readUploadNamed(w http.ResponseWriter, r *http.Request) ([]byte, string, bool) {
 	ct, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if ct != "multipart/form-data" {
-		return readBody(w, r)
+		data, ok := readBody(w, r)
+		return data, "", ok
 	}
-	f, _, err := r.FormFile("file")
+	f, header, err := r.FormFile("file")
 	if err != nil {
 		bodyError(w, err)
-		return nil, false
+		return nil, "", false
 	}
 	defer f.Close()
 	data, err := io.ReadAll(f)
 	if err != nil {
 		bodyError(w, err)
-		return nil, false
+		return nil, "", false
 	}
-	return data, true
+	return data, header.Filename, true
 }
 
 func bodyError(w http.ResponseWriter, err error) {

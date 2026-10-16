@@ -1,6 +1,9 @@
 /** 0.4567 → "45.7%"; values under 10% keep one decimal, larger ones too, for comparability. */
 export const percent = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
 
+/** "1 criterion", "6 criteria". */
+export const count = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
 /** A CSS color for an alternative's stored color: a series slot ("series-3") or a hex value. */
 export function colorOf(color: string): string {
   if (/^series-[1-8]$/.test(color)) return `var(--${color})`;

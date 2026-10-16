@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "id": "01TEMPLATEJOBOFFER00000000",
+  "version": 1,
+  "name": "Job offer comparison",
+  "description": "Weigh offers on more than salary.",
+  "createdAt": "2026-10-15T12:00:00Z",
+  "updatedAt": "2026-10-15T12:00:00Z",
+  "scale": "saaty9",
+  "alternatives": [],
+  "criteria": [
+    {
+      "id": "g1",
+      "name": "Pay and benefits",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g1c1",
+      "name": "Salary",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c2",
+      "name": "Equity",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c3",
+      "name": "Benefits",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2",
+      "name": "The work",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g2c1",
+      "name": "Interesting problems",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c2",
+      "name": "Growth",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c3",
+      "name": "Team",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3",
+      "name": "Life",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g3c1",
+      "name": "Commute or remote",
+      "description": "",
+      "notes": "",
+      "parentId": "g3",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3c2",
+      "name": "Hours",
+      "description": "",
+      "notes": "",
+      "parentId": "g3",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3c3",
+      "name": "Location",
+      "description": "",
+      "notes": "",
+      "parentId": "g3",
+      "method": "pairwise"
+    }
+  ],
+  "evaluators": [
+    {
+      "id": "e1",
+      "name": "Me",
+      "weight": 1
+    }
+  ],
+  "pairwise": [],
+  "ratings": [],
+  "values": []
+}

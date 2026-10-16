@@ -20,7 +20,10 @@ function fakeClient() {
     deleteProject: async () => {},
     duplicateProject: async () => fixture(),
     results: async (_id, ev) => ({ evaluator: ev }) as Results,
-    importFile: async () => fixture(),
+    importFile: async () => ({ project: fixture() }),
+    mergeFile: async () => ({ project: fixture(), report: { added: [], replaced: [], skipped: [], judgments: 0, dropped: 0 } }),
+    samples: async () => [],
+    templates: async () => [],
   };
   return { client, saves, setStored: (p: Project) => (stored = p), stored: () => stored };
 }
@@ -118,4 +121,22 @@ test('a rejected save explains what to fix in plain words', async () => {
   await vi.advanceTimersByTimeAsync(600);
   expect(s.saveState).toBe('error');
   expect(s.error).toBe('Option 1 needs a name. Your changes will save as soon as that’s fixed.');
+});
+
+test('a slow, older results response never replaces a newer one', async () => {
+  const f = fakeClient();
+  let calls = 0;
+  const pending: ((r: Results) => void)[] = [];
+  f.client.results = (_id, ev) =>
+    new Promise((resolve) => {
+      const n = ++calls;
+      pending.push(() => resolve({ evaluator: ev, completeness: n } as Results));
+    });
+  const s = new ProjectSession(fixture(), f.client, 600);
+  const first = s.refreshResults(['all']);
+  const second = s.refreshResults(['all']);
+  pending[1]({} as Results); // the newer request answers first
+  pending[0]({} as Results);
+  await Promise.all([first, second]);
+  expect(s.results.all.completeness).toBe(2);
 });

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { colorOf, percent, relativeTime } from './format';
+import { colorOf, count, percent, relativeTime } from './format';
 
 test('percent', () => {
   expect(percent(0.4567)).toBe('45.7%');
@@ -18,4 +18,10 @@ test('relativeTime', () => {
   expect(relativeTime('2026-10-15T11:59:30Z', now)).toBe('just now');
   expect(relativeTime('2026-10-15T11:55:00Z', now)).toBe('5 minutes ago');
   expect(relativeTime('2026-10-14T11:00:00Z', now)).toBe('yesterday');
+});
+
+test('count pluralizes', () => {
+  expect(count(1, 'criterion', 'criteria')).toBe('1 criterion');
+  expect(count(6, 'criterion', 'criteria')).toBe('6 criteria');
+  expect(count(0, 'option')).toBe('0 options');
 });

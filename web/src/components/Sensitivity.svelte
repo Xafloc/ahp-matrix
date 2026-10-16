@@ -1,7 +1,7 @@
 <script lang="ts">
   import { colorOf, percent } from '../lib/format';
   import { href } from '../lib/router.svelte';
-  import { at, leaderAt, lineFor } from '../lib/sensitivity';
+  import { at, leaderAt, lineFor, shiftLabel } from '../lib/sensitivity';
   import type { ProjectSession } from '../lib/session.svelte';
   import { path } from '../lib/tree';
   import { ALL_EVALUATORS } from '../lib/types';
@@ -35,8 +35,11 @@
   const leaderNow = $derived(line && chosen ? leaderAt(line, chosen.local) : 0);
   const changed = $derived(line ? leaderAt(line, x) !== leaderNow : false);
 
-  const verdict = (stability: number | null) =>
-    stability === null ? 'The leader holds at any weight' : `The leader changes if this moves ${Math.round(stability * 100)} points`;
+  const verdict = (stability: number | null) => {
+    if (stability === null) return 'The leader holds at any weight';
+    const points = Math.round(stability * 100);
+    return `The leader changes if this weight moves ${points < 1 ? 'less than 1 point' : `${points} point${points === 1 ? '' : 's'}`}`;
+  };
 </script>
 
 {#if !r}
@@ -57,7 +60,7 @@
             <a href={href(p.id, 'sensitivity', c.id)} class:current={c.id === chosen.id} aria-current={c.id === chosen.id ? 'true' : undefined}>
               <span class="name">{path(p, c.id).join(' › ')}</span>
               <span class="small" class:fragile={c.stability !== null && c.stability < 0.1}>
-                {c.stability === null ? 'Holds at any weight' : `Flips at ±${Math.round(c.stability * 100)} pts`}
+                {shiftLabel(c.stability)}
               </span>
             </a>
           </li>

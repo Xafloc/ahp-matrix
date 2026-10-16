@@ -31,8 +31,9 @@ func main() {
 		return
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-	if err := run(ctx, os.Args[1:], os.Stdout); err != nil {
+	err := run(ctx, os.Args[1:], os.Stdout)
+	stop()
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "ahp-matrix:", err)
 		os.Exit(1)
 	}

@@ -23,7 +23,7 @@ func Decode(data []byte) (*Project, error) {
 		SchemaVersion int `json:"schemaVersion"`
 	}
 	if err := json.Unmarshal(data, &head); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrNotProject, err)
+		return nil, fmt.Errorf("%w: %w", ErrNotProject, err)
 	}
 	switch {
 	case head.SchemaVersion <= 0:
@@ -35,7 +35,7 @@ func Decode(data []byte) (*Project, error) {
 	// the version 1 shape and converts it.
 	var p Project
 	if err := json.Unmarshal(data, &p); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrNotProject, err)
+		return nil, fmt.Errorf("%w: %w", ErrNotProject, err)
 	}
 	return &p, nil
 }

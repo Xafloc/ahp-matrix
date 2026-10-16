@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "id": "01TEMPLATEVENDORSELECTION0",
+  "version": 1,
+  "name": "Vendor selection",
+  "description": "The 23 criteria of the original Priority Matrix spreadsheet, grouped so you only compare criteria that belong together.",
+  "createdAt": "2026-10-15T12:00:00Z",
+  "updatedAt": "2026-10-15T12:00:00Z",
+  "scale": "saaty9",
+  "alternatives": [],
+  "criteria": [
+    {
+      "id": "g1",
+      "name": "Technical",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g1c1",
+      "name": "Accessibility",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c2",
+      "name": "Availability",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c3",
+      "name": "Capacity",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c4",
+      "name": "Data accuracy",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c5",
+      "name": "Performance",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c6",
+      "name": "Reliability",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c7",
+      "name": "Scalability",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g1c8",
+      "name": "Security",
+      "description": "",
+      "notes": "",
+      "parentId": "g1",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2",
+      "name": "Fit",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g2c1",
+      "name": "Functionality",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c2",
+      "name": "Flexibility",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c3",
+      "name": "Extensibility",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c4",
+      "name": "Integration",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c5",
+      "name": "Useability",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c6",
+      "name": "Globalization",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c7",
+      "name": "Standardization",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g2c8",
+      "name": "Simplification",
+      "description": "",
+      "notes": "",
+      "parentId": "g2",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3",
+      "name": "Delivery",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g3c1",
+      "name": "Implementation",
+      "description": "",
+      "notes": "",
+      "parentId": "g3",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3c2",
+      "name": "Migration",
+      "description": "",
+      "notes": "",
+      "parentId": "g3",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3c3",
+      "name": "Development",
+      "description": "",
+      "notes": "",
+      "parentId": "g3",
+      "method": "pairwise"
+    },
+    {
+      "id": "g3c4",
+      "name": "Manageability / Supportability",
+      "description": "",
+      "notes": "",
+      "parentId": "g3",
+      "method": "pairwise"
+    },
+    {
+      "id": "g4",
+      "name": "Commercial",
+      "description": "",
+      "notes": ""
+    },
+    {
+      "id": "g4c1",
+      "name": "Cost",
+      "description": "",
+      "notes": "",
+      "parentId": "g4",
+      "method": "pairwise"
+    },
+    {
+      "id": "g4c2",
+      "name": "Economy",
+      "description": "",
+      "notes": "",
+      "parentId": "g4",
+      "method": "pairwise"
+    },
+    {
+      "id": "g4c3",
+      "name": "Vendor",
+      "description": "",
+      "notes": "",
+      "parentId": "g4",
+      "method": "pairwise"
+    }
+  ],
+  "evaluators": [
+    {
+      "id": "e1",
+      "name": "Me",
+      "weight": 1
+    }
+  ],
+  "pairwise": [],
+  "ratings": [],
+  "values": []
+}

@@ -38,7 +38,7 @@ test('the grid shows reciprocals and flags suggested pairs', () => {
 test('the consistency meter explains contradictions and offers fixes', () => {
   const report = {
     context: 'alts:x', items: ['a', 'b', 'c'], weights: [0.5, 0.3, 0.2], cr: 0.3, threshold: 0.05, consistent: false,
-    complete: true, connected: true, missing: 0, pairs: 3, suggestions: [{ a: 'a', b: 'c', current: 0.25, suggested: 3 }],
+    complete: true, connected: true, missing: 0, pairs: 3, suggestions: [{ a: 'a', b: 'c', current: 0.25, suggested: 3 }], matrix: [],
   };
   const { body } = render(ConsistencyMeter, {
     props: { report, items: [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }], kind: 'alternatives', scale: 'saaty9', onfix: () => {} },
