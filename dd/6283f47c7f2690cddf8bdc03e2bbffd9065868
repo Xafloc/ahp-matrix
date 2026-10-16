@@ -1,0 +1,33 @@
+internal/samples/samples.go
+  s_65743add7cce22::t_d25b962e4b762b 1-79
+internal/samples/samples/cloud-provider.ahp.json
+  s_65743add7cce22::t_0f2ebb6ee979a2 1-343
+internal/samples/samples/family-car.ahp.json
+  s_65743add7cce22::t_d0b698de05f41e 1-184
+internal/samples/samples/hiring.ahp.json
+  s_65743add7cce22::t_d75b55340e508f 1-328
+internal/samples/samples_test.go
+  s_65743add7cce22::t_1e61b3bbbba21b 1-78
+internal/samples/templates/job-offer.ahp.json
+  s_65743add7cce22::t_a9c82867ac0d5e 1-113
+internal/samples/templates/software-tool.ahp.json
+  s_65743add7cce22::t_496077836889ae 1-120
+internal/samples/templates/vendor-selection.ahp.json
+  s_65743add7cce22::t_0047aba5316607 1-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dd6283f47c7f2690cddf8bdc03e2bbffd9065868",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
