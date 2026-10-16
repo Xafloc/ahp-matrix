@@ -1,0 +1,25 @@
+.golangci.yml
+  s_65743add7cce22::t_06c1827c7e7f46 1-35
+cmd/ahp-matrix/main.go
+  s_65743add7cce22::t_617511e60c6c61 34-36
+internal/model/decode.go
+  s_65743add7cce22::t_9e6c3ecc37c9fd 26,38
+internal/model/scale.go
+  s_65743add7cce22::t_300b808f3b9d15 80,87-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "51cdc365d6d017a1db367350d5a80a9b74eb9b19",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
