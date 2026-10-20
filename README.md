@@ -22,7 +22,13 @@ AHP Matrix is a single binary that runs a local web app. Your projects stay on y
 Download the archive for your system from the [latest release](https://github.com/Xafloc/ahp-matrix/releases/latest)
 (macOS, Linux and Windows, Intel or ARM), unpack it, and run `ahp-matrix`. It starts on http://127.0.0.1:7777 and opens your browser.
 
-The macOS binaries aren't notarized. If macOS blocks the one you downloaded, run `xattr -d com.apple.quarantine ahp-matrix`
+On macOS, Homebrew is the easiest way:
+
+```sh
+brew install xafloc/tap/ahp-matrix
+```
+
+The macOS binaries aren't notarized (Homebrew takes care of that for you). If macOS blocks the one you downloaded, run `xattr -d com.apple.quarantine ahp-matrix`
 once in the folder you unpacked it to, or allow it under System Settings › Privacy & Security.
 
 ### Build from source
