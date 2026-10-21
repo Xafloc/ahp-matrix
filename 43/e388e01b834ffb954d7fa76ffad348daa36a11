@@ -1,0 +1,23 @@
+web/src/lib/local.svelte.ts
+  s_65743add7cce22::t_e13dafc5947a67 1-88
+web/src/lib/local.test.ts
+  s_65743add7cce22::t_a1508f33c48b7f 1-64
+web/src/components/PairCompare.svelte
+  s_65743add7cce22::t_fceb5696416697 8,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "43e388e01b834ffb954d7fa76ffad348daa36a11",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
