@@ -24,6 +24,7 @@ func (s *server) exchangeRoutes() {
 	s.mux.HandleFunc("GET /api/projects/{id}/export.csv", s.exportCSV)
 	s.mux.HandleFunc("POST /api/projects/{id}/merge", s.mergeProject)
 	s.mux.HandleFunc("POST /api/projects/{id}/merge/preview", s.previewMerge)
+	s.mux.HandleFunc("GET /api/projects/{id}/invite.html", s.invitePage)
 }
 
 // importWorkbook creates a project from a workbook made with the original
