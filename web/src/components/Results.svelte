@@ -1,5 +1,6 @@
 <script lang="ts">
   import { exportUrl } from '../lib/api';
+  import { combineNote } from '../lib/copy';
   import { colorOf, percent } from '../lib/format';
   import { href } from '../lib/router.svelte';
   import { fraction } from '../lib/scale';
@@ -46,6 +47,7 @@
         <button role="tab" class="btn quiet" aria-selected={viewing === e.id} onclick={() => (viewing = e.id)}>{e.name}</button>
       {/each}
     </div>
+    {#if viewing === ALL_EVALUATORS}<p class="small muted combine">{combineNote}</p>{/if}
   {/if}
 
   {#if !r}
@@ -167,6 +169,9 @@
   }
   .headline {
     gap: 0.5rem;
+  }
+  .combine {
+    margin-top: -1.5rem;
   }
   .who {
     display: flex;

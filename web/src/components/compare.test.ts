@@ -48,3 +48,15 @@ test('the consistency meter explains contradictions and offers fixes', () => {
   expect(text(body)).toContain('Your other answers suggest: A is moderately better than C.');
   expect(text(body)).toContain('Use that');
 });
+
+test('the balance names the strengths before anything is chosen', () => {
+  const { body } = render(Balance, {
+    props: { a: { name: 'A' }, b: { name: 'B' }, value: undefined, scale: 'saaty9', kind: 'criteria', onchange: () => {} },
+  });
+  const words = text(body);
+  expect(words.match(/Extreme/g)).toHaveLength(2);
+  expect(words.match(/Very strong/g)).toHaveLength(2);
+  expect(words).toContain('Equal');
+  const classic = text(render(Balance, { props: { a: { name: 'A' }, b: { name: 'B' }, value: undefined, scale: 'classic5', kind: 'criteria', onchange: () => {} } }).body);
+  expect(classic.match(/Much/g)).toHaveLength(2);
+});

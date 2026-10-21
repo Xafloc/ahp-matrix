@@ -44,23 +44,32 @@ export function strength(v: number, scale: Scale): string {
   return (scale === 'classic5' ? classicWords : saatyWords)[k] ?? '';
 }
 
+/** The word printed under a stop on the balance: only the anchor strengths are named. */
+export function stopLabel(v: number, scale: Scale): string {
+  const k = Math.round(v >= 1 ? v : 1 / v);
+  const words: Record<number, string> =
+    scale === 'classic5' ? { 1: 'Equal', 5: 'Somewhat', 10: 'Much' } : { 1: 'Equal', 3: 'Moderate', 5: 'Strong', 7: 'Very strong', 9: 'Extreme' };
+  return words[k] ?? '';
+}
+
 export type CompareKind = 'criteria' | 'alternatives';
 
 /**
  * A sentence describing a judgment that a is preferred over b by v, such as
  * "Cost matters strongly more than Speed" or "Alpha is moderately better than
- * Beta on Price".
+ * Beta on Price". With preview, it reads as a possibility ("would matter"),
+ * for showing a choice before it's made.
  */
-export function describe(v: number, scale: Scale, kind: CompareKind, a: string, b: string, on?: string): string {
+export function describe(v: number, scale: Scale, kind: CompareKind, a: string, b: string, on?: string, preview = false): string {
   const s = snap(v, scale);
+  const where = on ? ` on ${on}` : '';
+  const [matter, is] = preview ? ['would matter', 'would be'] : ['matters', 'is'];
   if (s === 1) {
-    return kind === 'criteria' ? `${a} and ${b} matter equally` : `${a} and ${b} are equal${on ? ` on ${on}` : ''}`;
+    return kind === 'criteria' ? `${a} and ${b} ${preview ? 'would matter' : 'matter'} equally` : `${a} and ${b} ${preview ? 'would be' : 'are'} equal${where}`;
   }
   const [hi, lo, k] = s > 1 ? [a, b, s] : [b, a, 1 / s];
   const w = strength(k, scale);
-  return kind === 'criteria'
-    ? `${hi} matters ${w} more than ${lo}`
-    : `${hi} is ${w} better than ${lo}${on ? ` on ${on}` : ''}`;
+  return kind === 'criteria' ? `${hi} ${matter} ${w} more than ${lo}` : `${hi} ${is} ${w} better than ${lo}${where}`;
 }
 
 /** Formats a judgment value as people write it: 5, 1/5, 1. */

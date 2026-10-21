@@ -1,7 +1,7 @@
 <script lang="ts">
   // A balance beam for one pairwise judgment: the preferred side sinks. The
   // row of stops underneath is the control; arrow keys move along it.
-  import { describe, fraction, stops, type CompareKind } from '../lib/scale';
+  import { describe, fraction, stopLabel, stops, type CompareKind } from '../lib/scale';
   import type { Scale } from '../lib/types';
 
   interface Side {
@@ -33,6 +33,9 @@
   const index = $derived(value === undefined ? -1 : positions.findIndex((v) => Math.abs(Math.log(v / value)) < 1e-6));
   const tilt = $derived(value === undefined ? 0 : (-14 * Math.log(value)) / Math.log(max));
   const sentence = $derived(value === undefined ? 'Not compared yet' : describe(value, scale, kind, a.name, b.name, on));
+  // The stop under the pointer (or keyboard focus), previewed before it's chosen.
+  let hovered = $state<number | null>(null);
+  const preview = $derived(hovered !== null && hovered !== index ? describe(positions[hovered], scale, kind, a.name, b.name, on, true) : '');
 
   function set(i: number) {
     onchange(positions[Math.max(0, Math.min(positions.length - 1, i))]);
@@ -107,13 +110,25 @@
         class:toward-b={i > middle}
         aria-label={describe(v, scale, kind, a.name, b.name, on)}
         onclick={() => set(i)}
+        onpointerenter={() => (hovered = i)}
+        onpointerleave={() => (hovered = null)}
+        onfocus={() => (hovered = i)}
+        onblur={() => (hovered = null)}
       >
         <span>{label(v)}</span>
       </button>
     {/each}
   </div>
 
-  <p class="sentence" class:unset={value === undefined} aria-live="polite">{sentence}</p>
+  <div class="words" style:--n={positions.length} aria-hidden="true">
+    {#each positions as v, i}<span class:mid={i === middle}>{stopLabel(v, scale)}</span>{/each}
+  </div>
+
+  {#if preview}
+    <p class="sentence preview">{preview}</p>
+  {:else}
+    <p class="sentence" class:unset={value === undefined} aria-live="polite">{sentence}</p>
+  {/if}
 </div>
 
 <style>
@@ -225,6 +240,39 @@
   .stop.on {
     background: var(--ink);
     color: var(--paper);
+  }
+  .words {
+    display: grid;
+    grid-template-columns: repeat(var(--n, 17), minmax(0, 1fr));
+    width: min(100%, 40rem);
+    margin-top: -0.35rem;
+    font-size: 0.72rem;
+    line-height: 1.15;
+    color: var(--ink-3);
+    text-align: center;
+  }
+  /* A word sits on one line, centred on its stop and spilling into the
+     unlabelled stops beside it; the outermost align inwards so nothing
+     pokes out past the row. */
+  .words span {
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .words span:first-child {
+    justify-content: flex-start;
+  }
+  .words span:last-child {
+    justify-content: flex-end;
+  }
+  .words .mid {
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+  .sentence.preview {
+    color: var(--ink-3);
+    font-style: italic;
   }
   .sentence {
     font-size: 1.05rem;
