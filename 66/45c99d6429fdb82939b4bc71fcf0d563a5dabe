@@ -1,0 +1,32 @@
+web/src/lib/independence.ts
+  s_65743add7cce22::t_99cd3557f74e86 1-26
+web/src/lib/independence.test.ts
+  s_65743add7cce22::t_99cd3557f74e86 1-23
+web/src/App.svelte
+  s_65743add7cce22::t_d9245e970534a6 3,91-92
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_d9245e970534a6 11,227-228
+web/src/lib/session.svelte.ts
+  s_65743add7cce22::t_d9245e970534a6 2,20-26
+web/e2e/discussion.spec.ts
+  s_65743add7cce22::t_6f0c3d83dd1bc9 28
+  s_65743add7cce22::t_fa0f4743f86335 17-27,29-36
+web/src/components/Hidden.svelte
+  s_65743add7cce22::t_d9245e970534a6 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6645c99d6429fdb82939b4bc71fcf0d563a5dabe",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
