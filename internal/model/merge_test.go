@@ -82,7 +82,7 @@ func TestMergeAsksBeforeReplacingSomeone(t *testing.T) {
 	if pairs, ratings := countFor(owner, "e2"); pairs != 2 || ratings != 1 {
 		t.Errorf("after replace Bob has %d judgments and %d ratings, want 2 and 1", pairs, ratings)
 	}
-	if len(rep.Replaced) != 1 || rep.Replaced[0] != "Bob" || rep.Dropped != 1 || rep.Judgments != 3 {
+	if len(rep.Replaced) != 1 || rep.Replaced[0] != "Bob" || len(rep.Dropped) != 1 || rep.Judgments != 3 {
 		t.Errorf("report = %+v", rep)
 	}
 	if owner.Name != "Fixture" || owner.Values[0].Value != 100 {
@@ -166,5 +166,77 @@ func TestMergeAcceptsACopyImportedUnderANewID(t *testing.T) {
 	pk.ID, pk.Origin = NewProjectID(), owner.ID // the colleague already had a copy, so the import got a new id
 	if _, err := Merge(owner, pk, MergeReplace); err != nil {
 		t.Errorf("err = %v, want the copy to merge via its origin", err)
+	}
+}
+
+func TestPreviewSaysWhatWillComeAcrossAndWhatWont(t *testing.T) {
+	owner := fixture()
+	pk := returned(t, owner) // Bob: 2 usable pairs (one twice), a pair with a deleted option, 1 rating
+	before, _ := clone(owner)
+	pv, err := PreviewMerge(owner, pk)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pv.People) != 1 || pv.People[0].Name != "Bob" || pv.People[0].Judgments != 3 || pv.People[0].ReplacesExisting {
+		t.Errorf("people = %+v", pv.People)
+	}
+	if len(pv.Dropped) != 1 || pv.Dropped[0] != "Comparison of Alpha with zz on Performance: zz is no longer in this decision" {
+		t.Errorf("dropped = %q", pv.Dropped)
+	}
+	if pv.OutOfDate {
+		t.Error("a copy of the current structure was called out of date")
+	}
+	if len(owner.Pairwise) != len(before.Pairwise) {
+		t.Error("previewing changed the project")
+	}
+
+	owner.Pairwise = append(owner.Pairwise, PairwiseJudgment{EvaluatorID: "e2", Context: CriteriaContext(""), A: "c1", B: "c4", Value: 2})
+	owner.Criteria = append(owner.Criteria, Criterion{ID: "c9", Name: "Warranty", Method: MethodRating})
+	pv, _ = PreviewMerge(owner, pk)
+	if !pv.People[0].ReplacesExisting || !pv.OutOfDate {
+		t.Errorf("after Bob judged and a criterion was added: %+v, outOfDate %v", pv.People, pv.OutOfDate)
+	}
+}
+
+func TestDroppedLinesNameRemovedCriteriaAndRegrouping(t *testing.T) {
+	owner := fixture()
+	pk := returned(t, owner)
+	pk.Pairwise = append(pk.Pairwise, PairwiseJudgment{EvaluatorID: "e2", Context: CriteriaContext("c1"), A: "c2", B: "c3", Value: 2})
+	pk.Ratings = append(pk.Ratings, Rating{EvaluatorID: "e2", CriterionID: "c3", AlternativeID: "a2", Value: 4})
+	// Since sending: Security was removed.
+	removeCriterion := func(p *Project, id string) {
+		p.Criteria = keep(p.Criteria, func(c Criterion) bool { return c.ID != id })
+	}
+	removeCriterion(owner, "c3")
+	pv, _ := PreviewMerge(owner, pk)
+	want := map[string]bool{
+		"Comparison of Performance with Security: Security is no longer in this decision": true,
+		"Rating of Alpha on Security: Security is no longer in this decision":             true,
+		"Rating of Beta on Security: Security is no longer in this decision":              true,
+		"Comparison of Alpha with zz on Performance: zz is no longer in this decision":    true,
+	}
+	for _, d := range pv.Dropped {
+		if !want[d] {
+			t.Errorf("unexpected dropped line %q", d)
+		}
+		delete(want, d)
+	}
+	for d := range want {
+		t.Errorf("missing dropped line %q", d)
+	}
+}
+
+func TestMergeRecordsWhenAnswersCameBack(t *testing.T) {
+	owner := fixture()
+	rep, err := Merge(owner, returned(t, owner), MergeAsk)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bob := owner.Evaluators[1]
+	if bob.Invite == nil || bob.Invite.ReturnedAt == nil {
+		t.Fatalf("Bob's invite = %+v, want a return time", bob.Invite)
+	}
+	if len(rep.Dropped) != 1 {
+		t.Errorf("dropped = %q", rep.Dropped)
 	}
 }

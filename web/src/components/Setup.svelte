@@ -40,7 +40,7 @@
         who.length === 0
           ? 'Nothing merged: the current judgments were kept.'
           : `Merged ${count(report.judgments, 'judgment')} from ${who.join(', ')}.` +
-            (report.dropped ? ` ${count(report.dropped, 'judgment')} about options or criteria no longer in this decision ${report.dropped === 1 ? 'was' : 'were'} left out.` : '');
+            (report.dropped.length ? ` ${count(report.dropped.length, 'judgment')} about options or criteria no longer in this decision ${report.dropped.length === 1 ? 'was' : 'were'} left out.` : '');
       mergeFile = null;
     } catch (e) {
       if (e instanceof ApiError && e.code === 'evaluator-exists') {
