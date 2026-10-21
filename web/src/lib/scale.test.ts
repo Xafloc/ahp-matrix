@@ -1,5 +1,5 @@
 import { describe as group, expect, test } from 'vitest';
-import { describe, fraction, snap, stopIndex, stops } from './scale';
+import { describe, fraction, snap, stopIndex, stopLabel, stops } from './scale';
 
 group('scale', () => {
   test('saaty9 has 17 stops from 1/9 to 9', () => {
@@ -31,4 +31,17 @@ group('scale', () => {
     expect(fraction(1 / 7)).toBe('1/7');
     expect(fraction(1)).toBe('1');
   });
+});
+
+test('stop labels name the anchor strengths on each scale', () => {
+  const saaty = stops('saaty9').map((v) => stopLabel(v, 'saaty9'));
+  expect(saaty).toEqual(['Extreme', '', 'Very strong', '', 'Strong', '', 'Moderate', '', 'Equal', '', 'Moderate', '', 'Strong', '', 'Very strong', '', 'Extreme']);
+  expect(stops('classic5').map((v) => stopLabel(v, 'classic5'))).toEqual(['Much', 'Somewhat', 'Equal', 'Somewhat', 'Much']);
+});
+
+test('a previewed judgment reads as a possibility', () => {
+  expect(describe(5, 'saaty9', 'criteria', 'Cost', 'Speed', '', true)).toBe('Cost would matter strongly more than Speed');
+  expect(describe(1, 'saaty9', 'criteria', 'Cost', 'Speed', '', true)).toBe('Cost and Speed would matter equally');
+  expect(describe(1 / 3, 'saaty9', 'alternatives', 'A', 'B', 'Price', true)).toBe('B would be moderately better than A on Price');
+  expect(describe(1, 'classic5', 'alternatives', 'A', 'B', '', true)).toBe('A and B would be equal');
 });

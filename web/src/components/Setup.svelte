@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ApiError, api, exportUrl, type MergePolicy } from '../lib/api';
   import { addAlternative, addEvaluator, changeScale, removeAlternative, removeEvaluator, setEvaluatorWeight } from '../lib/edits';
+  import { combineNote } from '../lib/copy';
   import { colorOf, count } from '../lib/format';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
@@ -136,6 +137,10 @@
     <header>
       <h2>People</h2>
       <p class="muted">Everyone whose judgments count. Each person compares on their own; results combine them, weighted.</p>
+      <details class="how small">
+        <summary>How are people combined?</summary>
+        <p class="muted">{combineNote}</p>
+      </details>
     </header>
     <ul class="list">
       {#each p.evaluators as e (e.id)}
@@ -296,6 +301,14 @@
     display: flex;
     gap: 0.5rem;
     max-width: 30rem;
+  }
+  .how summary {
+    cursor: pointer;
+    color: var(--ink-2);
+    width: fit-content;
+  }
+  .how p {
+    margin-top: 0.3rem;
   }
   .remote {
     display: grid;

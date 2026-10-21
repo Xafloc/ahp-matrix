@@ -46,7 +46,9 @@
     {/if}
     <section class="main">
       <h1>
-        {group.parentId ? `Within ${p.criteria.find((c) => c.id === group.parentId)?.name}, which matters more?` : 'Which matters more?'}
+        {group.parentId
+          ? `Within ${p.criteria.find((c) => c.id === group.parentId)?.name}, which matters more, and by how much?`
+          : 'Which matters more, and by how much?'}
       </h1>
       {#key group.parentId}
         <PairCompare

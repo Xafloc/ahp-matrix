@@ -18,7 +18,7 @@ test('a decision from an empty library to a robust answer', async ({ page }) => 
 
   // Score taste in pairs: each time, the left option slightly better.
   await page.getByRole('link', { name: /Score options/ }).click();
-  await expect(page.getByRole('heading', { name: 'Which is better on Taste?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Which is better on Taste, and by how much?' })).toBeVisible();
   for (let k = 0; k < 3; k++) {
     await page.getByRole('slider').press('ArrowLeft');
     await page.getByRole('slider').press('Enter');

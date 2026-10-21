@@ -109,7 +109,7 @@
         </ul>
         <p class="small muted">Measured values are shared by everyone; they aren't anyone's opinion.</p>
       {:else}
-        <h1>Which is better on {leaf.name}?</h1>
+        <h1>Which is better on {leaf.name}, and by how much?</h1>
         {#key leaf.id}
           <PairCompare {session} context={altsContext(leaf.id)} {items} kind="alternatives" on={leaf.name} />
         {/key}
