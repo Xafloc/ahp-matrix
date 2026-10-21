@@ -79,8 +79,19 @@ func goldenProjects() map[string]*Project {
 }
 
 func TestGoldenResults(t *testing.T) {
+	type run struct {
+		p         *Project
+		evaluator string
+	}
+	runs := map[string]run{}
 	for name, p := range goldenProjects() {
-		res, err := Compute(p, AllEvaluators)
+		runs[name] = run{p, AllEvaluators}
+		// One person's own results too: the judging page computes these alone.
+		runs[name+"-"+p.Evaluators[0].ID] = run{p, p.Evaluators[0].ID}
+	}
+	for name, r := range runs {
+		p := r.p
+		res, err := Compute(p, r.evaluator)
 		if err != nil {
 			t.Fatal(err)
 		}

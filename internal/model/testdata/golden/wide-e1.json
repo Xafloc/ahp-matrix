@@ -1,0 +1,1163 @@
+{
+  "project": {
+    "schemaVersion": 2,
+    "id": "01GOLDENWIDE00000000000000",
+    "version": 0,
+    "name": "Wide",
+    "description": "",
+    "createdAt": "2026-10-15T12:00:00Z",
+    "updatedAt": "2026-10-15T12:00:00Z",
+    "scale": "saaty9",
+    "aggregation": "judgments",
+    "alternatives": [
+      {
+        "id": "a1",
+        "name": "Atlas",
+        "description": "",
+        "color": "series-1"
+      },
+      {
+        "id": "a2",
+        "name": "Birch",
+        "description": "",
+        "color": "series-2"
+      },
+      {
+        "id": "a3",
+        "name": "Cedar",
+        "description": "",
+        "color": "series-3"
+      },
+      {
+        "id": "a4",
+        "name": "Dune",
+        "description": "",
+        "color": "series-4"
+      },
+      {
+        "id": "a5",
+        "name": "Ember",
+        "description": "",
+        "color": "series-5"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "t",
+        "name": "Technical",
+        "description": "",
+        "notes": ""
+      },
+      {
+        "id": "t1",
+        "parentId": "t",
+        "name": "Speed",
+        "description": "",
+        "notes": "",
+        "method": "pairwise"
+      },
+      {
+        "id": "t2",
+        "parentId": "t",
+        "name": "Security",
+        "description": "",
+        "notes": "",
+        "method": "rating"
+      },
+      {
+        "id": "t3",
+        "parentId": "t",
+        "name": "Uptime",
+        "description": "",
+        "notes": "",
+        "method": "value",
+        "direction": "higher"
+      },
+      {
+        "id": "b",
+        "name": "Business",
+        "description": "",
+        "notes": ""
+      },
+      {
+        "id": "b1",
+        "parentId": "b",
+        "name": "Price",
+        "description": "",
+        "notes": "",
+        "method": "value",
+        "direction": "lower"
+      },
+      {
+        "id": "b2",
+        "parentId": "b",
+        "name": "Vendor",
+        "description": "",
+        "notes": "",
+        "method": "pairwise"
+      },
+      {
+        "id": "s",
+        "name": "Support",
+        "description": "",
+        "notes": "",
+        "method": "rating"
+      }
+    ],
+    "evaluators": [
+      {
+        "id": "e1",
+        "name": "Ann",
+        "weight": 1
+      },
+      {
+        "id": "e2",
+        "name": "Bob",
+        "weight": 2
+      }
+    ],
+    "pairwise": [
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "b",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "s",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:root",
+        "a": "b",
+        "b": "s",
+        "value": 0.5
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t2",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t3",
+        "value": 0.2
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:t",
+        "a": "t2",
+        "b": "t3",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:b",
+        "a": "b1",
+        "b": "b2",
+        "value": 0.125
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a2",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a3",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a4",
+        "value": 0.25
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a5",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.14285714285714285
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a4",
+        "value": 2
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a5",
+        "value": 9
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a4",
+        "value": 0.3333333333333333
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a5",
+        "value": 6
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:t1",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.16666666666666666
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a2",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a3",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a4",
+        "value": 0.5
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a5",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.2
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a4",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a5",
+        "value": 0.125
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a4",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a5",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:b2",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.25
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "b",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:root",
+        "a": "t",
+        "b": "s",
+        "value": 0.14285714285714285
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:root",
+        "a": "b",
+        "b": "s",
+        "value": 2
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t2",
+        "value": 9
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:t",
+        "a": "t1",
+        "b": "t3",
+        "value": 0.3333333333333333
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:t",
+        "a": "t2",
+        "b": "t3",
+        "value": 6
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "criteria:b",
+        "a": "b1",
+        "b": "b2",
+        "value": 0.16666666666666666
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a2",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a3",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a4",
+        "value": 0.5
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a1",
+        "b": "a5",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.2
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a4",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a2",
+        "b": "a5",
+        "value": 0.125
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a4",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a3",
+        "b": "a5",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:t1",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.25
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a2",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a3",
+        "value": 0.14285714285714285
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a4",
+        "value": 2
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a1",
+        "b": "a5",
+        "value": 9
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a3",
+        "value": 0.3333333333333333
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a4",
+        "value": 6
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a2",
+        "b": "a5",
+        "value": 0.16666666666666666
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a4",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a3",
+        "b": "a5",
+        "value": 0.1111111111111111
+      },
+      {
+        "evaluatorId": "e2",
+        "context": "alts:b2",
+        "a": "a4",
+        "b": "a5",
+        "value": 0.5
+      }
+    ],
+    "ratings": [
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a1",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a1",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a2",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a2",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a3",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a3",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a4",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a4",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "t2",
+        "alternativeId": "a5",
+        "value": 10
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "s",
+        "alternativeId": "a5",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a1",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a1",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a2",
+        "value": 8
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a2",
+        "value": 10
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a3",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a3",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a4",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a4",
+        "value": 10
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "t2",
+        "alternativeId": "a5",
+        "value": 7
+      },
+      {
+        "evaluatorId": "e2",
+        "criterionId": "s",
+        "alternativeId": "a5",
+        "value": 5
+      }
+    ],
+    "values": [
+      {
+        "criterionId": "t3",
+        "alternativeId": "a1",
+        "value": 99
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a1",
+        "value": 1000
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a2",
+        "value": 99.2
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a2",
+        "value": 1500
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a3",
+        "value": 99.4
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a3",
+        "value": 2000
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a4",
+        "value": 99.6
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a4",
+        "value": 1250
+      },
+      {
+        "criterionId": "t3",
+        "alternativeId": "a5",
+        "value": 99.8
+      },
+      {
+        "criterionId": "b1",
+        "alternativeId": "a5",
+        "value": 1750
+      }
+    ]
+  },
+  "results": {
+    "evaluator": "e1",
+    "scores": [
+      {
+        "id": "a1",
+        "score": 0.25314205270473694,
+        "rank": 2
+      },
+      {
+        "id": "a2",
+        "score": 0.10812510714375147,
+        "rank": 5
+      },
+      {
+        "id": "a3",
+        "score": 0.2746651718359378,
+        "rank": 1
+      },
+      {
+        "id": "a4",
+        "score": 0.1230132165155775,
+        "rank": 4
+      },
+      {
+        "id": "a5",
+        "score": 0.2410544517999961,
+        "rank": 3
+      }
+    ],
+    "criteria": [
+      {
+        "id": "t",
+        "local": 0.1794216412256454,
+        "global": 0.1794216412256454,
+        "subtree": [
+          0.24429616761429476,
+          0.1495603609556391,
+          0.19003361062193858,
+          0.20580855470862278,
+          0.21030130609950481
+        ],
+        "stability": 0.23304411434677252
+      },
+      {
+        "id": "t1",
+        "parentId": "t",
+        "local": 0.3697249586994264,
+        "global": 0.06633665889193505,
+        "subtree": [
+          0.27113110000228297,
+          0.18759354750559024,
+          0.22249609922981764,
+          0.19059681624292354,
+          0.1281824370193857
+        ],
+        "stability": null
+      },
+      {
+        "id": "t2",
+        "parentId": "t",
+        "local": 0.2742563810505593,
+        "global": 0.049207530004697346,
+        "subtree": [
+          0.26666666666666666,
+          0.03333333333333333,
+          0.13333333333333333,
+          0.23333333333333334,
+          0.3333333333333333
+        ],
+        "stability": null
+      },
+      {
+        "id": "t3",
+        "parentId": "t",
+        "local": 0.3560186602500144,
+        "global": 0.06387745232901303,
+        "subtree": [
+          0.19919517102615691,
+          0.19959758551307846,
+          0.19999999999999998,
+          0.2004024144869215,
+          0.20080482897384302
+        ],
+        "stability": null
+      },
+      {
+        "id": "b",
+        "local": 0.1424070510137252,
+        "global": 0.1424070510137252,
+        "subtree": [
+          0.19988021024324346,
+          0.09461336954045378,
+          0.4193847638545446,
+          0.128291239410994,
+          0.15783041695076414
+        ],
+        "stability": 0.09323134391656662
+      },
+      {
+        "id": "b1",
+        "parentId": "b",
+        "local": 0.11111111111111112,
+        "global": 0.01582300566819169,
+        "subtree": [
+          0.28263795423956933,
+          0.18842530282637956,
+          0.14131897711978467,
+          0.2261103633916555,
+          0.16150740242261105
+        ],
+        "stability": 0.3723285526658828
+      },
+      {
+        "id": "b2",
+        "parentId": "b",
+        "local": 0.8888888888888888,
+        "global": 0.1265840453455335,
+        "subtree": [
+          0.18953549224370272,
+          0.08288687787971306,
+          0.4541429871963896,
+          0.1160638489134113,
+          0.15737079376678328
+        ],
+        "stability": 0.37232855266588305
+      },
+      {
+        "id": "s",
+        "local": 0.6781713077606293,
+        "global": 0.6781713077606293,
+        "subtree": [
+          0.26666666666666666,
+          0.1,
+          0.26666666666666666,
+          0.1,
+          0.26666666666666666
+        ],
+        "stability": 0.3218286922393707
+      }
+    ],
+    "matrices": [
+      {
+        "context": "criteria:root",
+        "items": [
+          "t",
+          "b",
+          "s"
+        ],
+        "weights": [
+          0.1794216412256454,
+          0.1424070510137252,
+          0.6781713077606293
+        ],
+        "cr": 0.69058212176775,
+        "threshold": 0.05,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 3,
+        "suggestions": [
+          {
+            "a": "t",
+            "b": "b",
+            "current": 2.9999999999999996,
+            "suggested": 1,
+            "crAfter": 0.2212676626937008
+          },
+          {
+            "a": "t",
+            "b": "s",
+            "current": 0.11111111111111109,
+            "suggested": 0.25,
+            "crAfter": 0.316760173259693
+          },
+          {
+            "a": "b",
+            "b": "s",
+            "current": 0.5,
+            "suggested": 0.2,
+            "crAfter": 0.27965743547696964
+          }
+        ],
+        "matrix": [
+          [
+            1,
+            2.9999999999999996,
+            0.11111111111111109
+          ],
+          [
+            0.33333333333333337,
+            1,
+            0.5
+          ],
+          [
+            9.000000000000002,
+            2,
+            1
+          ]
+        ]
+      },
+      {
+        "context": "criteria:t",
+        "items": [
+          "t1",
+          "t2",
+          "t3"
+        ],
+        "weights": [
+          0.3697249586994264,
+          0.2742563810505593,
+          0.3560186602500144
+        ],
+        "cr": 2.918172224488382,
+        "threshold": 0.05,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 3,
+        "suggestions": [
+          {
+            "a": "t1",
+            "b": "t2",
+            "current": 7,
+            "suggested": 1,
+            "crAfter": 0.9334661779818493
+          },
+          {
+            "a": "t1",
+            "b": "t3",
+            "current": 0.2,
+            "suggested": 1,
+            "crAfter": 1.17750504299986
+          },
+          {
+            "a": "t2",
+            "b": "t3",
+            "current": 4,
+            "suggested": 1,
+            "crAfter": 1.3592905335529912
+          }
+        ],
+        "matrix": [
+          [
+            1,
+            7,
+            0.2
+          ],
+          [
+            0.14285714285714285,
+            1,
+            4
+          ],
+          [
+            5,
+            0.25,
+            1
+          ]
+        ]
+      },
+      {
+        "context": "criteria:b",
+        "items": [
+          "b1",
+          "b2"
+        ],
+        "weights": [
+          0.11111111111111112,
+          0.8888888888888888
+        ],
+        "cr": 0,
+        "threshold": 0.1,
+        "consistent": true,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 1,
+        "suggestions": [],
+        "matrix": [
+          [
+            1,
+            0.12500000000000003
+          ],
+          [
+            7.999999999999998,
+            1
+          ]
+        ]
+      },
+      {
+        "context": "alts:t1",
+        "items": [
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5"
+        ],
+        "weights": [
+          0.27113110000228297,
+          0.18759354750559024,
+          0.22249609922981764,
+          0.19059681624292354,
+          0.1281824370193857
+        ],
+        "cr": 1.2938516532482425,
+        "threshold": 0.1,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 10,
+        "suggestions": [
+          {
+            "a": "a4",
+            "b": "a5",
+            "current": 0.16666666666666669,
+            "suggested": 2,
+            "crAfter": 0.7000081319036522
+          },
+          {
+            "a": "a1",
+            "b": "a3",
+            "current": 7.999999999999998,
+            "suggested": 1,
+            "crAfter": 1.03023283180784
+          },
+          {
+            "a": "a2",
+            "b": "a5",
+            "current": 9.000000000000002,
+            "suggested": 2,
+            "crAfter": 1.1102299402989757
+          }
+        ],
+        "matrix": [
+          [
+            1,
+            1,
+            7.999999999999998,
+            0.25,
+            5
+          ],
+          [
+            1,
+            1,
+            0.14285714285714285,
+            2,
+            9.000000000000002
+          ],
+          [
+            0.12500000000000003,
+            7,
+            1,
+            0.3333333333333333,
+            6
+          ],
+          [
+            4,
+            0.5,
+            3,
+            1,
+            0.16666666666666669
+          ],
+          [
+            0.2,
+            0.11111111111111109,
+            0.16666666666666666,
+            5.999999999999999,
+            1
+          ]
+        ]
+      },
+      {
+        "context": "alts:b2",
+        "items": [
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5"
+        ],
+        "weights": [
+          0.18953549224370272,
+          0.08288687787971306,
+          0.4541429871963896,
+          0.1160638489134113,
+          0.15737079376678328
+        ],
+        "cr": 0.8250980994018342,
+        "threshold": 0.1,
+        "consistent": false,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 10,
+        "suggestions": [
+          {
+            "a": "a1",
+            "b": "a5",
+            "current": 7,
+            "suggested": 1,
+            "crAfter": 0.554207264974552
+          },
+          {
+            "a": "a2",
+            "b": "a4",
+            "current": 4,
+            "suggested": 1,
+            "crAfter": 0.6298623991210269
+          },
+          {
+            "a": "a2",
+            "b": "a5",
+            "current": 0.12500000000000003,
+            "suggested": 0.5,
+            "crAfter": 0.6472807282425718
+          }
+        ],
+        "matrix": [
+          [
+            1,
+            2.9999999999999996,
+            0.11111111111111109,
+            0.5,
+            7
+          ],
+          [
+            0.33333333333333337,
+            1,
+            0.2,
+            4,
+            0.12500000000000003
+          ],
+          [
+            9.000000000000002,
+            5,
+            1,
+            1,
+            7.999999999999998
+          ],
+          [
+            2,
+            0.25,
+            1,
+            1,
+            0.25
+          ],
+          [
+            0.14285714285714285,
+            7.999999999999998,
+            0.12500000000000003,
+            4,
+            1
+          ]
+        ]
+      }
+    ],
+    "issues": [],
+    "disagreements": [],
+    "completeness": 1,
+    "consistent": false,
+    "people": [
+      {
+        "id": "e1",
+        "done": 37,
+        "total": 37,
+        "finished": true,
+        "consistent": false,
+        "structure": "cf4c9169abb3",
+        "outOfDate": false
+      },
+      {
+        "id": "e2",
+        "done": 37,
+        "total": 37,
+        "finished": true,
+        "consistent": false,
+        "structure": "cf4c9169abb3",
+        "outOfDate": false
+      }
+    ],
+    "values": {
+      "done": 10,
+      "total": 10
+    },
+    "method": "judgments"
+  }
+}
