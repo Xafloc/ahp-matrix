@@ -48,3 +48,13 @@ test("disagreements show everyone's answer on one scale, and Revise my answer op
   await expect(page.getByRole('slider', { name: new RegExp(`Compare (${a} with ${b}|${b} with ${a})`) })).toBeVisible();
   await expect(page.getByText('Answering as Engineering lead')).toBeVisible();
 });
+
+test("everyone's own ranking sits beside the combined one, under a headline on whether they agree", async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
+  const section = page.getByRole('region', { name: "Each person's ranking" });
+  await expect(section.getByText(/^(Both people rank .+ first\.|People disagree on the winner: .+\.)$/)).toBeVisible();
+  const table = section.getByRole('table');
+  await expect(table.getByRole('columnheader')).toHaveText(['Option', 'Everyone combined', 'Engineering lead', 'Product manager']);
+  await expect(table.getByRole('row')).toHaveCount(4); // header + 3 candidates
+});

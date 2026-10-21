@@ -1,5 +1,6 @@
 <script lang="ts">
   import { exportUrl } from '../lib/api';
+  import { agreement } from '../lib/agreement';
   import { combineNote } from '../lib/copy';
   import { colorOf, percent } from '../lib/format';
   import { href } from '../lib/router.svelte';
@@ -41,6 +42,17 @@
     const [i, j] = [m?.items.indexOf(a) ?? -1, m?.items.indexOf(b) ?? -1];
     return m && i >= 0 && j >= 0 && m.matrix[i][j] ? m.matrix[i][j] : undefined;
   }
+  // Everyone's own ranking, for comparing side by side.
+  $effect(() => {
+    if (viewing === ALL_EVALUATORS) for (const e of p.evaluators) session.watch(e.id);
+  });
+  const answeredBy = (id: string) => (session.results[ALL_EVALUATORS]?.people.find((x) => x.id === id)?.done ?? 0) > 0;
+  const headline = $derived(
+    agreement(
+      p.evaluators.map((e) => ({ name: e.name, scores: answeredBy(e.id) ? (session.results[e.id]?.scores ?? null) : null })),
+      new Map(p.alternatives.map((a) => [a.id, a.name])),
+    ),
+  );
   const disagreements = $derived((r?.disagreements ?? []).filter((d) => d.spread >= 1.4).slice(0, 6));
   const lead = $derived(ranked.length >= 2 ? ranked[1].score > 0 ? (ranked[0].score - ranked[1].score) / ranked[0].score : 1 : 0);
 </script>
@@ -97,6 +109,36 @@
             </li>
           {/each}
         </ul>
+      </section>
+    {/if}
+
+    {#if viewing === ALL_EVALUATORS && p.evaluators.length > 1}
+      <section aria-labelledby="people-title">
+        <h2 id="people-title">Each person's ranking</h2>
+        {#if headline}<p>{headline}</p>{/if}
+        <div class="scroll">
+          <table class="matrices people">
+            <thead>
+              <tr>
+                <th scope="col">Option</th>
+                <th scope="col">Everyone combined</th>
+                {#each p.evaluators as e (e.id)}<th scope="col">{e.name}</th>{/each}
+              </tr>
+            </thead>
+            <tbody>
+              {#each ranked as s (s.id)}
+                <tr>
+                  <th scope="row"><span class="dot" style:background={colorOf(p.alternatives.find((a) => a.id === s.id)?.color ?? '')}></span>{altName(s.id)}</th>
+                  <td><strong>{s.rank}</strong> <span class="muted small">{percent(s.score, 0)}</span></td>
+                  {#each p.evaluators as e (e.id)}
+                    {@const own = answeredBy(e.id) ? session.results[e.id]?.scores.find((x) => x.id === s.id) : undefined}
+                    <td>{#if own}<strong>{own.rank}</strong> <span class="muted small">{percent(own.score, 0)}</span>{:else}<span class="muted small">No answers yet</span>{/if}</td>
+                  {/each}
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
       </section>
     {/if}
 
@@ -228,6 +270,19 @@
   }
   .matrices th {
     font-weight: 550;
+  }
+  .scroll {
+    overflow-x: auto;
+  }
+  .people th[scope='row'] {
+    white-space: nowrap;
+  }
+  .people .dot {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-right: 0.45rem;
+    border-radius: 50%;
   }
   .ok {
     color: var(--good);
