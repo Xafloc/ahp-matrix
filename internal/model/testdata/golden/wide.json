@@ -1234,6 +1234,31 @@
       }
     ],
     "completeness": 1,
-    "consistent": false
+    "consistent": false,
+    "people": [
+      {
+        "id": "e1",
+        "done": 37,
+        "total": 37,
+        "finished": true,
+        "consistent": false,
+        "structure": "cf4c9169abb3",
+        "outOfDate": false
+      },
+      {
+        "id": "e2",
+        "done": 37,
+        "total": 37,
+        "finished": true,
+        "consistent": false,
+        "structure": "cf4c9169abb3",
+        "outOfDate": false
+      }
+    ],
+    "values": {
+      "done": 10,
+      "total": 10
+    },
+    "method": "judgments"
   }
 }

@@ -316,7 +316,32 @@
     ],
     "issues": [],
     "disagreements": [],
-    "completeness": 1,
-    "consistent": true
+    "completeness": 0.5789473684210527,
+    "consistent": true,
+    "people": [
+      {
+        "id": "e1",
+        "done": 8,
+        "total": 8,
+        "finished": true,
+        "consistent": true,
+        "structure": "293112a6118c",
+        "outOfDate": false
+      },
+      {
+        "id": "e2",
+        "done": 0,
+        "total": 8,
+        "finished": false,
+        "consistent": true,
+        "structure": "293112a6118c",
+        "outOfDate": false
+      }
+    ],
+    "values": {
+      "done": 3,
+      "total": 3
+    },
+    "method": "judgments"
   }
 }
