@@ -1,4 +1,5 @@
 import { ApiError, api, type Client } from './api';
+import { hiddenFor } from './independence';
 import { explain, type Problem } from './problems';
 import { ALL_EVALUATORS, type Project, type Results } from './types';
 
@@ -16,6 +17,13 @@ export class ProjectSession {
   error = $state('');
   /** Evaluator whose judgments the compare screens edit. */
   scoringAs = $state('');
+  /** People who chose to see results before finishing (this session only). */
+  revealed: string[] = $state([]);
+
+  /** Whether results are kept from the person judging, so others' answers don't sway theirs. */
+  get hidesResults(): boolean {
+    return hiddenFor(this.results[ALL_EVALUATORS]?.people ?? [], this.scoringAs, this.project.evaluators.length) && !this.revealed.includes(this.scoringAs);
+  }
   /** Latest results, keyed by evaluator id or ALL_EVALUATORS. */
   results: Record<string, Results> = $state({});
 

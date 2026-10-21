@@ -1,14 +1,16 @@
 <script lang="ts">
   import { exportUrl } from '../lib/api';
+  import { agreement } from '../lib/agreement';
   import { combineNote } from '../lib/copy';
   import { colorOf, percent } from '../lib/format';
   import { href } from '../lib/router.svelte';
-  import { fraction } from '../lib/scale';
+  import { describe } from '../lib/scale';
   import type { ProjectSession } from '../lib/session.svelte';
   import { path } from '../lib/tree';
   import { ALL_EVALUATORS } from '../lib/types';
   import Contributions from './charts/Contributions.svelte';
   import PriorityBars from './charts/PriorityBars.svelte';
+  import PeopleScale from './PeopleScale.svelte';
   import WeightTree from './charts/WeightTree.svelte';
 
   let { session }: { session: ProjectSession } = $props();
@@ -35,6 +37,20 @@
   }
 
   // Only differences of opinion worth discussing: roughly a factor of two apart or more.
+  // The group's combined answer for a pair, from that matrix.
+  function combinedFor(context: string, a: string, b: string) {
+    const m = r?.matrices.find((x) => x.context === context);
+    const [i, j] = [m?.items.indexOf(a) ?? -1, m?.items.indexOf(b) ?? -1];
+    return m && i >= 0 && j >= 0 && m.matrix[i][j] ? m.matrix[i][j] : undefined;
+  }
+  // Everyone's own ranking, as combining rankings would use it, for comparing side by side.
+  const own = (id: string) => session.results[ALL_EVALUATORS]?.people.find((x) => x.id === id);
+  const headline = $derived(
+    agreement(
+      p.evaluators.map((e) => ({ name: e.name, scores: own(e.id)?.answered ? (own(e.id)?.scores ?? null) : null })),
+      new Map(p.alternatives.map((a) => [a.id, a.name])),
+    ),
+  );
   const disagreements = $derived((r?.disagreements ?? []).filter((d) => d.spread >= 1.4).slice(0, 6));
   const lead = $derived(ranked.length >= 2 ? ranked[1].score > 0 ? (ranked[0].score - ranked[1].score) / ranked[0].score : 1 : 0);
 </script>
@@ -94,6 +110,37 @@
       </section>
     {/if}
 
+    {#if viewing === ALL_EVALUATORS && p.evaluators.length > 1}
+      <section aria-labelledby="people-title">
+        <h2 id="people-title">Each person's ranking</h2>
+        {#if headline}<p>{headline}</p>{/if}
+        <p class="muted small">Each person's own answers, with everyone's combined answers filling in any part they weren't asked to judge.</p>
+        <div class="scroll">
+          <table class="matrices people">
+            <thead>
+              <tr>
+                <th scope="col">Option</th>
+                <th scope="col">Everyone combined</th>
+                {#each p.evaluators as e (e.id)}<th scope="col">{e.name}</th>{/each}
+              </tr>
+            </thead>
+            <tbody>
+              {#each ranked as s (s.id)}
+                <tr>
+                  <th scope="row"><span class="dot" style:background={colorOf(p.alternatives.find((a) => a.id === s.id)?.color ?? '')}></span>{altName(s.id)}</th>
+                  <td><strong>{s.rank}</strong> <span class="muted small">{percent(s.score, 0)}</span></td>
+                  {#each p.evaluators as e (e.id)}
+                    {@const mine = own(e.id)?.answered ? own(e.id)?.scores?.find((x) => x.id === s.id) : undefined}
+                    <td>{#if mine}<strong>{mine.rank}</strong> <span class="muted small">{percent(mine.score, 0)}</span>{:else}<span class="muted small">No answers yet</span>{/if}</td>
+                  {/each}
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {/if}
+
     <section>
       <h2>Where each score comes from</h2>
       <p class="muted small">Each cell is a criterion's weight times how well the option does on it. The cells in a row add up to its total.</p>
@@ -128,16 +175,30 @@
     </section>
 
     {#if disagreements.length}
-      <section>
-        <h2>Where people disagree most</h2>
-        <p class="muted small">Each number is how strongly the first is preferred over the second: 1 is equal, 9 is extreme, 1/9 is the reverse.</p>
+      <section aria-labelledby="disagree-title">
+        <h2 id="disagree-title">Where people disagree most</h2>
+        <p class="muted small">
+          Each person's answer on the same scale as the balance; the diamond is everyone combined. Worth talking through before you decide.
+        </p>
         <ul class="disagree">
-          {#each disagreements as d}
+          {#each disagreements as d (`${d.context}|${d.a}|${d.b}`)}
+            {@const [kind, id] = d.context.split(':')}
+            {@const together = combinedFor(d.context, d.a, d.b)}
             <li>
-              <span class="pair">{itemName(d.a)} vs {itemName(d.b)} <span class="muted small">({matrixName(d.context)})</span></span>
-              <span class="small">
-                {#each Object.entries(d.values) as [ev, v], k}{k ? ', ' : ''}{evName(ev)} said {fraction(v)}{/each}
-              </span>
+              <span class="pair">{matrixName(d.context)}</span>
+              {#if together !== undefined}
+                <span class="small">Combined: {describe(together, p.scale, kind === 'alts' ? 'alternatives' : 'criteria', itemName(d.a), itemName(d.b), kind === 'alts' ? itemName(id) : '')}</span>
+              {/if}
+              <PeopleScale
+                a={itemName(d.a)}
+                b={itemName(d.b)}
+                scale={p.scale}
+                kind={kind === 'alts' ? 'alternatives' : 'criteria'}
+                on={kind === 'alts' ? itemName(id) : ''}
+                answers={p.evaluators.filter((e) => d.values[e.id] !== undefined).map((e) => ({ id: e.id, name: e.name, v: d.values[e.id] }))}
+                combined={together}
+              />
+              <a class="btn quiet small revise" href={href(p.id, kind === 'alts' ? 'score' : 'weigh', id, `${d.a}|${d.b}`)}>{d.values[session.scoringAs] === undefined ? 'Answer this pair' : 'Revise my answer'}</a>
             </li>
           {/each}
         </ul>
@@ -213,6 +274,19 @@
   .matrices th {
     font-weight: 550;
   }
+  .scroll {
+    overflow-x: auto;
+  }
+  .people th[scope='row'] {
+    white-space: nowrap;
+  }
+  .people .dot {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-right: 0.45rem;
+    border-radius: 50%;
+  }
   .ok {
     color: var(--good);
     font-weight: 600;
@@ -230,8 +304,12 @@
   }
   .disagree li {
     display: grid;
-    padding: 0.5rem 0;
+    gap: 0.5rem;
+    padding: 0.9rem 0;
     border-bottom: 1px solid var(--line);
+  }
+  .revise {
+    justify-self: start;
   }
   .pair {
     font-weight: 600;

@@ -326,7 +326,8 @@
         "finished": true,
         "consistent": true,
         "structure": "293112a6118c",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": false
       },
       {
         "id": "e2",
@@ -335,7 +336,8 @@
         "finished": false,
         "consistent": true,
         "structure": "293112a6118c",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": false
       }
     ],
     "values": {

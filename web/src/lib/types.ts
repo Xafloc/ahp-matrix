@@ -184,6 +184,10 @@ export interface PersonProgress extends Progress {
   consistent: boolean;
   structure: string;
   outOfDate: boolean;
+  /** They've given any answer, assigned or not. */
+  answered: boolean;
+  /** Their own ranking with the group's answers filling in the rest (everyone-combined results only). */
+  scores?: AltScore[];
 }
 
 export interface RankedName {

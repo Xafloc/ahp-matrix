@@ -60,6 +60,12 @@ type PersonProgress struct {
 	Consistent bool   `json:"consistent"` // their own comparisons are within the thresholds
 	Structure  string `json:"structure"`  // Fingerprint of their copy as it would be sent now
 	OutOfDate  bool   `json:"outOfDate"`  // the copy they were sent no longer matches the decision
+	Answered   bool   `json:"answered"`   // they've given any answer, assigned or not (all of them count)
+
+	// Their own ranking, with the group's answers filling in what their role
+	// doesn't cover: the ranking "combine rankings" uses. Only in the
+	// everyone-combined results, and only for people who have answered.
+	Scores []AltScore `json:"scores,omitempty"`
 }
 
 // AltScore is an alternative's overall score (all scores sum to 1) and rank (1 is best).
@@ -139,6 +145,17 @@ func Compute(p *Project, evaluator string) (*Results, error) {
 	res.People, res.Values = progress(p)
 	res.Completeness = completeness(res.People, res.Values, evaluator)
 	res.Method = AggregateJudgments
+	if evaluator == AllEvaluators {
+		judged := judgedBy(p)
+		for i := range res.People {
+			pp := &res.People[i]
+			if pp.Answered = judged[pp.ID]; pp.Answered {
+				if own, err := ownRanking(p, p.Evaluators[i]); err == nil {
+					pp.Scores = own.Scores
+				}
+			}
+		}
+	}
 	if evaluator == AllEvaluators && p.Aggregation == AggregatePriorities {
 		if scores, ok := combineRankings(p); ok {
 			res.Scores, res.Method = scores, AggregatePriorities
@@ -679,11 +696,8 @@ func completeness(people []PersonProgress, values Progress, evaluator string) fl
 // combineRankings works out each person's own scores (using the group's
 // combined answers where their tasks don't reach) and combines them with a
 // weighted geometric mean. People who haven't judged anything are left out.
-func combineRankings(p *Project) ([]AltScore, bool) {
-	everyone := map[string]float64{}
-	for _, e := range p.Evaluators {
-		everyone[e.ID] = e.Weight
-	}
+// judgedBy reports who has made any judgment at all.
+func judgedBy(p *Project) map[string]bool {
 	judged := map[string]bool{}
 	for _, j := range p.Pairwise {
 		judged[j.EvaluatorID] = true
@@ -691,6 +705,29 @@ func combineRankings(p *Project) ([]AltScore, bool) {
 	for _, r := range p.Ratings {
 		judged[r.EvaluatorID] = true
 	}
+	return judged
+}
+
+// ownRanking is e's results from their own answers on the parts their role
+// covers, and everyone's combined answers on the rest.
+func ownRanking(p *Project, e Evaluator) (*Results, error) {
+	everyone := map[string]float64{}
+	for _, x := range p.Evaluators {
+		everyone[x.ID] = x.Weight
+	}
+	groups, leaves := assigned(p, e)
+	mine := map[string]bool{}
+	for _, g := range groups {
+		mine[g.context] = true
+	}
+	for _, c := range leaves {
+		mine[AltsContext(c.ID)] = true
+	}
+	return computeFor(p, e.ID, func(ctx string) bool { return mine[ctx] }, everyone)
+}
+
+func combineRankings(p *Project) ([]AltScore, bool) {
+	judged := judgedBy(p)
 	n := len(p.Alternatives)
 	logSum := make([]float64, n)
 	totalWeight := 0.0
@@ -698,15 +735,7 @@ func combineRankings(p *Project) ([]AltScore, bool) {
 		if !judged[e.ID] {
 			continue
 		}
-		groups, leaves := assigned(p, e)
-		mine := map[string]bool{}
-		for _, g := range groups {
-			mine[g.context] = true
-		}
-		for _, c := range leaves {
-			mine[AltsContext(c.ID)] = true
-		}
-		r, err := computeFor(p, e.ID, func(ctx string) bool { return mine[ctx] }, everyone)
+		r, err := ownRanking(p, e)
 		if err != nil || len(r.Scores) != n {
 			return nil, false
 		}

@@ -22,7 +22,8 @@
     items,
     kind,
     on = '',
-  }: { session: CompareSession; context: string; items: Item[]; kind: CompareKind; on?: string } = $props();
+    start = '',
+  }: { session: CompareSession; context: string; items: Item[]; kind: CompareKind; on?: string; start?: string } = $props();
 
   const p = $derived(session.project);
   const ev = $derived(session.scoringAs);
@@ -37,14 +38,20 @@
   let order = $state<Pair[]>([]);
   let at = $state(0);
   let orderKey = '';
+  let usedStart = '';
 
   $effect(() => {
     const key = `${context}|${ids.join(',')}|${ev}`;
     if (key === orderKey) return;
     orderKey = key;
     order = focusOrder(items.length, report?.weights);
+    // start ("a|b") opens a particular pair, say from Revise my answer, once.
+    const [sa, sb] = (start === usedStart ? '' : start).split('|').map((id) => ids.indexOf(id));
+    usedStart = start;
+    const asked = order.findIndex(([i, j]) => (i === sa && j === sb) || (i === sb && j === sa));
     const firstOpen = order.findIndex(([i, j]) => value(i, j) === undefined);
-    at = firstOpen < 0 ? 0 : firstOpen;
+    at = asked >= 0 ? asked : firstOpen < 0 ? 0 : firstOpen;
+    if (asked >= 0) mode = 'focus';
   });
 
   const value = (i: number, j: number) => getJudgment(p, ev, context, ids[i], ids[j]);

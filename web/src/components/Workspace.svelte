@@ -8,6 +8,7 @@
   import { slug } from '../lib/format';
   import { sender, weighs } from '../lib/people';
   import { mergedText, undoMerge } from '../lib/returned';
+  import Hidden from './Hidden.svelte';
   import Mark from './Mark.svelte';
   import MergeDialog from './MergeDialog.svelte';
   import Toast from './Toast.svelte';
@@ -19,7 +20,7 @@
   import ThemeToggle from './ThemeToggle.svelte';
   import Weigh from './Weigh.svelte';
 
-  let { session, step, sub }: { session: ProjectSession; step: Step; sub: string } = $props();
+  let { session, step, sub, pair = '' }: { session: ProjectSession; step: Step; sub: string; pair?: string } = $props();
   const p = $derived(session.project);
 
   const weigh = $derived(weighProgress(p, session.scoringAs));
@@ -156,7 +157,8 @@
     <span class="spacer"></span>
     {#if p.evaluators.length > 1}
       <label class="small who">
-        Judging as
+        <span class="initial" aria-hidden="true">{(judge?.name.trim()[0] ?? '?').toUpperCase()}</span>
+        Now judging as
         <select class="field" bind:value={session.scoringAs}>
           {#each p.evaluators as e (e.id)}<option value={e.id}>{e.name}</option>{/each}
         </select>
@@ -219,9 +221,11 @@
     {:else if step === 'people'}
       <PeopleStep {session} onmerge={startMerge} />
     {:else if step === 'weigh'}
-      <Weigh {session} {sub} />
+      <Weigh {session} {sub} {pair} />
     {:else if step === 'score'}
-      <Score {session} {sub} />
+      <Score {session} {sub} {pair} />
+    {:else if (step === 'results' || step === 'sensitivity') && session.hidesResults}
+      <Hidden {session} />
     {:else if step === 'results'}
       <Results {session} />
     {:else}
@@ -287,8 +291,27 @@
     gap: 0.4rem;
     color: var(--ink-2);
   }
+  .who {
+    padding: 0.2rem 0.25rem 0.2rem 0.3rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--fog);
+  }
   .who select {
     width: auto;
+    font-weight: 600;
+    border-radius: 999px;
+  }
+  .initial {
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+    font-size: 0.8rem;
   }
   .banner {
     display: flex;

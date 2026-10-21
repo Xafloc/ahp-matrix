@@ -12,7 +12,7 @@
   import RatingRows from './RatingRows.svelte';
   import SubNav from './SubNav.svelte';
 
-  let { session, sub }: { session: ProjectSession; sub: string } = $props();
+  let { session, sub, pair = '' }: { session: ProjectSession; sub: string; pair?: string } = $props();
   const p = $derived(session.project);
   const all = $derived(leaves(p));
   const ev = $derived(session.scoringAs);
@@ -64,6 +64,7 @@
   <div class="layout">
     <SubNav label="Criteria to score" {entries} current={leaf.id} />
     <section class="main">
+      {#if p.evaluators.length > 1}<p class="as small">Answering as <strong>{me?.name}</strong></p>{/if}
       {#if !assigns(me?.tasks, leaf)}
         <p class="unassigned">{me?.name} isn't asked to score the options on {leaf.name}. Anything entered here still counts.</p>
       {/if}
@@ -117,7 +118,7 @@
       {:else}
         <h1>Which is better on {leaf.name}, and by how much?</h1>
         {#key leaf.id}
-          <PairCompare {session} context={altsContext(leaf.id)} {items} kind="alternatives" on={leaf.name} />
+          <PairCompare {session} context={altsContext(leaf.id)} {items} kind="alternatives" on={leaf.name} start={pair} />
         {/key}
       {/if}
 
@@ -137,6 +138,10 @@
 {/if}
 
 <style>
+  .as {
+    margin: 0;
+    color: var(--ink-2);
+  }
   .unassigned {
     margin: 0;
     padding: 0.6rem 0.85rem;

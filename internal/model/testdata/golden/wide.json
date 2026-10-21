@@ -1243,7 +1243,35 @@
         "finished": true,
         "consistent": false,
         "structure": "cf4c9169abb3",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": true,
+        "scores": [
+          {
+            "id": "a1",
+            "score": 0.25314205270473694,
+            "rank": 2
+          },
+          {
+            "id": "a2",
+            "score": 0.10812510714375147,
+            "rank": 5
+          },
+          {
+            "id": "a3",
+            "score": 0.2746651718359378,
+            "rank": 1
+          },
+          {
+            "id": "a4",
+            "score": 0.1230132165155775,
+            "rank": 4
+          },
+          {
+            "id": "a5",
+            "score": 0.2410544517999961,
+            "rank": 3
+          }
+        ]
       },
       {
         "id": "e2",
@@ -1252,7 +1280,35 @@
         "finished": true,
         "consistent": false,
         "structure": "cf4c9169abb3",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": true,
+        "scores": [
+          {
+            "id": "a1",
+            "score": 0.19940082610519333,
+            "rank": 3
+          },
+          {
+            "id": "a2",
+            "score": 0.20488175842901732,
+            "rank": 2
+          },
+          {
+            "id": "a3",
+            "score": 0.206136336116729,
+            "rank": 1
+          },
+          {
+            "id": "a4",
+            "score": 0.19665575348396092,
+            "rank": 4
+          },
+          {
+            "id": "a5",
+            "score": 0.19292532586509933,
+            "rank": 5
+          }
+        ]
       }
     ],
     "values": {

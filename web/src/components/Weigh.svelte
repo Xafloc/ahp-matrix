@@ -9,7 +9,7 @@
   import PairCompare from './PairCompare.svelte';
   import SubNav from './SubNav.svelte';
 
-  let { session, sub }: { session: ProjectSession; sub: string } = $props();
+  let { session, sub, pair = '' }: { session: ProjectSession; sub: string; pair?: string } = $props();
   const p = $derived(session.project);
   const all = $derived(groups(p));
   const key = (parentId: string) => parentId || 'root';
@@ -49,6 +49,7 @@
       <SubNav label="Criteria groups" {entries} current={key(group.parentId)} />
     {/if}
     <section class="main">
+      {#if p.evaluators.length > 1}<p class="as small">Answering as <strong>{me?.name}</strong></p>{/if}
       {#if !mine}
         <p class="unassigned">{me?.name} isn't asked to weigh the criteria. Anything entered here still counts.</p>
       {/if}
@@ -63,6 +64,7 @@
           context={criteriaContext(group.parentId)}
           items={group.items.map((c) => ({ id: c.id, name: c.name }))}
           kind="criteria"
+          start={pair}
         />
       {/key}
     </section>
@@ -70,6 +72,10 @@
 {/if}
 
 <style>
+  .as {
+    margin: 0;
+    color: var(--ink-2);
+  }
   .unassigned {
     margin: 0;
     padding: 0.6rem 0.85rem;
