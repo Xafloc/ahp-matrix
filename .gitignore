@@ -7,3 +7,4 @@ coverage.out
 .DS_Store
 web/test-results/
 web/playwright-report/
+web/dist-judge/

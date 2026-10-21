@@ -9,6 +9,7 @@
   import type { Direction } from '../lib/types';
   import PriorityBars from './charts/PriorityBars.svelte';
   import PairCompare from './PairCompare.svelte';
+  import RatingRows from './RatingRows.svelte';
   import SubNav from './SubNav.svelte';
 
   let { session, sub }: { session: ProjectSession; sub: string } = $props();
@@ -69,19 +70,7 @@
       {#if leaf.method === 'rating'}
         <h1>Rate each option on {leaf.name}</h1>
         <p class="muted">1 is poor, 10 is excellent.</p>
-        <ul class="rows">
-          {#each p.alternatives as a (a.id)}
-            {@const r = getRating(p, ev, leaf.id, a.id)}
-            <li>
-              <span class="who"><span class="dot" style:background={colorOf(a.color)}></span>{a.name}</span>
-              <div class="seg" role="radiogroup" aria-label="Rating for {a.name}">
-                {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
-                  <button role="radio" aria-checked={r === n} class:on={r === n} onclick={() => rate(a.id, r === n ? undefined : n)}>{n}</button>
-                {/each}
-              </div>
-            </li>
-          {/each}
-        </ul>
+        <RatingRows items={items} get={(id) => getRating(p, ev, leaf.id, id)} set={rate} />
       {:else if leaf.method === 'value'}
         <h1>Enter each option's {leaf.name.toLowerCase()}</h1>
         <div class="direction" role="radiogroup" aria-label="Which values are better">
@@ -198,32 +187,6 @@
     height: 0.65rem;
     border-radius: 50%;
   }
-  .seg {
-    display: grid;
-    grid-template-columns: repeat(10, 2.1rem);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-s);
-    overflow: hidden;
-  }
-  .seg button {
-    border: 0;
-    border-right: 1px solid var(--line);
-    padding: 0.4rem 0;
-    background: var(--paper);
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--ink-2);
-  }
-  .seg button:last-child {
-    border-right: 0;
-  }
-  .seg button:hover {
-    background: var(--brass-wash);
-  }
-  .seg button.on {
-    background: var(--ink);
-    color: var(--paper);
-  }
   .direction {
     display: flex;
     gap: 0.25rem;
@@ -255,9 +218,6 @@
   @media (max-width: 1000px) {
     .layout {
       grid-template-columns: 1fr;
-    }
-    .seg {
-      grid-template-columns: repeat(10, 1.8rem);
     }
   }
 </style>
