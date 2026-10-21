@@ -35,6 +35,8 @@ type MergeReport struct {
 	Skipped   []string `json:"skipped"`   // people left as they were
 	Judgments int      `json:"judgments"` // judgments brought in
 	Dropped   []string `json:"dropped"`   // judgments that couldn't come across, in words
+
+	droppedBy map[string][]string // the same lines, by evaluator id
 }
 
 // MergePreview says what merging a file would do, without doing it.
@@ -53,6 +55,7 @@ type PreviewPerson struct {
 	Judgments            int        `json:"judgments"`        // that would come across
 	ReplacesExisting     bool       `json:"replacesExisting"` // they already have judgments here
 	PreviouslyReturnedAt *time.Time `json:"previouslyReturnedAt,omitempty"`
+	Dropped              []string   `json:"dropped"` // their answers that can't come across
 }
 
 // PreviewMerge reports what merging packet into owner would bring across and
@@ -82,7 +85,10 @@ func PreviewMerge(owner, packet *Project) (*MergePreview, error) {
 	}
 	pv := &MergePreview{ID: owner.ID, Name: owner.Name, People: []PreviewPerson{}, Dropped: rep.Dropped}
 	for _, e := range packet.Evaluators {
-		person := PreviewPerson{ID: e.ID, Name: e.Name, ReplacesExisting: judged[e.ID]}
+		person := PreviewPerson{ID: e.ID, Name: e.Name, ReplacesExisting: judged[e.ID], Dropped: rep.droppedBy[e.ID]}
+		if person.Dropped == nil {
+			person.Dropped = []string{}
+		}
 		if mine, ok := known[e.ID]; ok {
 			person.Name = mine.Name
 			if mine.Invite != nil {
@@ -160,7 +166,7 @@ func Merge(owner, packet *Project, policy MergePolicy) (*MergeReport, error) {
 	for _, r := range next.Ratings {
 		judged[r.EvaluatorID] = true
 	}
-	rep := &MergeReport{Added: []string{}, Replaced: []string{}, Skipped: []string{}, Dropped: []string{}}
+	rep := &MergeReport{Added: []string{}, Replaced: []string{}, Skipped: []string{}, Dropped: []string{}, droppedBy: map[string][]string{}}
 	var conflicts []string
 	incoming := map[string]bool{}
 	for _, e := range packet.Evaluators {
@@ -198,7 +204,9 @@ func Merge(owner, packet *Project, policy MergePolicy) (*MergeReport, error) {
 		if k.pair(j) {
 			next.Pairwise = append(next.Pairwise, j)
 		} else {
-			rep.Dropped = append(rep.Dropped, why.pair(j))
+			line := why.pair(j)
+			rep.Dropped = append(rep.Dropped, line)
+			rep.droppedBy[j.EvaluatorID] = append(rep.droppedBy[j.EvaluatorID], line)
 		}
 	}
 	for _, r := range packet.Ratings {
@@ -208,7 +216,9 @@ func Merge(owner, packet *Project, policy MergePolicy) (*MergeReport, error) {
 		if k.rating(r) {
 			next.Ratings = append(next.Ratings, r)
 		} else {
-			rep.Dropped = append(rep.Dropped, why.rating(r))
+			line := why.rating(r)
+			rep.Dropped = append(rep.Dropped, line)
+			rep.droppedBy[r.EvaluatorID] = append(rep.droppedBy[r.EvaluatorID], line)
 		}
 	}
 	if err := next.Prepare(); err != nil {
@@ -224,6 +234,10 @@ func Merge(owner, packet *Project, policy MergePolicy) (*MergeReport, error) {
 			e.Invite = &Invite{SentAt: now}
 			if packet.Packet != nil {
 				e.Invite.SentAt, e.Invite.Structure = packet.Packet.SentAt, packet.Packet.Structure
+			} else {
+				// Not an invitation copy (say, a whole export): their answers
+				// fit the decision as it is now, so they're up to date.
+				e.Invite.Structure = Fingerprint(next, e.ID)
 			}
 		}
 		e.Invite.ReturnedAt = &now

@@ -34,6 +34,11 @@
     <section>
       <h2>Ranking</h2>
       <PriorityBars sorted names={p.alternatives.map((a) => a.name)} colors={p.alternatives.map((a) => colorOf(a.color))} values={r.scores.map((s) => s.score)} />
+      {#if r.method === 'priorities'}
+        <p class="small">
+          The ranking combines each person's own ranking. The criteria weights and score breakdown below combine everyone's answers.
+        </p>
+      {/if}
       {#if r.completeness < 1}<p class="small">Provisional: {Math.round(r.completeness * 100)}% of the judgments were made.</p>{/if}
       {#if !r.consistent}<p class="small">Some comparisons contradict each other; see the consistency review in the app.</p>{/if}
     </section>

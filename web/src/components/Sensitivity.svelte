@@ -71,6 +71,11 @@
     <section class="main">
       <h1>What if {chosen ? p.criteria.find((c) => c.id === chosen.id)?.name : ''} counted more, or less?</h1>
       <p class="muted">{verdict(chosen.stability)}. Drag to see how the ranking responds; the other criteria in its group share the rest.</p>
+      {#if r.method === 'priorities'}
+        <p class="small muted">
+          What if works from everyone's answers combined, so its ranking can differ from Results, where each person's own ranking is combined.
+        </p>
+      {/if}
 
       <label class="slider">
         <span class="small">Weight within its group: <strong>{percent(x, 0)}</strong> <span class="muted">(now {percent(chosen.local, 0)})</span></span>

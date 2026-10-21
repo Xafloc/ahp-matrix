@@ -172,3 +172,15 @@ test('the balance names fewer strengths on a phone, so the words never overlap',
   );
   for (let i = 1; i < boxes.length; i++) expect(boxes[i][0], `label ${i} overlaps the one before`).toBeGreaterThanOrEqual(boxes[i - 1][1]);
 });
+
+test('with rankings combined, What if and the report say they use the combined answers', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
+  await page.getByRole('link', { name: /People/ }).click();
+  await page.getByRole('radio', { name: /Combine rankings/ }).click();
+  await saved(page);
+  await page.getByRole('link', { name: /What if/ }).click();
+  await expect(page.getByText("What if works from everyone's answers combined")).toBeVisible();
+  await page.getByRole('link', { name: 'Printable report' }).click();
+  await expect(page.getByText("The ranking combines each person's own ranking")).toBeVisible();
+});

@@ -85,6 +85,14 @@
                 New here
               {/if}
             </span>
+            {#if person.dropped.length}
+              <details class="dropped" open={person.dropped.length <= 4}>
+                <summary>{person.dropped.length} of {person.name}'s answers can't come across</summary>
+                <ul class="small">
+                  {#each person.dropped as line}<li>{line}</li>{/each}
+                </ul>
+              </details>
+            {/if}
           </li>
         {/each}
       </ul>
@@ -96,14 +104,6 @@
         </p>
       {/if}
 
-      {#if preview.dropped.length}
-        <details class="dropped" open={preview.dropped.length <= 4}>
-          <summary>{count(preview.dropped.length, 'answer')} can't come across</summary>
-          <ul class="small">
-            {#each preview.dropped as line}<li>{line}</li>{/each}
-          </ul>
-        </details>
-      {/if}
     {/if}
   </div>
   <footer>
@@ -188,6 +188,9 @@
     padding: 0.6rem 0.8rem;
     border-radius: var(--radius-s);
     background: var(--rust-wash);
+  }
+  .dropped {
+    flex-basis: 100%;
   }
   .dropped summary {
     cursor: pointer;

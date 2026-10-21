@@ -66,7 +66,7 @@ export function reminder(decision: string, person: string, progress: Progress, f
       : left === 0
         ? "It looks like you've finished: could you send the file back?"
         : `You've got ${left} of ${progress.total} comparisons left.`;
-  return `Hi ${person}, a reminder about "${decision}". ${where} Open the file I sent with Import file in AHP Matrix, then export it from the library and send it back to me. Thanks, ${from}`;
+  return `Hi ${person}, a reminder about "${decision}". ${where} Open the file I sent with Import file in AHP Matrix, answer, then press Send your answers back and email me the file it saves. Thanks, ${from}`;
 }
 
 /** Whether someone with these tasks compares the criteria. */

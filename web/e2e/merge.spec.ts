@@ -51,7 +51,7 @@ test('answers about a criterion removed since the copy went out are listed, not 
   await dropFile(page, page.locator('main'), path);
   const dialog = page.getByRole('dialog');
   await expect(dialog).toContainText('1 answer');
-  await expect(dialog).toContainText("1 answer can't come across");
+  await expect(dialog).toContainText("1 of Carol's answers can't come across");
   await expect(dialog).toContainText('Comparison of X with Y on Cost: Cost is no longer in this decision');
   await expect(dialog).toContainText('This copy was made before the decision last changed');
 });
@@ -77,4 +77,18 @@ test('a returned file can be dropped on its row in the library', async ({ page }
   await page.getByRole('link', { name: 'All decisions' }).click();
   await dropFile(page, page.getByRole('listitem').filter({ hasText: 'Row drop' }), path);
   await expect(page.getByRole('dialog', { name: "Merge Carol's answers into Row drop?" })).toBeVisible();
+});
+
+test('Undo is withdrawn once you change the decision after merging, so it never loses your edits', async ({ page }, info) => {
+  await decisionWithCarol(page, 'Undo then edit');
+  const path = info.outputPath('carol.ahp.json');
+  await answeredCopy(page, 'Carol', path, ['Speed']);
+  await page.getByLabel('Returned decision file to merge').setInputFiles(path);
+  await page.getByRole('dialog').getByRole('button', { name: 'Merge' }).click();
+  await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible();
+  await page.getByLabel('Decision name').fill('Undo then edit, renamed');
+  await expect(page.getByRole('button', { name: 'Undo' })).toHaveCount(0);
+  await saved(page);
+  await page.reload();
+  await expect(page.getByLabel('Decision name')).toHaveValue('Undo then edit, renamed');
 });

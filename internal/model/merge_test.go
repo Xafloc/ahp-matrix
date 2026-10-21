@@ -240,3 +240,38 @@ func TestMergeRecordsWhenAnswersCameBack(t *testing.T) {
 		t.Errorf("dropped = %q", rep.Dropped)
 	}
 }
+
+func TestMergingAPlainExportDoesNotLookOutOfDate(t *testing.T) {
+	owner := fixture()
+	back, err := clone(owner) // a whole-library export, not an invitation copy
+	if err != nil {
+		t.Fatal(err)
+	}
+	back.Pairwise = keep(back.Pairwise, func(j PairwiseJudgment) bool { return j.EvaluatorID == "e2" })
+	back.Ratings = keep(back.Ratings, func(r Rating) bool { return r.EvaluatorID == "e2" })
+	back.Evaluators = back.Evaluators[1:]
+	back.Pairwise = append(back.Pairwise, PairwiseJudgment{EvaluatorID: "e2", Context: CriteriaContext(""), A: "c1", B: "c4", Value: 3})
+	if _, err := Merge(owner, back, MergeReplace); err != nil {
+		t.Fatal(err)
+	}
+	res, err := Compute(owner, AllEvaluators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, pp := range res.People {
+		if pp.OutOfDate {
+			t.Errorf("%s shows out of date right after their answers were merged", pp.ID)
+		}
+	}
+}
+
+func TestPreviewSaysWhichLinesBelongToWhom(t *testing.T) {
+	owner := fixture()
+	pv, err := PreviewMerge(owner, returned(t, owner))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pv.People) != 1 || len(pv.People[0].Dropped) != 1 || pv.People[0].Dropped[0] != pv.Dropped[0] {
+		t.Errorf("per-person dropped lines: %+v", pv.People)
+	}
+}

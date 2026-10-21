@@ -85,9 +85,20 @@
     toast = { text: mergedText(r.report), undo: r.report.judgments ? { before: r.before, version: r.project.version } : undefined };
   }
 
+  // Undo restores the decision as it was before the merge, so it's only
+  // offered until the decision changes again.
+  $effect(() => {
+    if (toast?.undo && session.saveState !== 'saved') toast = { text: toast.text };
+  });
+
   async function undo() {
     const u = toast?.undo;
     if (!u) return;
+    await session.flush();
+    if (session.unsaved || session.project.version !== u.version) {
+      toast = { text: "You've changed the decision since merging, so the merge can't be undone." };
+      return;
+    }
     try {
       await undoMerge(api, u.before, u.version);
       await session.reload();

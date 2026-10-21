@@ -248,6 +248,8 @@ export interface PreviewPerson {
   judgments: number;
   replacesExisting: boolean;
   previouslyReturnedAt?: string;
+  /** Their answers that can't come across, in words. */
+  dropped: string[];
 }
 
 export const ALL_EVALUATORS = 'all';
