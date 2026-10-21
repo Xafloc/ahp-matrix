@@ -8,6 +8,7 @@
   import { slug } from '../lib/format';
   import { sender, weighs } from '../lib/people';
   import { mergedText, undoMerge } from '../lib/returned';
+  import Hidden from './Hidden.svelte';
   import Mark from './Mark.svelte';
   import MergeDialog from './MergeDialog.svelte';
   import Toast from './Toast.svelte';
@@ -223,6 +224,8 @@
       <Weigh {session} {sub} />
     {:else if step === 'score'}
       <Score {session} {sub} />
+    {:else if (step === 'results' || step === 'sensitivity') && session.hidesResults}
+      <Hidden {session} />
     {:else if step === 'results'}
       <Results {session} />
     {:else}

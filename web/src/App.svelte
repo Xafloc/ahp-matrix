@@ -1,5 +1,6 @@
 <script lang="ts">
   import Library from './components/Library.svelte';
+  import Hidden from './components/Hidden.svelte';
   import Report from './components/Report.svelte';
   import Workspace from './components/Workspace.svelte';
   import { untrack } from 'svelte';
@@ -87,6 +88,8 @@
   </main>
 {:else if !session}
   <main class="message" aria-busy="true"><p class="muted">Opening…</p></main>
+{:else if router.route.name === 'report' && session.hidesResults}
+  <main class="message"><Hidden {session} /></main>
 {:else if router.route.name === 'report'}
   <Report {session} />
 {:else}
