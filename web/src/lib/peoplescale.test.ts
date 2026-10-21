@@ -1,0 +1,29 @@
+import { expect, test } from 'vitest';
+import { placeMarkers, scaleX } from './peoplescale';
+import { parse } from './router.svelte';
+
+test('answers sit where the balance would put them: the first item preferred is to the left', () => {
+  expect(scaleX(9, 'saaty9')).toBe(0);
+  expect(scaleX(1, 'saaty9')).toBe(0.5);
+  expect(scaleX(1 / 9, 'saaty9')).toBe(1);
+  expect(scaleX(4, "saaty9")).toBe(5 / 16);
+  expect(scaleX(Math.sqrt(12), "saaty9")).toBeCloseTo(5.5 / 16); // halfway between 4 and 3, in ratio terms
+  expect(scaleX(100, 'saaty9')).toBe(0); // clamped
+});
+
+test('answers that would overlap are stacked, in the order given', () => {
+  const placed = placeMarkers(
+    [
+      { id: 'a', v: 3 },
+      { id: 'b', v: 3 },
+      { id: 'c', v: 1 / 7 },
+      { id: 'd', v: 3 },
+    ],
+    'saaty9',
+  );
+  expect(placed.map((m) => m.row)).toEqual([0, 1, 0, 2]);
+});
+
+test('a link can open a particular pair', () => {
+  expect(parse('#/p/P1/weigh/root/c1|c2')).toEqual({ name: 'project', id: 'P1', step: 'weigh', sub: 'root', pair: 'c1|c2' });
+});

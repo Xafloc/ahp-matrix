@@ -9,7 +9,7 @@
   import PairCompare from './PairCompare.svelte';
   import SubNav from './SubNav.svelte';
 
-  let { session, sub }: { session: ProjectSession; sub: string } = $props();
+  let { session, sub, pair = '' }: { session: ProjectSession; sub: string; pair?: string } = $props();
   const p = $derived(session.project);
   const all = $derived(groups(p));
   const key = (parentId: string) => parentId || 'root';
@@ -64,6 +64,7 @@
           context={criteriaContext(group.parentId)}
           items={group.items.map((c) => ({ id: c.id, name: c.name }))}
           kind="criteria"
+          start={pair}
         />
       {/key}
     </section>

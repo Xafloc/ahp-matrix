@@ -20,7 +20,7 @@
   import ThemeToggle from './ThemeToggle.svelte';
   import Weigh from './Weigh.svelte';
 
-  let { session, step, sub }: { session: ProjectSession; step: Step; sub: string } = $props();
+  let { session, step, sub, pair = '' }: { session: ProjectSession; step: Step; sub: string; pair?: string } = $props();
   const p = $derived(session.project);
 
   const weigh = $derived(weighProgress(p, session.scoringAs));
@@ -221,9 +221,9 @@
     {:else if step === 'people'}
       <PeopleStep {session} onmerge={startMerge} />
     {:else if step === 'weigh'}
-      <Weigh {session} {sub} />
+      <Weigh {session} {sub} {pair} />
     {:else if step === 'score'}
-      <Score {session} {sub} />
+      <Score {session} {sub} {pair} />
     {:else if (step === 'results' || step === 'sensitivity') && session.hidesResults}
       <Hidden {session} />
     {:else if step === 'results'}

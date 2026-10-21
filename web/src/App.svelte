@@ -93,7 +93,7 @@
 {:else if router.route.name === 'report'}
   <Report {session} />
 {:else}
-  <Workspace {session} step={router.route.step} sub={router.route.sub} />
+  <Workspace {session} step={router.route.step} sub={router.route.sub} pair={router.route.pair ?? ''} />
 {/if}
 
 <style>

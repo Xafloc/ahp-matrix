@@ -12,7 +12,7 @@
   import RatingRows from './RatingRows.svelte';
   import SubNav from './SubNav.svelte';
 
-  let { session, sub }: { session: ProjectSession; sub: string } = $props();
+  let { session, sub, pair = '' }: { session: ProjectSession; sub: string; pair?: string } = $props();
   const p = $derived(session.project);
   const all = $derived(leaves(p));
   const ev = $derived(session.scoringAs);
@@ -118,7 +118,7 @@
       {:else}
         <h1>Which is better on {leaf.name}, and by how much?</h1>
         {#key leaf.id}
-          <PairCompare {session} context={altsContext(leaf.id)} {items} kind="alternatives" on={leaf.name} />
+          <PairCompare {session} context={altsContext(leaf.id)} {items} kind="alternatives" on={leaf.name} start={pair} />
         {/key}
       {/if}
 

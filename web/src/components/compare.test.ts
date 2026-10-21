@@ -108,3 +108,25 @@ test('the Why? explanation walks through the contradiction in plain words', () =
   expect(t).toContain('Use the suggestion');
   expect(t).toContain('Keep my answer');
 });
+
+test("the people scale puts everyone's answer on one scale, named, with the combined answer", async () => {
+  const { default: PeopleScale } = await import('./PeopleScale.svelte');
+  const { body } = render(PeopleScale, {
+    props: {
+      a: 'Speed',
+      b: 'Cost',
+      scale: 'saaty9',
+      kind: 'criteria',
+      answers: [
+        { id: 'e1', name: 'Ann', v: 3 },
+        { id: 'e2', name: 'Bob', v: 1 / 5 },
+        { id: 'e3', name: 'Cy', v: 1 },
+      ],
+      combined: Math.cbrt(3 / 5),
+    },
+  });
+  expect(body.match(/class="marker person/g)).toHaveLength(3);
+  expect(body.match(/class="marker combined/g)).toHaveLength(1);
+  expect(text(body)).toMatch(/Ann.*Bob.*Cy/);
+  expect(body).toContain('aria-label="Bob: Cost matters strongly more than Speed"');
+});

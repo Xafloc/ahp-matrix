@@ -34,3 +34,17 @@ test("results stay hidden from someone who hasn't finished, until they choose to
   await page.getByLabel('Now judging as').selectOption({ label: 'Engineering lead' });
   await expect(page.getByRole('heading', { name: /comes out ahead/ })).toBeVisible();
 });
+
+test("disagreements show everyone's answer on one scale, and Revise my answer opens that pair", async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
+  const section = page.getByRole('region', { name: 'Where people disagree most' });
+  const first = section.getByRole('listitem').first();
+  await expect(first.getByRole('img', { name: /^Engineering lead: / })).toBeVisible();
+  await expect(first.getByRole('img', { name: /^Product manager: / })).toBeVisible();
+  await expect(first.getByRole('img', { name: /^Everyone combined: / })).toBeVisible();
+  const [a, b] = await first.locator('.ends span').allTextContents();
+  await first.getByRole('link', { name: 'Revise my answer' }).click();
+  await expect(page.getByRole('slider', { name: new RegExp(`Compare (${a} with ${b}|${b} with ${a})`) })).toBeVisible();
+  await expect(page.getByText('Answering as Engineering lead')).toBeVisible();
+});
