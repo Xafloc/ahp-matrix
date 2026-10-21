@@ -4,9 +4,10 @@
   // control as the balance. The side a judgment favours is set in bold. Rows
   // are flagged only when the consistency check finds contradictions.
   import { describe, type CompareKind } from '../lib/scale';
-  import type { MatrixReport, Scale } from '../lib/types';
+  import type { MatrixReport, PairSuggestion, Scale } from '../lib/types';
   import StrengthScale from './StrengthScale.svelte';
   import StrengthWords from './StrengthWords.svelte';
+  import WhyDialog from './WhyDialog.svelte';
 
   interface Item {
     id: string;
@@ -35,6 +36,9 @@
 
   const pairs = $derived(items.flatMap((_, i) => items.slice(i + 1).map((__, k) => [i, i + 1 + k] as const)));
   let hovered = $state<{ key: string; v: number } | null>(null);
+  let why = $state<PairSuggestion | null>(null);
+  const raw = (i: number, j: number) =>
+    report?.suggestions.find((s) => (s.a === items[i].id && s.b === items[j].id) || (s.a === items[j].id && s.b === items[i].id)) ?? null;
 
   // The suggestion for a pair, oriented first-over-second, when the answers contradict each other.
   function suggestion(i: number, j: number) {
@@ -86,12 +90,18 @@
           <p class="fix">
             <span><strong>Suggested by your other answers:</strong> {say(fix, i, j)}</span>
             <button class="btn small" onclick={() => onfix(items[i].id, items[j].id, fix)}>Use that</button>
+            <button class="btn quiet small why" onclick={() => (why = raw(i, j))}>Why?</button>
           </p>
         {/if}
       </li>
     {/each}
   </ol>
 </div>
+
+{#if why && report}
+  {@const s = why}
+  <WhyDialog open {items} {report} suggestion={s} {scale} {kind} {on} onuse={() => onfix(s.a, s.b, s.suggested)} onclose={() => (why = null)} />
+{/if}
 
 <style>
   .list {
@@ -182,6 +192,10 @@
   }
   .fix .btn {
     padding: 0.25rem 0.6rem;
+  }
+  .fix .why {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   @media (max-width: 640px) {
     .list {

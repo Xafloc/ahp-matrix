@@ -1,6 +1,7 @@
 <script lang="ts">
   import { describe, type CompareKind } from '../lib/scale';
-  import type { MatrixReport, Scale } from '../lib/types';
+  import type { MatrixReport, PairSuggestion, Scale } from '../lib/types';
+  import WhyDialog from './WhyDialog.svelte';
 
   let {
     report,
@@ -18,6 +19,7 @@
     fixes?: boolean; // list the suggested fixes (the pair list shows them on its rows instead)
   } = $props();
 
+  let why = $state<PairSuggestion | null>(null);
   const name = (id: string) => items.find((i) => i.id === id)?.name ?? id;
   // The meter spans 0 to three times the threshold, so "fine" fills a third.
   const span = $derived(report ? Math.max(report.threshold * 3, report.cr) : 0.3);
@@ -48,13 +50,20 @@
                 <span class="said">You said: {describe(s.current, scale, kind, name(s.a), name(s.b))}.</span>
                 <span class="small">Your other answers suggest: {describe(s.suggested, scale, kind, name(s.a), name(s.b))}.</span>
               </span>
-              <button class="btn" onclick={() => onfix(s.a, s.b, s.suggested)}>Use that</button>
+              <span class="acts">
+                <button class="btn" onclick={() => onfix(s.a, s.b, s.suggested)}>Use that</button>
+                <button class="btn quiet why" onclick={() => (why = s)}>Why?</button>
+              </span>
             </li>
           {/each}
         </ul>
       {/if}
     {/if}
   </section>
+  {#if why}
+    {@const s = why}
+    <WhyDialog open {items} {report} suggestion={s} {scale} {kind} onuse={() => onfix(s.a, s.b, s.suggested)} onclose={() => (why = null)} />
+  {/if}
 {/if}
 
 <style>
@@ -108,8 +117,17 @@
     display: grid;
     gap: 0.5rem;
   }
-  .fixes li > span {
+  .fixes li > span:first-child {
     display: grid;
+  }
+  .acts {
+    display: flex;
+    gap: 0.35rem;
+    flex: none;
+  }
+  .why {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   .said {
     font-weight: 600;

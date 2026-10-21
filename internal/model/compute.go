@@ -87,6 +87,7 @@ type PairSuggestion struct {
 	B         string  `json:"b"`
 	Current   float64 `json:"current"` // how strongly A is preferred over B now
 	Suggested float64 `json:"suggested"`
+	CRAfter   float64 `json:"crAfter"` // the consistency ratio if Suggested replaced Current
 }
 
 // Issue is a problem that makes the results less trustworthy.
@@ -341,7 +342,9 @@ func (c *computer) compare(context string, items []string, code, criterionID str
 		return uniform(n)
 	}
 	for _, s := range ahp.Suggestions(m, a.Weights, c.p.Scale.Allowed(), maxSuggestions) {
-		rep.Suggestions = append(rep.Suggestions, PairSuggestion{A: items[s.I], B: items[s.J], Current: s.Current, Suggested: s.Suggested})
+		rep.Suggestions = append(rep.Suggestions, PairSuggestion{
+			A: items[s.I], B: items[s.J], Current: s.Current, Suggested: s.Suggested, CRAfter: crWith(m, s.I, s.J, s.Suggested),
+		})
 	}
 	c.res.Matrices = append(c.res.Matrices, rep)
 	return a.Weights
@@ -482,4 +485,14 @@ func rank(scores []float64, a int) int {
 		}
 	}
 	return r
+}
+
+// crWith is m's consistency ratio with the judgment for (i, j) set to v.
+func crWith(m ahp.Matrix, i, j int, v float64) float64 {
+	trial := ahp.NewMatrix(m.N())
+	for r := range m {
+		copy(trial[r], m[r])
+	}
+	trial.Set(i, j, v)
+	return ahp.Analyze(trial).CR
 }
