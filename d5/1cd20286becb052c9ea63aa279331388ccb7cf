@@ -1,0 +1,44 @@
+web/src/components/PairCompare.svelte
+  s_65743add7cce22::t_864bcbec685684 25-26,47-49,51-52
+web/src/lib/router.svelte.ts
+  s_65743add7cce22::t_c9e9404488c3d7 23,25
+  s_65743add7cce22::t_c48920ceced4dc 4,6,12-14,19-20
+web/src/components/Score.svelte
+  s_65743add7cce22::t_864bcbec685684 15,121
+web/e2e/discussion.spec.ts
+  s_65743add7cce22::t_3c9707f6c4bb62 37-50
+web/src/lib/peoplescale.ts
+  s_65743add7cce22::t_c48920ceced4dc 1-31
+web/src/components/compare.test.ts
+  s_65743add7cce22::t_eab616adf45d0b 111-132
+web/src/lib/peoplescale.test.ts
+  s_65743add7cce22::t_c48920ceced4dc 9-10
+  s_65743add7cce22::t_7aebef8320d14f 1-8,11-29
+web/src/components/PeopleScale.svelte
+  s_65743add7cce22::t_0373755ea03887 42
+  s_65743add7cce22::t_bff2614deb8347 1-41,43-132
+web/src/components/Weigh.svelte
+  s_65743add7cce22::t_864bcbec685684 12,67
+web/src/components/Results.svelte
+  s_65743add7cce22::t_864bcbec685684 11,38-43,137-141,143-144,146-156,249-250,253-255
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_864bcbec685684 23,224,226
+web/src/App.svelte
+  s_65743add7cce22::t_864bcbec685684 96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d51cd20286becb052c9ea63aa279331388ccb7cf",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
