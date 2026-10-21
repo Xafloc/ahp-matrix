@@ -1,0 +1,25 @@
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_1cd0683499e147 159-160,291-296,299-311
+web/src/components/Score.svelte
+  s_65743add7cce22::t_1cd0683499e147 67,141-144
+web/e2e/discussion.spec.ts
+  s_65743add7cce22::t_c4a8385a464262 1-16
+web/src/components/Weigh.svelte
+  s_65743add7cce22::t_1cd0683499e147 52,74-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "88eb08b8874a92671e677d0861a70ca9eb4c3af2",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
