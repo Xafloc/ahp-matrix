@@ -92,3 +92,16 @@ test('Undo is withdrawn once you change the decision after merging, so it never 
   await page.reload();
   await expect(page.getByLabel('Decision name')).toHaveValue('Undo then edit, renamed');
 });
+
+test('Import recognises returned answers even before the library has finished loading', async ({ page }, info) => {
+  await decisionWithCarol(page, 'Slow library');
+  const path = info.outputPath('carol.ahp.json');
+  await answeredCopy(page, 'Carol', path, ['Speed']);
+  await page.route('**/api/projects', async (route) => {
+    if (route.request().method() === 'GET') await new Promise((r) => setTimeout(r, 1500));
+    await route.continue();
+  });
+  await page.getByRole('link', { name: 'All decisions' }).click();
+  await page.getByLabel('Import a decision file or Priority Matrix spreadsheet').setInputFiles(path);
+  await expect(page.getByText('carol.ahp.json looks like answers sent back for Slow library.')).toBeVisible();
+});
