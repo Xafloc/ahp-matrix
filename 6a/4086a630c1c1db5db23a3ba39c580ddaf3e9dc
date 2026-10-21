@@ -1,0 +1,45 @@
+web/src/components/Results.svelte
+  s_65743add7cce22::t_ae1113aab75de5 50
+web/src/lib/types.ts
+  s_65743add7cce22::t_ae1113aab75de5 251-252
+web/src/lib/people.ts
+  s_65743add7cce22::t_ae1113aab75de5 69
+web/e2e/guidance.spec.ts
+  s_65743add7cce22::t_1299a75c7f544f 175-186
+web/src/components/MergeDialog.svelte
+  s_65743add7cce22::t_ae1113aab75de5 88-95,192-193
+  s_65743add7cce22::t_bea6f95715d827 194
+web/e2e/merge.spec.ts
+  s_65743add7cce22::t_1299a75c7f544f 54,81-93
+  s_65743add7cce22::t_07019d1ef13c85 94
+internal/model/merge.go
+  s_65743add7cce22::t_24fd5dd953d4e5 58
+  s_65743add7cce22::t_5b4d2bd9d52b4e 38-39,88-91,169,207-209,219-221,237-240
+web/src/components/Report.svelte
+  s_65743add7cce22::t_ae1113aab75de5 37-41
+web/src/components/Sensitivity.svelte
+  s_65743add7cce22::t_ae1113aab75de5 74-78
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_ae1113aab75de5 88-93,97-101
+README.md
+  s_65743add7cce22::t_88102a54ac06c8 45-61,66
+internal/model/merge_test.go
+  s_65743add7cce22::t_79222403eed2d9 243-244,246-268,270-277
+  s_65743add7cce22::t_f757f02c44cb9d 245,269
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6a4086a630c1c1db5db23a3ba39c580ddaf3e9dc",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
