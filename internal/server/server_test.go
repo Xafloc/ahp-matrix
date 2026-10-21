@@ -17,6 +17,7 @@ import (
 var testUI = fstest.MapFS{
 	"index.html":    {Data: []byte("<html>app</html>")},
 	"assets/app.js": {Data: []byte("console.log(1)")},
+	"judge.html":    {Data: []byte(`<html><body><script type="application/json" id="ahp-packet"></script><script>judge()</script></body></html>`)},
 }
 
 func newTestServer(t *testing.T) (http.Handler, *store.FileStore) {

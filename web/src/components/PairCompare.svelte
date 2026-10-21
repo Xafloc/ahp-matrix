@@ -5,7 +5,7 @@
   import { focusOrder, type Pair } from '../lib/pairs';
   import { pairProgress } from '../lib/progress';
   import type { CompareKind } from '../lib/scale';
-  import type { ProjectSession } from '../lib/session.svelte';
+  import type { CompareSession } from '../lib/local.svelte';
   import Balance from './Balance.svelte';
   import ConsistencyMeter from './ConsistencyMeter.svelte';
   import PairList from './PairList.svelte';
@@ -22,7 +22,7 @@
     items,
     kind,
     on = '',
-  }: { session: ProjectSession; context: string; items: Item[]; kind: CompareKind; on?: string } = $props();
+  }: { session: CompareSession; context: string; items: Item[]; kind: CompareKind; on?: string } = $props();
 
   const p = $derived(session.project);
   const ev = $derived(session.scoringAs);

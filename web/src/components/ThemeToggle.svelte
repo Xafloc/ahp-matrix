@@ -1,6 +1,6 @@
 <script lang="ts">
   type Theme = 'system' | 'light' | 'dark';
-  let theme = $state<Theme>((document.documentElement.dataset.theme as Theme) ?? 'system');
+  let theme = $state<Theme>((typeof document === 'undefined' ? undefined : (document.documentElement.dataset.theme as Theme)) ?? 'system');
   const next: Record<Theme, Theme> = { system: 'light', light: 'dark', dark: 'system' };
   const label: Record<Theme, string> = { system: 'Theme: match system', light: 'Theme: light', dark: 'Theme: dark' };
 

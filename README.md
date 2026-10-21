@@ -47,9 +47,11 @@ how robust the winner is.
 The **People** step lists everyone whose judgments count, what each person is asked to judge (everything, only the criteria,
 only the options, or a custom set), how far they've got, and where their copy is.
 
-1. **Invite** someone. It downloads a copy with only their part, for them to open with Import file in AHP Matrix.
-2. They make their comparisons and press **Send your answers back**. Their copy can't change the options or criteria, so
-   their answers always fit yours.
+1. **Invite** someone. Download a **web page** for them (it opens in any browser, works offline, and needs nothing installed)
+   or a file for their own AHP Matrix, and copy the ready-to-send message, with an optional answer-by date.
+2. They answer their part, with the same consistency check and **Why?** explanations as the app, then press **Finish and
+   send back** (or **Send your answers back** in the app) and email you the file it saves. Their copy can't change the
+   options or criteria, so their answers always fit yours.
 3. **Drop the returned file** anywhere on the decision (or on its row in the library). A preview shows whose answers it holds,
    whether it replaces earlier ones, and anything that can't come across because you've since removed it. Merge, and
    **Undo** if you change your mind.

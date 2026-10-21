@@ -1,0 +1,347 @@
+{
+  "project": {
+    "schemaVersion": 2,
+    "id": "01GOLDENFIXTURE0000000000A",
+    "version": 0,
+    "name": "Fixture",
+    "description": "",
+    "createdAt": "2026-10-15T12:00:00Z",
+    "updatedAt": "2026-10-15T12:00:00Z",
+    "scale": "saaty9",
+    "aggregation": "judgments",
+    "alternatives": [
+      {
+        "id": "a1",
+        "name": "Alpha",
+        "description": "",
+        "color": ""
+      },
+      {
+        "id": "a2",
+        "name": "Beta",
+        "description": "",
+        "color": ""
+      },
+      {
+        "id": "a3",
+        "name": "Gamma",
+        "description": "",
+        "color": ""
+      }
+    ],
+    "criteria": [
+      {
+        "id": "c1",
+        "name": "Technical",
+        "description": "",
+        "notes": ""
+      },
+      {
+        "id": "c2",
+        "parentId": "c1",
+        "name": "Performance",
+        "description": "",
+        "notes": "",
+        "method": "pairwise"
+      },
+      {
+        "id": "c3",
+        "parentId": "c1",
+        "name": "Security",
+        "description": "",
+        "notes": "",
+        "method": "rating"
+      },
+      {
+        "id": "c4",
+        "name": "Cost",
+        "description": "",
+        "notes": "",
+        "method": "value",
+        "direction": "lower",
+        "unit": "USD"
+      }
+    ],
+    "evaluators": [
+      {
+        "id": "e1",
+        "name": "Ann",
+        "weight": 1
+      },
+      {
+        "id": "e2",
+        "name": "Bob",
+        "weight": 1
+      }
+    ],
+    "pairwise": [
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:root",
+        "a": "c1",
+        "b": "c4",
+        "value": 3
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "criteria:c1",
+        "a": "c2",
+        "b": "c3",
+        "value": 1
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:c2",
+        "a": "a1",
+        "b": "a2",
+        "value": 2
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:c2",
+        "a": "a1",
+        "b": "a3",
+        "value": 4
+      },
+      {
+        "evaluatorId": "e1",
+        "context": "alts:c2",
+        "a": "a2",
+        "b": "a3",
+        "value": 2
+      }
+    ],
+    "ratings": [
+      {
+        "evaluatorId": "e1",
+        "criterionId": "c3",
+        "alternativeId": "a1",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "c3",
+        "alternativeId": "a2",
+        "value": 5
+      },
+      {
+        "evaluatorId": "e1",
+        "criterionId": "c3",
+        "alternativeId": "a3",
+        "value": 10
+      }
+    ],
+    "values": [
+      {
+        "criterionId": "c4",
+        "alternativeId": "a1",
+        "value": 100
+      },
+      {
+        "criterionId": "c4",
+        "alternativeId": "a2",
+        "value": 200
+      },
+      {
+        "criterionId": "c4",
+        "alternativeId": "a3",
+        "value": 400
+      }
+    ]
+  },
+  "results": {
+    "evaluator": "e1",
+    "scores": [
+      {
+        "id": "a1",
+        "score": 0.4508928571428572,
+        "rank": 1
+      },
+      {
+        "id": "a2",
+        "score": 0.2723214285714286,
+        "rank": 3
+      },
+      {
+        "id": "a3",
+        "score": 0.2767857142857143,
+        "rank": 2
+      }
+    ],
+    "criteria": [
+      {
+        "id": "c1",
+        "local": 0.75,
+        "global": 0.75,
+        "subtree": [
+          0.4107142857142857,
+          0.26785714285714285,
+          0.3214285714285714
+        ],
+        "stability": null
+      },
+      {
+        "id": "c2",
+        "parentId": "c1",
+        "local": 0.5,
+        "global": 0.375,
+        "subtree": [
+          0.5714285714285714,
+          0.2857142857142857,
+          0.14285714285714285
+        ],
+        "stability": 0.34210526315789475
+      },
+      {
+        "id": "c3",
+        "parentId": "c1",
+        "local": 0.5,
+        "global": 0.375,
+        "subtree": [
+          0.25,
+          0.25,
+          0.5
+        ],
+        "stability": 0.3421052631578948
+      },
+      {
+        "id": "c4",
+        "local": 0.25000000000000006,
+        "global": 0.25000000000000006,
+        "subtree": [
+          0.5714285714285715,
+          0.28571428571428575,
+          0.14285714285714288
+        ],
+        "stability": null
+      }
+    ],
+    "matrices": [
+      {
+        "context": "criteria:root",
+        "items": [
+          "c1",
+          "c4"
+        ],
+        "weights": [
+          0.75,
+          0.25000000000000006
+        ],
+        "cr": 0,
+        "threshold": 0.1,
+        "consistent": true,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 1,
+        "suggestions": [],
+        "matrix": [
+          [
+            1,
+            2.9999999999999996
+          ],
+          [
+            0.33333333333333337,
+            1
+          ]
+        ]
+      },
+      {
+        "context": "criteria:c1",
+        "items": [
+          "c2",
+          "c3"
+        ],
+        "weights": [
+          0.5,
+          0.5
+        ],
+        "cr": 0,
+        "threshold": 0.1,
+        "consistent": true,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 1,
+        "suggestions": [],
+        "matrix": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "context": "alts:c2",
+        "items": [
+          "a1",
+          "a2",
+          "a3"
+        ],
+        "weights": [
+          0.5714285714285714,
+          0.2857142857142857,
+          0.14285714285714285
+        ],
+        "cr": 0,
+        "threshold": 0.05,
+        "consistent": true,
+        "complete": true,
+        "connected": true,
+        "missing": 0,
+        "pairs": 3,
+        "suggestions": [],
+        "matrix": [
+          [
+            1,
+            2,
+            4
+          ],
+          [
+            0.5,
+            1,
+            2
+          ],
+          [
+            0.25,
+            0.5,
+            1
+          ]
+        ]
+      }
+    ],
+    "issues": [],
+    "disagreements": [],
+    "completeness": 1,
+    "consistent": true,
+    "people": [
+      {
+        "id": "e1",
+        "done": 8,
+        "total": 8,
+        "finished": true,
+        "consistent": true,
+        "structure": "293112a6118c",
+        "outOfDate": false
+      },
+      {
+        "id": "e2",
+        "done": 0,
+        "total": 8,
+        "finished": false,
+        "consistent": true,
+        "structure": "293112a6118c",
+        "outOfDate": false
+      }
+    ],
+    "values": {
+      "done": 3,
+      "total": 3
+    },
+    "method": "judgments"
+  }
+}

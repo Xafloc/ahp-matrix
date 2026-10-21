@@ -23,6 +23,8 @@ test('inviting someone records it, and changing the decision afterwards marks th
 
   const download = page.waitForEvent('download');
   await personRow(page, 'Priya').getByRole('button', { name: 'Invite' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Download app file' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
   expect((await download).suggestedFilename()).toBe('invites-for-priya.ahp.json');
   await expect(personRow(page, 'Priya')).toContainText('Invited');
   await saved(page);
@@ -66,4 +68,23 @@ test('the People step fits a phone', async ({ page }) => {
   const width = await page.evaluate(() => document.documentElement.scrollWidth);
   expect(width).toBeLessThanOrEqual(390);
   await expect(personRow(page, 'Priya Raghunathan-Okafor').getByRole('button', { name: 'Invite' })).toBeInViewport({ ratio: 1 });
+});
+
+test('the invitation offers a web page to answer in, and a message to send with it', async ({ page }) => {
+  await createDecision(page, 'Web invite');
+  await addAll(page, 'New option', ['X', 'Y']);
+  await addAll(page, 'New criterion', ['Speed', 'Cost']);
+  await openPeople(page);
+  await page.getByLabel("Person's name").first().fill('Darren');
+  await addAll(page, 'New person', ['Priya']);
+  await saved(page);
+  await personRow(page, 'Priya').getByRole('button', { name: 'Invite' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Invite Priya' });
+  await dialog.getByLabel('Answer by').fill('2026-10-24');
+  await expect(dialog.getByLabel('Message to send')).toHaveValue(/Hi Priya, could you help me decide "Web invite"\?.*Open the attached page in any browser.*Please answer by Sat 24 Oct\. Thanks, Darren/);
+  const download = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'Download web page' }).click();
+  expect((await download).suggestedFilename()).toBe('web-invite-for-priya.html');
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
+  await expect(personRow(page, 'Priya')).toContainText('Invited');
 });

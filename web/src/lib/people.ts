@@ -1,3 +1,4 @@
+import { minutes } from './judge';
 import type { Progress } from './progress';
 import { groups, leaves } from './tree';
 import { list } from './format';
@@ -57,8 +58,16 @@ export function statusOf(e: Evaluator, progress: PersonProgress | undefined, fir
   return { kind: 'invited', at: e.invite.sentAt };
 }
 
+/** How a copy was sent: the judging web page, or a file for the app. */
+export type InviteKind = 'page' | 'app';
+
+const howToAnswer: Record<InviteKind, string> = {
+  page: "Open the attached page in any browser (there's nothing to install), answer, then press Finish and send back, then email me the file it saves.",
+  app: 'Open the attached file with Import file in AHP Matrix, answer, then press Send your answers back, then email me the file it saves.',
+};
+
 /** A short nudge to paste into an email or chat. */
-export function reminder(decision: string, person: string, progress: Progress, from: string): string {
+export function reminder(decision: string, person: string, progress: Progress, from: string, kind: InviteKind = 'app'): string {
   const left = progress.total - progress.done;
   const where =
     progress.total === 0 || progress.done === 0
@@ -66,7 +75,36 @@ export function reminder(decision: string, person: string, progress: Progress, f
       : left === 0
         ? "It looks like you've finished: could you send the file back?"
         : `You've got ${left} of ${progress.total} comparisons left.`;
-  return `Hi ${person}, a reminder about "${decision}". ${where} Open the file I sent with Import file in AHP Matrix, answer, then press Send your answers back and email me the file it saves. Thanks, ${from}`;
+  const how =
+    kind === 'page'
+      ? 'Open the page I sent in any browser, answer, then press Finish and send back, then email me the file it saves.'
+      : 'Open the file I sent with Import file in AHP Matrix, answer, then press Send your answers back, then email me the file it saves.';
+  return `Hi ${person}, a reminder about "${decision}". ${where} ${how} ${from ? `Thanks, ${from}` : 'Thanks!'}`;
+}
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "2026-10-24" → "Fri 24 Oct". */
+function day(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return Number.isNaN(date.getTime()) ? iso : `${DAYS[date.getDay()]} ${d} ${MONTHS[m - 1]}`;
+}
+
+/** The message to send with an invitation. */
+export function invitation(p: Project, e: Evaluator, o: { from: string; kind: InviteKind; deadline?: string }): string {
+  const n = minutes(p, e);
+  return [
+    `Hi ${e.name}, could you help me decide "${p.name}"?`,
+    `I'd like you to ${describeTasks(p, e.tasks)}.`,
+    `It takes about ${n} minute${n === 1 ? '' : 's'}.`,
+    howToAnswer[o.kind],
+    o.deadline ? `Please answer by ${day(o.deadline)}.` : '',
+    o.from ? `Thanks, ${o.from}` : 'Thanks!',
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 /** Whether someone with these tasks compares the criteria. */
@@ -100,9 +138,12 @@ export function sender(packet: PacketInfo | undefined): string {
 export function describeTasks(p: Project, tasks: Tasks | undefined): string {
   const parts: string[] = [];
   if (weighs(tasks)) parts.push('weigh the criteria');
-  if (!tasks || tasks.scoreAll) parts.push('score the options on every criterion');
+  const judged = leaves(p).filter((c) => c.method !== 'value'); // measured values are the sender's
+  if (!tasks || tasks.scoreAll) {
+    if (judged.length && p.alternatives.length >= 2) parts.push('score the options on every criterion');
+  }
   else {
-    const names = leaves(p)
+    const names = judged
       .filter((c) => tasks.score?.includes(c.id))
       .map((c) => c.name);
     if (names.length) parts.push(`score the options on ${list(names)}`);

@@ -13,6 +13,8 @@ async function openPriyasCopy(page: Page, name: string, path: string) {
   await saved(page);
   const download = page.waitForEvent('download');
   await personRow(page, 'Priya').getByRole('button', { name: 'Invite' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Download app file' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
   await (await download).saveAs(path);
   await saved(page);
 

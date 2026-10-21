@@ -1,10 +1,11 @@
 <script lang="ts">
   // Who judges the decision, what each person is asked to judge, how far
   // they've got, where their copy is, and how their answers are combined.
-  import { exportUrl } from '../lib/api';
+  import { exportUrl, inviteUrl } from '../lib/api';
+  import InviteDialog from './InviteDialog.svelte';
   import { addEvaluator, removeEvaluator, setEvaluatorWeight } from '../lib/edits';
   import { relativeTime } from '../lib/format';
-  import { describeTasks, reminder, ROLES, roleOf, sender, statusOf, tasksFor, type Role, type Status } from '../lib/people';
+  import { describeTasks, reminder, type InviteKind, ROLES, roleOf, sender, statusOf, tasksFor, type Role, type Status } from '../lib/people';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import { leaves } from '../lib/tree';
@@ -56,33 +57,47 @@
     });
   }
 
+  // The person whose invitation dialog is open, and any problem inviting them.
+  let inviting = $state<Evaluator | null>(null);
+  let inviteError = $state('');
+
   // Records the invitation (with the structure the copy is made from), saves
   // it, then downloads the copy, so the copy and the record always agree.
-  async function invite(e: Evaluator) {
+  // Problems show in the invitation dialog.
+  async function invite(e: Evaluator, kind: InviteKind) {
     busy = e.id;
-    notice = null;
+    inviteError = '';
     try {
+      if (kind === 'page') {
+        const ok = await fetch(inviteUrl(p.id, e.id), { method: 'HEAD' }).then((r) => r.ok, () => false);
+        if (!ok) {
+          inviteError = "This copy of AHP Matrix can't make the web page. Send the app file instead, or update AHP Matrix.";
+          return;
+        }
+      }
       await session.flush();
       if (session.unsaved) {
-        notice = { id: e.id, text: 'Fix the unsaved changes first; then invite.' };
+        inviteError = 'Fix the unsaved changes first; then invite.';
         return;
       }
       await session.refreshResults([ALL_EVALUATORS]);
       const structure = progressOf(e.id)?.structure;
       const person = session.project.evaluators.find((x) => x.id === e.id);
-      if (!structure || !person) return;
-      person.invite = { sentAt: new Date().toISOString(), structure };
+      if (!structure || !person) {
+        inviteError = "The invitation couldn't be made yet; try again in a moment.";
+        return;
+      }
+      person.invite = { sentAt: new Date().toISOString(), structure, kind };
       session.changed();
       await session.flush();
       if (session.unsaved) {
-        notice = { id: e.id, text: `The invitation couldn't be saved: ${session.error}` };
+        inviteError = `The invitation couldn't be saved: ${session.error}`;
         return;
       }
       const a = document.createElement('a');
-      a.href = exportUrl(p.id, 'ahp.json', e.id);
+      a.href = kind === 'page' ? inviteUrl(p.id, e.id) : exportUrl(p.id, 'ahp.json', e.id);
       a.download = '';
       a.click();
-      notice = { id: e.id, text: `Send the downloaded file to ${e.name}. They open it with Import file in AHP Matrix.` };
     } finally {
       busy = '';
     }
@@ -90,7 +105,8 @@
 
   async function copyReminder(e: Evaluator) {
     const prog = progressOf(e.id) ?? { done: 0, total: 0 };
-    const text = reminder(p.name, e.name, prog, p.evaluators[0].name);
+    const owner = p.evaluators[0].name.trim();
+    const text = reminder(p.name, e.name, prog, owner === 'Me' ? '' : owner, e.invite?.kind ?? 'app');
     try {
       await navigator.clipboard.writeText(text);
       notice = { id: e.id, text: 'Reminder copied. Paste it into an email or chat.' };
@@ -230,9 +246,9 @@
           {#if i > 0}
             <div class="actions">
               {#if status.kind === 'out-of-date'}
-                <button class="btn small" disabled={busy === e.id} onclick={() => invite(e)}>Send updated copy</button>
+                <button class="btn small" disabled={busy === e.id} onclick={() => (inviting = e)}>Send updated copy</button>
               {:else}
-                <button class="btn small" class:quiet={status.kind !== 'not-invited'} disabled={busy === e.id} onclick={() => invite(e)}>
+                <button class="btn small" class:quiet={status.kind !== 'not-invited'} disabled={busy === e.id} onclick={() => (inviting = e)}>
                   {status.kind === 'not-invited' ? 'Invite' : 'Invite again'}
                 </button>
               {/if}
@@ -301,6 +317,18 @@
     <a class="btn primary next" href={href(p.id, 'weigh')}>Next: weigh the criteria</a>
   {/if}
 </div>
+
+{#if inviting}
+  {@const person = inviting}
+  <InviteDialog
+    project={p}
+    {person}
+    busy={busy === person.id}
+    onsend={(kind) => invite(person, kind)}
+    error={inviteError}
+    onclose={() => ((inviting = null), (inviteError = ''))}
+  />
+{/if}
 
 <style>
   .people {
