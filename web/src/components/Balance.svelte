@@ -1,7 +1,9 @@
 <script lang="ts">
   // A balance beam for one pairwise judgment: the preferred side sinks. The
-  // row of stops underneath is the control; arrow keys move along it.
-  import { describe, fraction, stopLabel, stops, type CompareKind } from '../lib/scale';
+  // row of stops underneath (StrengthScale) is the control.
+  import { describe, type CompareKind } from '../lib/scale';
+  import StrengthScale from './StrengthScale.svelte';
+  import StrengthWords from './StrengthWords.svelte';
   import type { Scale } from '../lib/types';
 
   interface Side {
@@ -26,43 +28,12 @@
     onchange: (v: number | undefined) => void;
   } = $props();
 
-  // Positions run left (a strongly preferred) to right (b strongly preferred).
-  const positions = $derived([...stops(scale)].reverse());
-  const max = $derived(positions[0]);
-  const middle = $derived((positions.length - 1) / 2);
-  const index = $derived(value === undefined ? -1 : positions.findIndex((v) => Math.abs(Math.log(v / value)) < 1e-6));
+  const max = $derived(scale === 'classic5' ? 10 : 9);
   const tilt = $derived(value === undefined ? 0 : (-14 * Math.log(value)) / Math.log(max));
   const sentence = $derived(value === undefined ? 'Not compared yet' : describe(value, scale, kind, a.name, b.name, on));
   // The stop under the pointer (or keyboard focus), previewed before it's chosen.
   let hovered = $state<number | null>(null);
-  const preview = $derived(hovered !== null && hovered !== index ? describe(positions[hovered], scale, kind, a.name, b.name, on, true) : '');
-
-  function set(i: number) {
-    onchange(positions[Math.max(0, Math.min(positions.length - 1, i))]);
-  }
-
-  function onKey(e: KeyboardEvent) {
-    const from = index < 0 ? middle : index;
-    const moves: Record<string, () => void> = {
-      ArrowLeft: () => set(index < 0 ? middle - 1 : from - 1),
-      ArrowRight: () => set(index < 0 ? middle + 1 : from + 1),
-      // A slider's ↑/↓ raise and lower its value, here toward the right-hand side.
-      ArrowUp: () => set(index < 0 ? middle + 1 : from + 1),
-      ArrowDown: () => set(index < 0 ? middle - 1 : from - 1),
-      Home: () => set(0),
-      End: () => set(positions.length - 1),
-      '=': () => set(middle),
-      Backspace: () => onchange(undefined),
-      Delete: () => onchange(undefined),
-    };
-    if (moves[e.key]) {
-      e.preventDefault();
-      moves[e.key]();
-    }
-  }
-
-  // Labels under the stops: strength toward the nearer side.
-  const label = (v: number) => fraction(v >= 1 ? v : 1 / v);
+  const preview = $derived(hovered !== null && hovered !== value ? describe(hovered, scale, kind, a.name, b.name, on, true) : '');
 </script>
 
 <div class="balance">
@@ -87,41 +58,17 @@
     <span class="side right">{b.name}<span class="dot" style:background={b.color ?? 'var(--ink-3)'}></span></span>
   </div>
 
-  <div
-    class="stops"
-    style:--n={positions.length}
-    role="slider"
-    tabindex="0"
-    aria-label="Compare {a.name} with {b.name}"
-    aria-valuemin={0}
-    aria-valuemax={positions.length - 1}
-    aria-valuenow={index < 0 ? undefined : index}
-    aria-valuetext={sentence}
-    onkeydown={onKey}
-  >
-    {#each positions as v, i}
-      <button
-        type="button"
-        tabindex="-1"
-        class="stop"
-        class:mid={i === middle}
-        class:on={i === index}
-        class:toward-a={i < middle}
-        class:toward-b={i > middle}
-        aria-label={describe(v, scale, kind, a.name, b.name, on)}
-        onclick={() => set(i)}
-        onpointerenter={() => (hovered = i)}
-        onpointerleave={() => (hovered = null)}
-        onfocus={() => (hovered = i)}
-        onblur={() => (hovered = null)}
-      >
-        <span>{label(v)}</span>
-      </button>
-    {/each}
-  </div>
-
-  <div class="words" style:--n={positions.length} aria-hidden="true">
-    {#each positions as v, i}<span class:mid={i === middle}>{stopLabel(v, scale)}</span>{/each}
+  <div class="control">
+    <StrengthScale
+      {value}
+      {scale}
+      label="Compare {a.name} with {b.name}"
+      valuetext={sentence}
+      describeAt={(v) => describe(v, scale, kind, a.name, b.name, on)}
+      {onchange}
+      onhover={(v) => (hovered = v)}
+    />
+    <StrengthWords {scale} />
   </div>
 
   {#if preview}
@@ -204,71 +151,10 @@
     height: 0.7rem;
     border-radius: 50%;
   }
-  .stops {
+  .control {
     display: grid;
-    grid-template-columns: repeat(var(--n, 17), minmax(0, 1fr));
-    grid-auto-flow: column;
+    gap: 0.25rem;
     width: min(100%, 40rem);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-s);
-    background: var(--paper);
-    overflow: hidden;
-  }
-  .stops:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 3px;
-  }
-  .stop {
-    border: 0;
-    border-right: 1px solid var(--line);
-    background: transparent;
-    padding: 0.55rem 0;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--ink-2);
-  }
-  .stop:last-child {
-    border-right: 0;
-  }
-  .stop:hover {
-    background: var(--brass-wash);
-  }
-  .stop.mid {
-    color: var(--ink);
-  }
-  .stop.on {
-    background: var(--ink);
-    color: var(--paper);
-  }
-  .words {
-    display: grid;
-    grid-template-columns: repeat(var(--n, 17), minmax(0, 1fr));
-    width: min(100%, 40rem);
-    margin-top: -0.35rem;
-    font-size: 0.72rem;
-    line-height: 1.15;
-    color: var(--ink-3);
-    text-align: center;
-  }
-  /* A word sits on one line, centred on its stop and spilling into the
-     unlabelled stops beside it; the outermost align inwards so nothing
-     pokes out past the row. */
-  .words span {
-    display: flex;
-    justify-content: center;
-    min-width: 0;
-    white-space: nowrap;
-  }
-  .words span:first-child {
-    justify-content: flex-start;
-  }
-  .words span:last-child {
-    justify-content: flex-end;
-  }
-  .words .mid {
-    color: var(--ink-2);
-    font-weight: 600;
   }
   .sentence.preview {
     color: var(--ink-3);

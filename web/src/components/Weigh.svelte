@@ -75,7 +75,7 @@
   .main {
     display: grid;
     gap: 1.25rem;
-    max-width: 46rem;
+    max-width: 54rem;
   }
   .empty {
     display: grid;

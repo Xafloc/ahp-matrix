@@ -8,12 +8,14 @@
     kind,
     scale,
     onfix,
+    fixes = true,
   }: {
     report: MatrixReport | undefined;
     items: { id: string; name: string }[];
     kind: CompareKind;
     scale: Scale;
     onfix: (a: string, b: string, v: number) => void;
+    fixes?: boolean; // list the suggested fixes (the pair list shows them on its rows instead)
   } = $props();
 
   const name = (id: string) => items.find((i) => i.id === id)?.name ?? id;
@@ -38,7 +40,7 @@
         <span class="fill" class:bad={!report.consistent} style:width="{Math.min(100, (report.cr / span) * 100)}%"></span>
         <span class="tick" style:left="{(report.threshold / span) * 100}%"></span>
       </div>
-      {#if !report.consistent && report.suggestions.length}
+      {#if fixes && !report.consistent && report.suggestions.length}
         <ul class="fixes">
           {#each report.suggestions as s}
             <li>
