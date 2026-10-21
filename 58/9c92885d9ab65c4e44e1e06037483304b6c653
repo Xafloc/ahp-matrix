@@ -1,0 +1,33 @@
+internal/model/fingerprint.go
+  s_65743add7cce22::t_5980c461feddca 1-43
+internal/model/group_test.go
+  s_65743add7cce22::t_fd53a94672e860 1-85
+internal/model/project.go
+  s_65743add7cce22::t_5980c461feddca 8-16,44-51,86-109
+internal/model/merge.go
+  s_65743add7cce22::t_5980c461feddca 8,56-63
+internal/model/decode.go
+  s_65743add7cce22::t_5980c461feddca 38-39
+internal/model/prepare.go
+  s_65743add7cce22::t_5980c461feddca 65-67,183-192,254-256
+internal/model/testdata/golden/fixture.json
+  s_65743add7cce22::t_f2f0f8b23e696d 3,11
+internal/model/testdata/golden/wide.json
+  s_65743add7cce22::t_a3bd061a301b10 3,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "589c92885d9ab65c4e44e1e06037483304b6c653",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
