@@ -53,3 +53,10 @@ export function placeMarkers<T extends { v: number; label?: string }>(
   }
   return out.map(({ at: _, ...m }) => m as T & { x: number; row: number; align: Align });
 }
+
+/**
+ * Where a place on the scale (0–1, from scaleX) falls across a row of n
+ * stops laid out as equal columns, the way the strength words are: the first
+ * stop is the middle of the first column, not its edge.
+ */
+export const onStops = (x: number, n: number): number => (x * (n - 1) + 0.5) / n;

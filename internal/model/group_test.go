@@ -232,3 +232,20 @@ func TestEachPersonsRankingIsTheOneCombined(t *testing.T) {
 		t.Errorf("off-role answers: answered %v, done %d", b.Answered, b.Done)
 	}
 }
+
+func TestSomeoneWithNothingToJudgeHasNoRankingOfTheirOwn(t *testing.T) {
+	p := twoPeople()
+	p.Aggregation = AggregatePriorities
+	// Bob's role covers nothing, though he answered before it changed: his
+	// "own" ranking would just be the group's, counted again.
+	p.Evaluators[1].Tasks = &Tasks{}
+	r, err := Compute(p, AllEvaluators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bob := r.People[1]; bob.Scores != nil {
+		t.Errorf("bob has a ranking of his own: %+v", bob.Scores)
+	}
+	// Combining rankings is then Ann's alone.
+	approx(t, "One", r.Scores[0].Score, 0.625, 1e-6)
+}

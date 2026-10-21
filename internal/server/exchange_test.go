@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"io"
 	"mime/multipart"
@@ -9,6 +10,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/xuri/excelize/v2"
 
@@ -248,5 +250,68 @@ func TestSendingAnswersBackNamesThePerson(t *testing.T) {
 	rec := request(t, h, "GET", "/api/projects/"+copy.ID+"/export.ahp.json", nil)
 	if cd := rec.Header().Get("Content-Disposition"); !strings.Contains(cd, "hiring-a-senior-engineer-answers-from-product-manager.ahp.json") {
 		t.Errorf("received copy's export filename: %q", cd)
+	}
+}
+
+func TestANewerInvitationUpdatesTheCopyYouHave(t *testing.T) {
+	h, st := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	first := decode[*model.Project](t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body.Bytes())
+
+	// The product manager imports their invitation and changes an answer.
+	mine := decode[*model.Project](t, upload(t, h, "/api/import/ahp", "for-pm.ahp.json", readAll(t, mustJSON(t, first))).Body.Bytes())
+	mine.Pairwise[0].Value = 1.0 / mine.Pairwise[0].Value
+	changed := mine.Pairwise[0]
+	mine = decode[*model.Project](t, request(t, h, "PUT", "/api/projects/"+mine.ID, mustJSON(t, mine)).Body.Bytes())
+
+	// The owner adds an option and sends a newer invitation.
+	owner.Alternatives = append(owner.Alternatives, model.Alternative{ID: "late", Name: "Late applicant", Color: "slate"})
+	owner = decode[*model.Project](t, request(t, h, "PUT", "/api/projects/"+owner.ID, mustJSON(t, owner)).Body.Bytes())
+	second := decode[*model.Project](t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body.Bytes())
+	second.Packet.SentAt = first.Packet.SentAt.Add(time.Hour)
+
+	count := func() int {
+		entries, _ := st.List(context.Background())
+		return len(entries)
+	}
+	rec := upload(t, h, "/api/import/ahp", "for-pm.ahp.json", readAll(t, mustJSON(t, second)))
+	got := decode[*model.Project](t, rec.Body.Bytes())
+	if rec.Code != http.StatusOK || got.ID != mine.ID || count() != 2 {
+		t.Fatalf("newer invitation: %d, id %q (want %q), %d projects (want 2)", rec.Code, got.ID, mine.ID, count())
+	}
+	if len(got.Alternatives) != len(owner.Alternatives) || got.Packet.SentAt != second.Packet.SentAt {
+		t.Errorf("the copy wasn't updated: %d options, sent %v", len(got.Alternatives), got.Packet.SentAt)
+	}
+	found := false
+	for _, j := range got.Pairwise {
+		if j.EvaluatorID == changed.EvaluatorID && j.Context == changed.Context && j.A == changed.A && j.B == changed.B {
+			found = j.Value == changed.Value
+		}
+	}
+	if !found {
+		t.Errorf("the product manager's own answer was lost: %+v", got.Pairwise)
+	}
+
+	// Opening the older invitation again just opens the copy, as it is.
+	rec = upload(t, h, "/api/import/ahp", "for-pm.ahp.json", readAll(t, mustJSON(t, first)))
+	again := decode[*model.Project](t, rec.Body.Bytes())
+	if rec.Code != http.StatusOK || again.ID != mine.ID || count() != 2 || len(again.Alternatives) != len(owner.Alternatives) {
+		t.Errorf("older invitation: %d, id %q, %d projects, %d options", rec.Code, again.ID, count(), len(again.Alternatives))
+	}
+}
+
+func TestANewerInvitationKeepsItsAnswersWhenYourCopyHasNone(t *testing.T) {
+	h, _ := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	first := decode[*model.Project](t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body.Bytes())
+	mine := decode[*model.Project](t, upload(t, h, "/api/import/ahp", "for-pm.ahp.json", readAll(t, mustJSON(t, first))).Body.Bytes())
+	mine.Pairwise, mine.Ratings = nil, nil
+	request(t, h, "PUT", "/api/projects/"+mine.ID, mustJSON(t, mine))
+
+	second := first
+	second.Packet.SentAt = first.Packet.SentAt.Add(time.Hour)
+	got := decode[*model.Project](t, upload(t, h, "/api/import/ahp", "for-pm.ahp.json", readAll(t, mustJSON(t, second))).Body.Bytes())
+	if got.ID != mine.ID || len(got.Pairwise) == 0 {
+		t.Errorf("id %q (want %q), %d answers; the invitation's own answers should stay", got.ID, mine.ID, len(got.Pairwise))
 	}
 }

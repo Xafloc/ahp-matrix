@@ -39,3 +39,19 @@ export function agreement(people: { name: string; scores: { id: string; score: n
   if (missing.length) line += ` ${list(missing)} ${missing.length === 1 ? "hasn't" : "haven't"} answered yet.`;
   return line;
 }
+
+/**
+ * The people whose own rankings are worth showing side by side: everyone
+ * whose role asks them to judge something, with their ranking once they've
+ * answered (null until then). People with nothing to judge are left out.
+ */
+export function rankers<P extends { id: string; total: number; answered: boolean; scores?: { id: string; score: number; rank: number }[] }>(
+  evaluators: { id: string; name: string }[],
+  people: P[],
+): { id: string; name: string; scores: NonNullable<P['scores']> | null }[] {
+  return evaluators.flatMap((e) => {
+    const x = people.find((q) => q.id === e.id);
+    if (!x || x.total === 0) return [];
+    return [{ id: e.id, name: e.name, scores: x.answered && x.scores ? x.scores : null }];
+  });
+}

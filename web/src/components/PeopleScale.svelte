@@ -1,9 +1,10 @@
 <script lang="ts">
   // Everyone's answer to one pair on the same 9…1…9 scale as the balance: a
   // named marker per person, and the group's combined answer in brass.
-  // Answers that would overlap stack upwards.
-  import { placeMarkers, scaleX } from '../lib/peoplescale';
-  import { describe, type CompareKind } from '../lib/scale';
+  // Answers that would overlap stack upwards. Markers sit over the strength
+  // words below them, and can be focused to read the answer.
+  import { onStops, placeMarkers, scaleX } from '../lib/peoplescale';
+  import { describe, stops, type CompareKind } from '../lib/scale';
   import type { Scale } from '../lib/types';
   import StrengthWords from './StrengthWords.svelte';
 
@@ -26,9 +27,16 @@
   } = $props();
 
   let width = $state(0);
-  const placed = $derived(placeMarkers(answers.map((x) => ({ ...x, label: x.name })), scale, { width: width || undefined }));
+  const n = $derived(stops(scale).length);
+  // The stops span all but half a column at each end, so overlaps are measured on that.
+  const span = $derived(width ? (width * (n - 1)) / n : undefined);
+  const placed = $derived(placeMarkers(answers.map((x) => ({ ...x, label: x.name })), scale, { width: span }));
   const rows = $derived(Math.max(1, ...placed.map((m) => m.row + 1)));
   const say = (v: number) => describe(v, scale, kind, a, b, on);
+  const at = (x: number) => `${onStops(x, n) * 100}%`;
+
+  // The answer being pointed at or focused, read out under the scale.
+  let showing = $state('');
 </script>
 
 <div class="scale">
@@ -36,20 +44,46 @@
     <span>{a}</span>
     <span>{b}</span>
   </div>
-  <div class="plot" style:--rows={rows} bind:clientWidth={width}>
+  <div class="plot" style:--rows={rows} style:--inset="{50 / n}%" bind:clientWidth={width}>
     <span class="track" aria-hidden="true"></span>
     <span class="tick mid" aria-hidden="true"></span>
     {#if combined !== undefined}
-      <span class="marker combined" style:left="{scaleX(combined, scale) * 100}%" role="img" aria-label="Everyone combined: {say(combined)}" title="Everyone combined: {say(combined)}"></span>
+      {@const line = `Everyone combined: ${say(combined)}`}
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <span
+        class="marker combined"
+        style:left={at(scaleX(combined, scale))}
+        role="img"
+        tabindex="0"
+        aria-label={line}
+        onfocus={() => (showing = line)}
+        onblur={() => (showing = '')}
+        onpointerenter={() => (showing = line)}
+        onpointerleave={() => (showing = '')}
+      ></span>
     {/if}
     {#each placed as m (m.id)}
-      <span class="marker person {m.align}" style:left="{m.x * 100}%" style:--row={m.row} role="img" aria-label="{m.name}: {say(m.v)}" title="{m.name}: {say(m.v)}">
+      {@const line = `${m.name}: ${say(m.v)}`}
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <span
+        class="marker person {m.align}"
+        style:left={at(m.x)}
+        style:--row={m.row}
+        role="img"
+        tabindex="0"
+        aria-label={line}
+        onfocus={() => (showing = line)}
+        onblur={() => (showing = '')}
+        onpointerenter={() => (showing = line)}
+        onpointerleave={() => (showing = '')}
+      >
         <span class="who small">{m.name}</span>
         <span class="dot" aria-hidden="true"></span>
       </span>
     {/each}
   </div>
   <StrengthWords {scale} sparse />
+  <p class="readout small" aria-hidden="true">{showing}</p>
 </div>
 
 <style>
@@ -70,8 +104,8 @@
   }
   .track {
     position: absolute;
-    left: 0;
-    right: 0;
+    left: var(--inset);
+    right: var(--inset);
     bottom: 0.55rem;
     height: 2px;
     background: var(--line-strong);
@@ -88,6 +122,16 @@
   .marker {
     position: absolute;
     transform: translateX(-50%);
+    outline: none;
+  }
+  .marker:focus-visible {
+    border-radius: 3px;
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink);
+  }
+  .readout {
+    margin: 0;
+    min-height: 1.2em;
+    color: var(--ink-2);
   }
   .combined {
     bottom: 0.15rem;
