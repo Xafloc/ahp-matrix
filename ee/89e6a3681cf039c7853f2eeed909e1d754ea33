@@ -1,0 +1,49 @@
+web/src/components/ThemeToggle.svelte
+  s_65743add7cce22::t_b4f70b05fb1921 3
+web/src/lib/judge.ts
+  s_65743add7cce22::t_aa868d18a1c6b4 1-77
+web/src/judge/Judge.svelte
+  s_65743add7cce22::t_357bf9a570c38a 1-4,6-18,21-25,28-320
+  s_65743add7cce22::t_a674316d5c2626 26-27
+  s_65743add7cce22::t_b4f70b05fb1921 5,19-20
+web/src/components/RatingRows.svelte
+  s_65743add7cce22::t_2a1dd32c1baab7 1-82
+web/src/judge/judge.test.ts
+  s_65743add7cce22::t_69db685a11693e 1-24
+web/src/judge/fonts.css
+  s_65743add7cce22::t_34dfcbd23e8f34 1-15
+web/src/judge/main.ts
+  s_65743add7cce22::t_bd1c430a92d73d 1-13
+web/package.json
+  s_65743add7cce22::t_34dfcbd23e8f34 7
+web/src/judge/build.test.ts
+  s_65743add7cce22::t_34dfcbd23e8f34 1-14
+.gitignore
+  s_65743add7cce22::t_34dfcbd23e8f34 10
+web/judge.html
+  s_65743add7cce22::t_bd1c430a92d73d 1-14
+web/src/lib/judge.test.ts
+  s_65743add7cce22::t_1015c95ad1b8ba 1-49
+web/src/components/Score.svelte
+  s_65743add7cce22::t_2a1dd32c1baab7 12,73
+web/scripts/inline-judge.mjs
+  s_65743add7cce22::t_34dfcbd23e8f34 1-17
+web/vite.judge.config.ts
+  s_65743add7cce22::t_34dfcbd23e8f34 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ee89e6a3681cf039c7853f2eeed909e1d754ea33",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
