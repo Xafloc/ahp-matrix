@@ -26,9 +26,9 @@ export function agreement(people: { name: string; scores: { id: string; score: n
   }
 
   let line: string;
-  if (groups.length === 1 && groups[0].top.length === 1) {
-    const who = answered.length === 2 ? 'Both people' : `All ${answered.length} people`;
-    line = `${who}${missing.length ? " who've answered" : ''} rank ${pick(groups[0].top)} first.`;
+  if (groups.length === 1) {
+    const who = `${answered.length === 2 ? 'Both people' : `All ${answered.length} people`}${missing.length ? " who've answered" : ''}`;
+    line = groups[0].top.length === 1 ? `${who} rank ${pick(groups[0].top)} first.` : `${who} put ${pick(groups[0].top)} level at the top.`;
   } else {
     const parts = groups.map((g) => {
       const many = g.names.length > 1;

@@ -36,3 +36,9 @@ test("people who haven't answered are left out, and said so", () => {
   );
   expect(agreement([person('Darren', [0.5, 0.3, 0.2]), person('Sam', null)], names)).toBe('');
 });
+
+test('a tie everyone shares is agreement, not disagreement', () => {
+  expect(agreement([person('Darren', [0.4, 0.4, 0.2]), person('Priya', [0.4, 0.4, 0.2])], names)).toBe(
+    'Both people put MacBook Pro and ThinkPad X1 level at the top.',
+  );
+});

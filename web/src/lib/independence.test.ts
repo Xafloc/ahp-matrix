@@ -3,7 +3,7 @@ import { fixture } from './fixture.test-helper';
 import { hiddenFor, nextTask } from './independence';
 import type { PersonProgress } from './types';
 
-const prog = (id: string, done: number, total: number): PersonProgress => ({ id, done, total, finished: total > 0 && done === total, consistent: true, structure: '', outOfDate: false });
+const prog = (id: string, done: number, total: number): PersonProgress => ({ id, done, total, finished: total > 0 && done === total, consistent: true, structure: '', outOfDate: false, answered: done > 0 });
 
 test('results stay hidden from someone who has judging left to do, when others are judging too', () => {
   const people = [prog('e1', 5, 5), prog('e2', 1, 5)];

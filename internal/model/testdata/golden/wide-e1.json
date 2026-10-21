@@ -1142,7 +1142,8 @@
         "finished": true,
         "consistent": false,
         "structure": "cf4c9169abb3",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": false
       },
       {
         "id": "e2",
@@ -1151,7 +1152,8 @@
         "finished": true,
         "consistent": false,
         "structure": "cf4c9169abb3",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": false
       }
     ],
     "values": {

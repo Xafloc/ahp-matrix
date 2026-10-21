@@ -24,10 +24,10 @@ test("results stay hidden from someone who hasn't finished, until they choose to
   await page.getByLabel('Now judging as').selectOption({ label: 'Sam' });
 
   await page.getByRole('link', { name: /What if/ }).click();
-  await expect(page.getByText("Results are hidden until Sam finishes, so others' answers don't sway Sam's.")).toBeVisible();
+  await expect(page.getByText("Results are hidden until Sam finishes, so others' answers don't sway theirs.")).toBeVisible();
   await page.getByRole('navigation', { name: 'Steps' }).getByRole('link', { name: /Results/ }).click();
   await expect(page.getByText("Results are hidden until Sam finishes")).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Go to the next comparison' })).toHaveAttribute('href', /\/weigh\//);
+  await expect(page.getByRole('link', { name: 'Go to the next question' })).toHaveAttribute('href', /\/weigh\//);
   await page.getByRole('button', { name: 'Show anyway' }).click();
   await expect(page.getByRole('heading', { name: /comes out ahead/ })).toBeVisible();
 
@@ -57,4 +57,12 @@ test("everyone's own ranking sits beside the combined one, under a headline on w
   const table = section.getByRole('table');
   await expect(table.getByRole('columnheader')).toHaveText(['Option', 'Everyone combined', 'Engineering lead', 'Product manager']);
   await expect(table.getByRole('row')).toHaveCount(4); // header + 3 candidates
+});
+
+test('the discussion views fit a phone without scrolling sideways', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/');
+  await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
+  await expect(page.getByRole('region', { name: 'Where people disagree most' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
 });

@@ -36,3 +36,20 @@ test('names that would overlap at the real width stack, even when the answers di
   expect(placeMarkers(answers, 'saaty9', { width: 1400 }).map((m) => m.row)).toEqual([0, 0]);
   expect(placeMarkers(answers, 'saaty9', { width: 360 }).map((m) => m.row)).toEqual([0, 1]);
 });
+
+test('names at the ends hang inwards, and stacking allows for it', () => {
+  const placed = placeMarkers(
+    [
+      { id: 'a', v: 9, label: 'Alexandra Konstantinou' },
+      { id: 'b', v: 6, label: 'Sam' },
+      { id: 'c', v: 1 / 9, label: 'Priya' },
+    ],
+    'saaty9',
+    { width: 700 },
+  );
+  expect(placed.map((m) => [m.align, m.row])).toEqual([
+    ['start', 0],
+    ['start', 1],
+    ['end', 0],
+  ]);
+});

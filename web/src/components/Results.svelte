@@ -4,6 +4,7 @@
   import { combineNote } from '../lib/copy';
   import { colorOf, percent } from '../lib/format';
   import { href } from '../lib/router.svelte';
+  import { describe } from '../lib/scale';
   import type { ProjectSession } from '../lib/session.svelte';
   import { path } from '../lib/tree';
   import { ALL_EVALUATORS } from '../lib/types';
@@ -42,14 +43,11 @@
     const [i, j] = [m?.items.indexOf(a) ?? -1, m?.items.indexOf(b) ?? -1];
     return m && i >= 0 && j >= 0 && m.matrix[i][j] ? m.matrix[i][j] : undefined;
   }
-  // Everyone's own ranking, for comparing side by side.
-  $effect(() => {
-    if (viewing === ALL_EVALUATORS) for (const e of p.evaluators) session.watch(e.id);
-  });
-  const answeredBy = (id: string) => (session.results[ALL_EVALUATORS]?.people.find((x) => x.id === id)?.done ?? 0) > 0;
+  // Everyone's own ranking, as combining rankings would use it, for comparing side by side.
+  const own = (id: string) => session.results[ALL_EVALUATORS]?.people.find((x) => x.id === id);
   const headline = $derived(
     agreement(
-      p.evaluators.map((e) => ({ name: e.name, scores: answeredBy(e.id) ? (session.results[e.id]?.scores ?? null) : null })),
+      p.evaluators.map((e) => ({ name: e.name, scores: own(e.id)?.answered ? (own(e.id)?.scores ?? null) : null })),
       new Map(p.alternatives.map((a) => [a.id, a.name])),
     ),
   );
@@ -116,6 +114,7 @@
       <section aria-labelledby="people-title">
         <h2 id="people-title">Each person's ranking</h2>
         {#if headline}<p>{headline}</p>{/if}
+        <p class="muted small">Each person's own answers, with everyone's combined answers filling in any part they weren't asked to judge.</p>
         <div class="scroll">
           <table class="matrices people">
             <thead>
@@ -131,8 +130,8 @@
                   <th scope="row"><span class="dot" style:background={colorOf(p.alternatives.find((a) => a.id === s.id)?.color ?? '')}></span>{altName(s.id)}</th>
                   <td><strong>{s.rank}</strong> <span class="muted small">{percent(s.score, 0)}</span></td>
                   {#each p.evaluators as e (e.id)}
-                    {@const own = answeredBy(e.id) ? session.results[e.id]?.scores.find((x) => x.id === s.id) : undefined}
-                    <td>{#if own}<strong>{own.rank}</strong> <span class="muted small">{percent(own.score, 0)}</span>{:else}<span class="muted small">No answers yet</span>{/if}</td>
+                    {@const mine = own(e.id)?.answered ? own(e.id)?.scores?.find((x) => x.id === s.id) : undefined}
+                    <td>{#if mine}<strong>{mine.rank}</strong> <span class="muted small">{percent(mine.score, 0)}</span>{:else}<span class="muted small">No answers yet</span>{/if}</td>
                   {/each}
                 </tr>
               {/each}
@@ -184,8 +183,12 @@
         <ul class="disagree">
           {#each disagreements as d (`${d.context}|${d.a}|${d.b}`)}
             {@const [kind, id] = d.context.split(':')}
+            {@const together = combinedFor(d.context, d.a, d.b)}
             <li>
               <span class="pair">{matrixName(d.context)}</span>
+              {#if together !== undefined}
+                <span class="small">Combined: {describe(together, p.scale, kind === 'alts' ? 'alternatives' : 'criteria', itemName(d.a), itemName(d.b), kind === 'alts' ? itemName(id) : '')}</span>
+              {/if}
               <PeopleScale
                 a={itemName(d.a)}
                 b={itemName(d.b)}
@@ -193,9 +196,9 @@
                 kind={kind === 'alts' ? 'alternatives' : 'criteria'}
                 on={kind === 'alts' ? itemName(id) : ''}
                 answers={p.evaluators.filter((e) => d.values[e.id] !== undefined).map((e) => ({ id: e.id, name: e.name, v: d.values[e.id] }))}
-                combined={combinedFor(d.context, d.a, d.b)}
+                combined={together}
               />
-              <a class="btn quiet small revise" href={href(p.id, kind === 'alts' ? 'score' : 'weigh', id, `${d.a}|${d.b}`)}>Revise my answer</a>
+              <a class="btn quiet small revise" href={href(p.id, kind === 'alts' ? 'score' : 'weigh', id, `${d.a}|${d.b}`)}>{d.values[session.scoringAs] === undefined ? 'Answer this pair' : 'Revise my answer'}</a>
             </li>
           {/each}
         </ul>

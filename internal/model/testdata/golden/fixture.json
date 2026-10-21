@@ -326,7 +326,25 @@
         "finished": true,
         "consistent": true,
         "structure": "293112a6118c",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": true,
+        "scores": [
+          {
+            "id": "a1",
+            "score": 0.4508928571428572,
+            "rank": 1
+          },
+          {
+            "id": "a2",
+            "score": 0.2723214285714286,
+            "rank": 3
+          },
+          {
+            "id": "a3",
+            "score": 0.2767857142857143,
+            "rank": 2
+          }
+        ]
       },
       {
         "id": "e2",
@@ -335,7 +353,8 @@
         "finished": false,
         "consistent": true,
         "structure": "293112a6118c",
-        "outOfDate": false
+        "outOfDate": false,
+        "answered": false
       }
     ],
     "values": {

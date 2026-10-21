@@ -89,7 +89,7 @@
 {:else if !session}
   <main class="message" aria-busy="true"><p class="muted">Opening…</p></main>
 {:else if router.route.name === 'report' && session.hidesResults}
-  <main class="message"><Hidden {session} /></main>
+  <main class="message"><Hidden {session} back /></main>
 {:else if router.route.name === 'report'}
   <Report {session} />
 {:else}

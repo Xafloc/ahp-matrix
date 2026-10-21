@@ -205,3 +205,30 @@ func TestCombiningRankingsFillsUnassignedPartsFromTheGroup(t *testing.T) {
 	two := math.Sqrt(0.375 * 0.625)
 	approx(t, "One", r.Scores[0].Score, one/(one+two), 1e-6)
 }
+
+func TestEachPersonsRankingIsTheOneCombined(t *testing.T) {
+	p := fixture()
+	// Bob only weighs, and has: his own scores would all be equal without the group's answers.
+	p.Evaluators[1].Tasks = &Tasks{Weigh: true}
+	p.Pairwise = append(p.Pairwise,
+		PairwiseJudgment{EvaluatorID: "e2", Context: CriteriaContext(""), A: "c1", B: "c4", Value: 1.0 / 3},
+		PairwiseJudgment{EvaluatorID: "e2", Context: CriteriaContext("c1"), A: "c2", B: "c3", Value: 2})
+	res, err := Compute(p, AllEvaluators)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bob := res.People[1]
+	if !bob.Answered || len(bob.Scores) != 3 {
+		t.Fatalf("bob: answered %v, scores %+v", bob.Answered, bob.Scores)
+	}
+	if bob.Scores[0].Score == bob.Scores[1].Score && bob.Scores[1].Score == bob.Scores[2].Score {
+		t.Errorf("bob's ranking is a three-way tie; the group's scoring should fill in what he wasn't asked: %+v", bob.Scores)
+	}
+
+	// Answers outside someone's role still count, so they count as answered.
+	p.Evaluators[1].Tasks = &Tasks{Score: []string{"c3"}}
+	res, _ = Compute(p, AllEvaluators)
+	if b := res.People[1]; !b.Answered || b.Done != 0 {
+		t.Errorf("off-role answers: answered %v, done %d", b.Answered, b.Done)
+	}
+}

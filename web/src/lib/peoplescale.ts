@@ -21,6 +21,11 @@ export function scaleX(v: number, scale: Scale): number {
 const CHAR = 7.5; // rough width of a small-text character, in pixels
 const PAD = 10;
 
+export type Align = 'start' | 'center' | 'end';
+
+/** How a name hangs off its marker: inwards near the ends, so it stays on the scale. */
+export const alignAt = (x: number): Align => (x < 0.2 ? 'start' : x > 0.8 ? 'end' : 'center');
+
 /**
  * Places people's answers on the scale, stacking ones whose markers, or
  * names (given the plot's width in pixels), would overlap.
@@ -29,15 +34,22 @@ export function placeMarkers<T extends { v: number; label?: string }>(
   values: T[],
   scale: Scale,
   o: { gap?: number; width?: number } = {},
-): (T & { x: number; row: number })[] {
+): (T & { x: number; row: number; align: Align })[] {
   const gap = o.gap ?? 0.05;
-  const half = (m: T) => (o.width ? ((m.label?.length ?? 0) * CHAR + PAD) / 2 / o.width : 0);
-  const out: (T & { x: number; row: number })[] = [];
+  // The stretch of the scale (0–1) a marker and its name cover.
+  const span = (x: number, label: string | undefined, align: Align): [number, number] => {
+    const w = o.width ? ((label?.length ?? 0) * CHAR + PAD) / o.width : 0;
+    const [lo, hi] = align === 'start' ? [x, x + w] : align === 'end' ? [x - w, x] : [x - w / 2, x + w / 2];
+    return [Math.min(lo, x - gap / 2), Math.max(hi, x + gap / 2)];
+  };
+  const out: (T & { x: number; row: number; align: Align; at: [number, number] })[] = [];
   for (const m of values) {
     const x = scaleX(m.v, scale);
+    const align = alignAt(x);
+    const at = span(x, m.label, align);
     let row = 0;
-    while (out.some((p) => p.row === row && Math.abs(p.x - x) < Math.max(gap, half(p) + half(m)))) row++;
-    out.push({ ...m, x, row });
+    while (out.some((p) => p.row === row && p.at[0] < at[1] && at[0] < p.at[1])) row++;
+    out.push({ ...m, x, row, align, at });
   }
-  return out;
+  return out.map(({ at: _, ...m }) => m as T & { x: number; row: number; align: Align });
 }

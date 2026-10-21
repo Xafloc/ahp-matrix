@@ -6,7 +6,7 @@
   import type { ProjectSession } from '../lib/session.svelte';
   import { ALL_EVALUATORS } from '../lib/types';
 
-  let { session }: { session: ProjectSession } = $props();
+  let { session, back = false }: { session: ProjectSession; back?: boolean } = $props();
   const p = $derived(session.project);
   const me = $derived(p.evaluators.find((e) => e.id === session.scoringAs));
   const prog = $derived(session.results[ALL_EVALUATORS]?.people.find((x) => x.id === session.scoringAs));
@@ -14,10 +14,11 @@
 </script>
 
 <section class="hidden">
-  <h1>Results are hidden until {me?.name} finishes, so others' answers don't sway {me?.name}'s.</h1>
-  {#if prog}<p class="muted">{count(prog.total - prog.done, 'answer')} to go. Everyone's answers are combined once they're in.</p>{/if}
+  <h1>Results are hidden until {me?.name} finishes, so others' answers don't sway theirs.</h1>
+  {#if prog}<p class="muted">{count(prog.total - prog.done, 'answer')} to go.</p>{/if}
   <div class="actions">
-    {#if next}<a class="btn primary" href={href(p.id, next.step, next.sub)}>Go to the next comparison</a>{/if}
+    {#if next}<a class="btn primary" href={href(p.id, next.step, next.sub)}>Go to the next question</a>{/if}
+    {#if back}<a class="btn quiet" href={href(p.id, 'people')}>Back to the decision</a>{/if}
     <button class="btn quiet" onclick={() => session.revealed.push(session.scoringAs)}>Show anyway</button>
   </div>
 </section>

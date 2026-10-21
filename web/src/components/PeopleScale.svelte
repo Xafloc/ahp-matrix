@@ -43,16 +43,9 @@
       <span class="marker combined" style:left="{scaleX(combined, scale) * 100}%" role="img" aria-label="Everyone combined: {say(combined)}" title="Everyone combined: {say(combined)}"></span>
     {/if}
     {#each placed as m (m.id)}
-      <span
-        class="marker person"
-        style:left="{m.x * 100}%"
-        style:--row={m.row}
-        role="img"
-        aria-label="{m.name}: {say(m.v)}"
-        title="{m.name}: {say(m.v)}"
-      >
+      <span class="marker person {m.align}" style:left="{m.x * 100}%" style:--row={m.row} role="img" aria-label="{m.name}: {say(m.v)}" title="{m.name}: {say(m.v)}">
+        <span class="who small">{m.name}</span>
         <span class="dot" aria-hidden="true"></span>
-        <span class="who small" class:right={m.x > 0.8} class:left={m.x < 0.2}>{m.name}</span>
       </span>
     {/each}
   </div>
@@ -72,6 +65,7 @@
   }
   .plot {
     position: relative;
+    overflow-x: clip;
     height: calc(1.2rem + var(--rows) * 1.55rem);
   }
   .track {
@@ -103,13 +97,19 @@
     border: 2px solid var(--paper);
     transform: translateX(-50%) rotate(45deg);
   }
+  /* A person's marker is a point on the scale; the dot sits on it and the
+     name hangs above, inwards near the ends so it stays on the scale. */
   .person {
     bottom: calc(1.2rem + var(--row) * 1.55rem);
-    display: grid;
-    justify-items: center;
+    width: 0.6rem;
+    height: 1.35rem;
+    margin-left: -0.3rem;
+    transform: none;
   }
   .person .dot {
-    order: 2;
+    position: absolute;
+    bottom: 0;
+    left: 0;
     width: 0.6rem;
     height: 0.6rem;
     border-radius: 50%;
@@ -117,17 +117,20 @@
     border: 2px solid var(--paper);
   }
   .person .who {
-    order: 1;
+    position: absolute;
+    top: 0;
     white-space: nowrap;
     color: var(--ink);
     line-height: 1.1;
   }
-  .who.left {
-    justify-self: start;
-    transform: translateX(calc(50% - 0.4rem));
+  .center .who {
+    left: 50%;
+    transform: translateX(-50%);
   }
-  .who.right {
-    justify-self: end;
-    transform: translateX(calc(-50% + 0.4rem));
+  .start .who {
+    left: 0;
+  }
+  .end .who {
+    right: 0;
   }
 </style>

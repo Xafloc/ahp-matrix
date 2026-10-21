@@ -25,7 +25,7 @@ describe('roles and tasks', () => {
 });
 
 describe('status', () => {
-  const progress = (outOfDate = false): PersonProgress => ({ id: 'e2', done: 0, total: 3, finished: false, consistent: true, structure: 'abc', outOfDate });
+  const progress = (outOfDate = false): PersonProgress => ({ id: 'e2', done: 0, total: 3, finished: false, consistent: true, structure: 'abc', outOfDate, answered: false });
   const priya = (invite?: Evaluator['invite']): Evaluator => ({ id: 'e2', name: 'Priya', weight: 1, invite });
 
   it('calls the first person you', () => {

@@ -38,14 +38,16 @@
   let order = $state<Pair[]>([]);
   let at = $state(0);
   let orderKey = '';
+  let usedStart = '';
 
   $effect(() => {
     const key = `${context}|${ids.join(',')}|${ev}`;
     if (key === orderKey) return;
     orderKey = key;
     order = focusOrder(items.length, report?.weights);
-    // start ("a|b") opens a particular pair, say from Revise my answer.
-    const [sa, sb] = start.split('|').map((id) => ids.indexOf(id));
+    // start ("a|b") opens a particular pair, say from Revise my answer, once.
+    const [sa, sb] = (start === usedStart ? '' : start).split('|').map((id) => ids.indexOf(id));
+    usedStart = start;
     const asked = order.findIndex(([i, j]) => (i === sa && j === sb) || (i === sb && j === sa));
     const firstOpen = order.findIndex(([i, j]) => value(i, j) === undefined);
     at = asked >= 0 ? asked : firstOpen < 0 ? 0 : firstOpen;
