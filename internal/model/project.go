@@ -5,7 +5,15 @@ package model
 import "time"
 
 // SchemaVersion is the newest project file version this build reads and writes.
-const SchemaVersion = 1
+// Version 2 added evaluator tasks and invitations, the combining method, and
+// packet details; version 1 files load unchanged.
+const SchemaVersion = 2
+
+// How several people's judgments become one result.
+const (
+	AggregateJudgments  = "judgments"  // combine their answers (AIJ): the group acts as one
+	AggregatePriorities = "priorities" // combine their final rankings (AIP): independent experts
+)
 
 // Method is how a leaf criterion scores the alternatives.
 type Method string
@@ -33,11 +41,14 @@ type Project struct {
 	// Origin is the id of the decision this file was copied from when it was
 	// imported under a new id (its own id was taken), so judgments made in the
 	// copy can still be merged back into the original.
-	Origin       string             `json:"origin,omitempty"`
-	Description  string             `json:"description"`
-	CreatedAt    time.Time          `json:"createdAt"`
-	UpdatedAt    time.Time          `json:"updatedAt"`
-	Scale        Scale              `json:"scale"`
+	Origin      string    `json:"origin,omitempty"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Scale       Scale     `json:"scale"`
+	Aggregation string    `json:"aggregation,omitempty"` // AggregateJudgments (default) or AggregatePriorities
+	// Packet is set only in a copy sent to someone to judge (see Packet).
+	Packet       *PacketInfo        `json:"packet,omitempty"`
 	Alternatives []Alternative      `json:"alternatives"`
 	Criteria     []Criterion        `json:"criteria"`
 	Evaluators   []Evaluator        `json:"evaluators"`
@@ -72,6 +83,30 @@ type Evaluator struct {
 	ID     string  `json:"id"`
 	Name   string  `json:"name"`
 	Weight float64 `json:"weight"`
+	Tasks  *Tasks  `json:"tasks,omitempty"`  // nil: everything
+	Invite *Invite `json:"invite,omitempty"` // set once a copy has been sent to them
+}
+
+// Tasks is the part of a decision one person is asked to judge.
+type Tasks struct {
+	Weigh    bool     `json:"weigh"`           // compare the criteria in every sibling group
+	ScoreAll bool     `json:"scoreAll"`        // score the options on every leaf criterion...
+	Score    []string `json:"score,omitempty"` // ...or only on these leaves
+}
+
+// Invite records a copy sent to someone, so the app can tell when it's out of date.
+type Invite struct {
+	SentAt     time.Time  `json:"sentAt"`
+	Structure  string     `json:"structure"` // Fingerprint of the decision when the copy was made
+	ReturnedAt *time.Time `json:"returnedAt,omitempty"`
+}
+
+// PacketInfo marks a copy made for one person to judge and send back.
+type PacketInfo struct {
+	For       string    `json:"for"`  // the evaluator id it was made for
+	From      string    `json:"from"` // who sent it
+	SentAt    time.Time `json:"sentAt"`
+	Structure string    `json:"structure"` // Fingerprint when it was made
 }
 
 // PairwiseJudgment says how strongly A is preferred over B within Context

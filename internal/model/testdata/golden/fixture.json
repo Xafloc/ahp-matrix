@@ -1,6 +1,6 @@
 {
   "project": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "01GOLDENFIXTURE0000000000A",
     "version": 0,
     "name": "Fixture",
@@ -8,6 +8,7 @@
     "createdAt": "2026-10-15T12:00:00Z",
     "updatedAt": "2026-10-15T12:00:00Z",
     "scale": "saaty9",
+    "aggregation": "judgments",
     "alternatives": [
       {
         "id": "a1",

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // ErrDifferentProject means a returned file belongs to another decision.
@@ -52,7 +53,14 @@ func Packet(p *Project, evaluatorID string) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	out.Evaluators = []Evaluator{*who}
+	them := *who
+	them.Invite = nil // the owner's bookkeeping, not theirs
+	out.Evaluators = []Evaluator{them}
+	from := ""
+	if len(p.Evaluators) > 0 {
+		from = p.Evaluators[0].Name // the first person is the decision's owner
+	}
+	out.Packet = &PacketInfo{For: evaluatorID, From: from, SentAt: time.Now().UTC(), Structure: Fingerprint(p, evaluatorID)}
 	out.Pairwise = keep(out.Pairwise, func(j PairwiseJudgment) bool { return j.EvaluatorID == evaluatorID })
 	out.Ratings = keep(out.Ratings, func(r Rating) bool { return r.EvaluatorID == evaluatorID })
 	return out, nil
