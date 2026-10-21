@@ -40,7 +40,7 @@ test('Enter on a focused link or button does what it says, not "next pair"', asy
   await page.getByRole('link', { name: /Weigh criteria/ }).click();
   await page.getByRole('tab', { name: 'All pairs' }).focus();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('button', { name: /One compared with Two/ })).toBeVisible();
+  await expect(page.getByRole('slider', { name: 'Compare One with Two' })).toBeVisible();
   await page.getByRole('link', { name: /Results/ }).focus();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/results$/);

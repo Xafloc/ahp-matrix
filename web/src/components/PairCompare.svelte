@@ -8,7 +8,7 @@
   import type { ProjectSession } from '../lib/session.svelte';
   import Balance from './Balance.svelte';
   import ConsistencyMeter from './ConsistencyMeter.svelte';
-  import MatrixGrid from './MatrixGrid.svelte';
+  import PairList from './PairList.svelte';
 
   export interface Item {
     id: string;
@@ -116,19 +116,10 @@
       </div>
       <p class="hint small muted">Use ← and → to tip the balance, Enter for the next pair.</p>
     {:else}
-      <MatrixGrid
-        {items}
-        get={value}
-        suggestions={report?.suggestions ?? []}
-        onpick={(i, j) => {
-          const k = order.findIndex(([x, y]) => (x === i && y === j) || (x === j && y === i));
-          if (k >= 0) at = k;
-          mode = 'focus';
-        }}
-      />
+      <PairList {items} get={value} set={set} scale={p.scale} {kind} {on} {report} onfix={fix} />
     {/if}
 
-    <ConsistencyMeter {report} {items} {kind} scale={p.scale} onfix={fix} />
+    <ConsistencyMeter {report} {items} {kind} scale={p.scale} onfix={fix} fixes={mode === 'focus'} />
   </div>
 {/if}
 
