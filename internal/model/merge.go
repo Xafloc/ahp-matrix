@@ -282,10 +282,8 @@ func clone(p *Project) (*Project, error) {
 // explainer words why a judgment from a returned file can't be merged,
 // naming things as the file knew them.
 type explainer struct {
-	owner         known
-	names         map[string]string // id → name, from the file and the owner
-	critParent    map[string]string
-	ownerCriteria map[string]bool
+	owner known
+	names map[string]string // id → name, from the file and the owner
 }
 
 func newExplainer(owner, packet *Project) explainer {
