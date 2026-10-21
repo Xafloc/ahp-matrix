@@ -47,6 +47,8 @@ export interface Invite {
   /** Fingerprint of the decision when the copy was made. */
   structure: string;
   returnedAt?: string;
+  /** How it was sent: the judging web page, or a file for the app. */
+  kind?: 'page' | 'app';
 }
 
 /** Only in a copy sent to someone. */

@@ -54,6 +54,8 @@ export async function answeredCopy(page: Page, name: string, path: string, on: s
   await openPeople(page);
   const download = page.waitForEvent('download');
   await personRow(page, name).getByRole('button', { name: 'Invite' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Download app file' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
   await (await download).saveAs(path);
   await saved(page);
   const copy = JSON.parse(readFileSync(path, 'utf8'));

@@ -51,6 +51,8 @@ test("a colleague's returned copy merges back, after asking", async ({ page }, i
 
   const download = page.waitForEvent('download');
   await personRow(page, 'Product manager').getByRole('button', { name: 'Invite' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Download app file' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
   const copy = await download;
   expect(copy.suggestedFilename()).toBe('hiring-a-senior-engineer-for-product-manager.ahp.json');
   const path = info.outputPath(copy.suggestedFilename());
@@ -86,6 +88,8 @@ test("someone's first returned copy merges without asking", async ({ page }, inf
   await saved(page);
   const download = page.waitForEvent('download');
   await personRow(page, 'Carol').getByRole('button', { name: 'Invite' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Download app file' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
   const path = info.outputPath('carol.ahp.json');
   await (await download).saveAs(path);
   // Carol fills in her one comparison.
@@ -106,6 +110,8 @@ test('a returned file that can\'t be merged says why, and offers nothing to do',
   await openPeople(page);
   const download = page.waitForEvent('download');
   await personRow(page, 'Product manager').getByRole('button', { name: 'Invite' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Download app file' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
   const path = info.outputPath('pm.ahp.json');
   await (await download).saveAs(path);
   const copy = JSON.parse(readFileSync(path, 'utf8'));

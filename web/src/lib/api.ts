@@ -85,6 +85,10 @@ export const api: Client = {
   templates: () => call('GET', '/api/templates'),
 };
 
+/** The judging web page with one person's copy inside, to send them. */
+export const inviteUrl = (id: string, evaluator: string) =>
+  `/api/projects/${encodeURIComponent(id)}/invite.html?evaluator=${encodeURIComponent(evaluator)}`;
+
 export type ExportKind = 'ahp.json' | 'xlsx' | 'csv';
 
 /**

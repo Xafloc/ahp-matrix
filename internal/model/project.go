@@ -99,6 +99,7 @@ type Invite struct {
 	SentAt     time.Time  `json:"sentAt"`
 	Structure  string     `json:"structure"` // Fingerprint of the decision when the copy was made
 	ReturnedAt *time.Time `json:"returnedAt,omitempty"`
+	Kind       string     `json:"kind,omitempty"` // how it was sent: "page" (the judging web page) or "app" (a file for the app)
 }
 
 // PacketInfo marks a copy made for one person to judge and send back.
