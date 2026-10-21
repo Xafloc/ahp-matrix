@@ -25,7 +25,8 @@
     combined: number | undefined;
   } = $props();
 
-  const placed = $derived(placeMarkers(answers, scale));
+  let width = $state(0);
+  const placed = $derived(placeMarkers(answers.map((x) => ({ ...x, label: x.name })), scale, { width: width || undefined }));
   const rows = $derived(Math.max(1, ...placed.map((m) => m.row + 1)));
   const say = (v: number) => describe(v, scale, kind, a, b, on);
 </script>
@@ -35,7 +36,7 @@
     <span>{a}</span>
     <span>{b}</span>
   </div>
-  <div class="plot" style:--rows={rows}>
+  <div class="plot" style:--rows={rows} bind:clientWidth={width}>
     <span class="track" aria-hidden="true"></span>
     <span class="tick mid" aria-hidden="true"></span>
     {#if combined !== undefined}

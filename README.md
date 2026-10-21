@@ -56,6 +56,10 @@ only the options, or a custom set), how far they've got, and where their copy is
    whether it replaces earlier ones, and anything that can't come across because you've since removed it. Merge, and
    **Undo** if you change your mind.
 
+Answers stay independent: while someone still has comparisons to make, their results stay hidden (with **Show anyway**),
+so others' answers don't sway theirs. Once everyone's in, Results shows each person's ranking beside the combined one, says
+whether they agree on the winner, and puts everyone's answer to each contested pair on one scale, with **Revise my answer**.
+
 If you change the decision after sending a copy, that person shows as **Out of date**, with **Send updated copy**. Answers can
 be combined in two ways: **combine answers** (the AHP standard: each comparison is averaged across people first) or
 **combine rankings** (each person gets their own ranking, and the rankings are averaged), which suits people who each judge

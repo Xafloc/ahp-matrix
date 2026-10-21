@@ -27,3 +27,12 @@ test('answers that would overlap are stacked, in the order given', () => {
 test('a link can open a particular pair', () => {
   expect(parse('#/p/P1/weigh/root/c1|c2')).toEqual({ name: 'project', id: 'P1', step: 'weigh', sub: 'root', pair: 'c1|c2' });
 });
+
+test('names that would overlap at the real width stack, even when the answers differ', () => {
+  const answers = [
+    { id: 'a', v: 2, label: 'Engineering lead' },
+    { id: 'b', v: 1 / 2, label: 'Product manager' },
+  ];
+  expect(placeMarkers(answers, 'saaty9', { width: 1400 }).map((m) => m.row)).toEqual([0, 0]);
+  expect(placeMarkers(answers, 'saaty9', { width: 360 }).map((m) => m.row)).toEqual([0, 1]);
+});

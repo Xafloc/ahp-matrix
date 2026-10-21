@@ -18,13 +18,25 @@ export function scaleX(v: number, scale: Scale): number {
   return 0.5;
 }
 
-/** Places people's answers on the scale, stacking ones that would overlap. */
-export function placeMarkers<T extends { v: number }>(values: T[], scale: Scale, gap = 0.05): (T & { x: number; row: number })[] {
+const CHAR = 7.5; // rough width of a small-text character, in pixels
+const PAD = 10;
+
+/**
+ * Places people's answers on the scale, stacking ones whose markers, or
+ * names (given the plot's width in pixels), would overlap.
+ */
+export function placeMarkers<T extends { v: number; label?: string }>(
+  values: T[],
+  scale: Scale,
+  o: { gap?: number; width?: number } = {},
+): (T & { x: number; row: number })[] {
+  const gap = o.gap ?? 0.05;
+  const half = (m: T) => (o.width ? ((m.label?.length ?? 0) * CHAR + PAD) / 2 / o.width : 0);
   const out: (T & { x: number; row: number })[] = [];
   for (const m of values) {
     const x = scaleX(m.v, scale);
     let row = 0;
-    while (out.some((o) => o.row === row && Math.abs(o.x - x) < gap)) row++;
+    while (out.some((p) => p.row === row && Math.abs(p.x - x) < Math.max(gap, half(p) + half(m)))) row++;
     out.push({ ...m, x, row });
   }
   return out;
