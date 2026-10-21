@@ -22,3 +22,13 @@ test('a page without its decision says what to do', () => {
   const body = text(render(Judge, { props: { packet: '' } }).body);
   expect(body).toContain('This page is missing its decision.');
 });
+
+test('someone with nothing to answer is told so, not thanked for a file', () => {
+  const p = fixture();
+  p.criteria = [{ id: 'c4', name: 'Cost', description: '', notes: '', method: 'value' }];
+  p.evaluators = [p.evaluators[1]];
+  p.packet = { for: 'e2', from: 'Ann', sentAt: '', structure: 'x' };
+  const body = text(render(Judge, { props: { packet: JSON.stringify(p) } }).body);
+  expect(body).toContain("There's nothing for you to answer in this decision");
+  expect(body).not.toContain('Start');
+});

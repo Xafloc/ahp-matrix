@@ -62,3 +62,16 @@ test('a browser that refuses storage still works, without resuming', () => {
   expect(() => s.changed()).not.toThrow();
   expect(s.results.e2?.matrices.length).toBeGreaterThan(0);
 });
+
+test('a newer invitation with the same structure starts from the new copy', () => {
+  const store = memory();
+  const s = new LocalSession(packet(), store);
+  setJudgment(s.project, 'e2', 'criteria:root', 'c1', 'c4', 5);
+  s.changed();
+  const newer = packet();
+  newer.name = 'Renamed';
+  newer.packet!.sentAt = '2026-10-22T10:00:00Z';
+  const again = LocalSession.restore(newer, store);
+  expect(again.project.name).toBe('Renamed');
+  expect(again.project.pairwise).toHaveLength(0);
+});

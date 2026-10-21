@@ -82,6 +82,14 @@
     <h1>Nothing to judge here</h1>
     <p>{'error' in read ? read.error : ''}</p>
   </main>
+{:else if steps.length === 0}
+  <main class="welcome">
+    <h1>{p.name}</h1>
+    <p>
+      There's nothing for you to answer in this decision as it stands, so you can close this page. If you think that's a mistake, tell
+      {from || 'the person who sent it'}.
+    </p>
+  </main>
 {:else if phase === 'welcome'}
   <main class="welcome">
     <h1>{from ? `${from} asked for your view on ${p.name}` : `Your view on ${p.name}`}</h1>
@@ -97,7 +105,7 @@
       Nothing is sent anywhere by itself.
     </p>
     <div class="actions">
-      <button class="btn primary" onclick={() => go(started ? steps.findIndex((s) => unfinished.includes(s)) : 0)}>
+      <button class="btn primary" onclick={() => (started && !unfinished.length ? go(steps.length - 1) : go(started ? steps.indexOf(unfinished[0]) : 0))}>
         {started ? 'Continue where you left off' : 'Start'}
       </button>
     </div>
@@ -121,7 +129,7 @@
       <p class="small muted">Step {at + 1} of {steps.length}</p>
       {#key step.key}
         {#if step.kind === 'rating'}
-          <h1>{step.title}</h1>
+          <h1>{step.heading}</h1>
           <p class="muted">1 is poor, 10 is excellent.</p>
           <RatingRows
             items={alts}
@@ -132,7 +140,7 @@
             }}
           />
         {:else}
-          <h1>{step.title.replace('?', ', and by how much?')}</h1>
+          <h1>{step.heading}</h1>
           <PairCompare
             session={session!}
             context={step.context}
@@ -167,7 +175,7 @@
       <button class="btn quiet" onclick={() => go(steps.indexOf(unfinished[0]))}>Keep answering</button>
     </div>
   </main>
-{:else}
+{:else if file}
   <main class="welcome" role="status">
     <h1>Thank you</h1>
     <p>

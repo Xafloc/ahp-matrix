@@ -62,8 +62,8 @@ export function statusOf(e: Evaluator, progress: PersonProgress | undefined, fir
 export type InviteKind = 'page' | 'app';
 
 const howToAnswer: Record<InviteKind, string> = {
-  page: "Open the attached page in any browser (there's nothing to install), answer, then press Finish and send back and email me the file it saves.",
-  app: 'Open the attached file with Import file in AHP Matrix, answer, then press Send your answers back and email me the file it saves.',
+  page: "Open the attached page in any browser (there's nothing to install), answer, then press Finish and send back, then email me the file it saves.",
+  app: 'Open the attached file with Import file in AHP Matrix, answer, then press Send your answers back, then email me the file it saves.',
 };
 
 /** A short nudge to paste into an email or chat. */
@@ -77,8 +77,8 @@ export function reminder(decision: string, person: string, progress: Progress, f
         : `You've got ${left} of ${progress.total} comparisons left.`;
   const how =
     kind === 'page'
-      ? 'Open the page I sent in any browser, answer, then press Finish and send back and email me the file it saves.'
-      : 'Open the file I sent with Import file in AHP Matrix, answer, then press Send your answers back and email me the file it saves.';
+      ? 'Open the page I sent in any browser, answer, then press Finish and send back, then email me the file it saves.'
+      : 'Open the file I sent with Import file in AHP Matrix, answer, then press Send your answers back, then email me the file it saves.';
   return `Hi ${person}, a reminder about "${decision}". ${where} ${how} ${from ? `Thanks, ${from}` : 'Thanks!'}`;
 }
 
@@ -138,9 +138,12 @@ export function sender(packet: PacketInfo | undefined): string {
 export function describeTasks(p: Project, tasks: Tasks | undefined): string {
   const parts: string[] = [];
   if (weighs(tasks)) parts.push('weigh the criteria');
-  if (!tasks || tasks.scoreAll) parts.push('score the options on every criterion');
+  const judged = leaves(p).filter((c) => c.method !== 'value'); // measured values are the sender's
+  if (!tasks || tasks.scoreAll) {
+    if (judged.length && p.alternatives.length >= 2) parts.push('score the options on every criterion');
+  }
   else {
-    const names = leaves(p)
+    const names = judged
       .filter((c) => tasks.score?.includes(c.id))
       .map((c) => c.name);
     if (names.length) parts.push(`score the options on ${list(names)}`);

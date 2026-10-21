@@ -109,7 +109,7 @@ describe('invitation message', () => {
     const page = invitation(p, bob, { from: 'Ann', kind: 'page', deadline: '2026-10-24' });
     expect(page).toBe(
       'Hi Bob, could you help me decide "Fixture"? I\'d like you to weigh the criteria. It takes about 1 minute. ' +
-        'Open the attached page in any browser (there\'s nothing to install), answer, then press Finish and send back and email me the file it saves. ' +
+        'Open the attached page in any browser (there\'s nothing to install), answer, then press Finish and send back, then email me the file it saves. ' +
         'Please answer by Sat 24 Oct. Thanks, Ann',
     );
     const app = invitation(p, bob, { from: '', kind: 'app' });
@@ -122,5 +122,19 @@ describe('invitation message', () => {
     const { reminder } = await import('./people');
     expect(reminder('Laptops', 'Priya', { done: 0, total: 6 }, 'Darren', 'page')).toContain('Open the page I sent in any browser');
     expect(reminder('Laptops', 'Priya', { done: 0, total: 6 }, 'Darren', 'app')).toContain('Import file in AHP Matrix');
+  });
+});
+
+describe('nothing to judge', () => {
+  it("doesn't promise scoring when every leaf is measured", async () => {
+    const { describeTasks } = await import('./people');
+    const { fixture } = await import('./fixture.test-helper');
+    const p = fixture();
+    p.criteria = [{ id: 'c4', name: 'Cost', description: '', notes: '', method: 'value' }];
+    expect(describeTasks(p, { weigh: false, scoreAll: true })).toBe('nothing yet');
+  });
+  it('says "then email", not "and email"', async () => {
+    const { reminder } = await import('./people');
+    expect(reminder('L', 'P', { done: 0, total: 1 }, 'D', 'page')).toContain('press Finish and send back, then email me the file it saves');
   });
 });

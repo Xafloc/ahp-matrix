@@ -47,3 +47,22 @@ test('the answers file is named for the decision and the person', () => {
   p.evaluators = [p.evaluators[1]];
   expect(answersFile(p)).toBe('fixture-answers-from-bob.ahp.json');
 });
+
+describe('edge cases', () => {
+  test('nothing to do when every leaf is a measured value', () => {
+    const p = fixture();
+    p.criteria = [{ id: 'c4', name: 'Cost', description: '', notes: '', method: 'value' }];
+    expect(judgeSteps(p, p.evaluators[1])).toEqual([]);
+  });
+  test('no scoring with fewer than two options', () => {
+    const p = fixture();
+    p.alternatives = p.alternatives.slice(0, 1);
+    expect(judgeSteps(p, p.evaluators[1]).every((s) => s.kind === 'weigh')).toBe(true);
+  });
+  test('headings are built, not patched, so a "?" in a name survives', () => {
+    const p = fixture();
+    p.criteria[1].name = 'Remote?';
+    const s = judgeSteps(p, p.evaluators[1]).find((x) => x.criterionId === 'c2')!;
+    expect(s.heading).toBe('Which is better on Remote?, and by how much?');
+  });
+});

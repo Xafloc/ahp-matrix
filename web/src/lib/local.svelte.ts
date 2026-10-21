@@ -46,7 +46,9 @@ export class LocalSession implements CompareSession {
       const saved = store?.getItem(key(packet));
       if (saved) {
         const p = JSON.parse(saved) as Project;
-        if (p.id === packet.id && p.packet?.structure === packet.packet?.structure) return new LocalSession(p, store);
+        // Only the same invitation resumes; a newer one may carry new names or answers merged since.
+        if (p.id === packet.id && p.packet?.sentAt === packet.packet?.sentAt && p.packet?.structure === packet.packet?.structure)
+          return new LocalSession(p, store);
       }
     } catch {
       // unreadable or refused: start fresh

@@ -7,7 +7,7 @@ const from = 'dist-judge';
 let html = readFileSync(join(from, 'judge.html'), 'utf8');
 const read = (ref) => readFileSync(join(from, ref.replace(/^\//, '')), 'utf8');
 
-html = html.replace(/<script type="module" crossorigin src="([^"]+)"><\/script>/g, (_, src) => `<script type="module">${read(src).replaceAll('</script', '<\\/script')}</script>`);
+html = html.replace(/<script type="module" crossorigin src="([^"]+)"><\/script>/g, (_, src) => `<script type="module">${read(src).replace(/<\/(script)/gi, '<\\/$1')}</script>`);
 html = html.replace(/<link rel="stylesheet" crossorigin href="([^"]+)">/g, (_, href) => `<style>${read(href)}</style>`);
 
 const left = html.match(/\s(?:src|href)=["'](?!data:|#)[^"']+/g);

@@ -57,32 +57,41 @@
     });
   }
 
+  // The person whose invitation dialog is open, and any problem inviting them.
+  let inviting = $state<Evaluator | null>(null);
+  let inviteError = $state('');
+
   // Records the invitation (with the structure the copy is made from), saves
   // it, then downloads the copy, so the copy and the record always agree.
-  // The person whose invitation dialog is open.
-  let inviting = $state<Evaluator | null>(null);
-
+  // Problems show in the invitation dialog.
   async function invite(e: Evaluator, kind: InviteKind) {
     busy = e.id;
-    notice = null;
+    inviteError = '';
     try {
+      if (kind === 'page') {
+        const ok = await fetch(inviteUrl(p.id, e.id), { method: 'HEAD' }).then((r) => r.ok, () => false);
+        if (!ok) {
+          inviteError = "This copy of AHP Matrix can't make the web page. Send the app file instead, or update AHP Matrix.";
+          return;
+        }
+      }
       await session.flush();
       if (session.unsaved) {
-        notice = { id: e.id, text: 'Fix the unsaved changes first; then invite.' };
+        inviteError = 'Fix the unsaved changes first; then invite.';
         return;
       }
       await session.refreshResults([ALL_EVALUATORS]);
       const structure = progressOf(e.id)?.structure;
       const person = session.project.evaluators.find((x) => x.id === e.id);
       if (!structure || !person) {
-        notice = { id: e.id, text: 'The invitation couldn\'t be made yet; try again in a moment.' };
+        inviteError = "The invitation couldn't be made yet; try again in a moment.";
         return;
       }
       person.invite = { sentAt: new Date().toISOString(), structure, kind };
       session.changed();
       await session.flush();
       if (session.unsaved) {
-        notice = { id: e.id, text: `The invitation couldn't be saved: ${session.error}` };
+        inviteError = `The invitation couldn't be saved: ${session.error}`;
         return;
       }
       const a = document.createElement('a');
@@ -316,7 +325,8 @@
     {person}
     busy={busy === person.id}
     onsend={(kind) => invite(person, kind)}
-    onclose={() => (inviting = null)}
+    error={inviteError}
+    onclose={() => ((inviting = null), (inviteError = ''))}
   />
 {/if}
 

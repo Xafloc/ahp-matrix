@@ -13,6 +13,7 @@ export interface JudgeStep {
   key: string;
   kind: 'weigh' | 'pairwise' | 'rating';
   title: string;
+  heading: string; // the question, in full
   context: string; // pairwise context; for ratings, the criterion's alts context
   criterionId: string; // the leaf scored, or the group's parent ('' for the top level)
   items: { id: string; name: string }[];
@@ -28,19 +29,21 @@ export function judgeSteps(p: Project, e: Evaluator): JudgeStep[] {
         key: `weigh:${g.parentId || 'root'}`,
         kind: 'weigh',
         title: parent ? `Within ${parent.name}, which matters more?` : 'Which matters more?',
+        heading: parent ? `Within ${parent.name}, which matters more, and by how much?` : 'Which matters more, and by how much?',
         context: criteriaContext(g.parentId),
         criterionId: g.parentId,
         items: g.items.map((c) => ({ id: c.id, name: c.name })),
       });
     }
   const alts = p.alternatives.map((a) => ({ id: a.id, name: a.name }));
-  for (const c of leaves(p)) {
+  for (const c of p.alternatives.length >= 2 ? leaves(p) : []) {
     if (c.method === 'value' || !assigns(e.tasks, c)) continue; // measured values are the sender's
     const rating = c.method === 'rating';
     steps.push({
       key: `score:${c.id}`,
       kind: rating ? 'rating' : 'pairwise',
       title: rating ? `Rate each option on ${c.name}` : `Which is better on ${c.name}?`,
+      heading: rating ? `Rate each option on ${c.name}` : `Which is better on ${c.name}, and by how much?`,
       context: altsContext(c.id),
       criterionId: c.id,
       items: alts,

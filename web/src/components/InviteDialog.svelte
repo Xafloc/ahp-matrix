@@ -1,6 +1,7 @@
 <script lang="ts">
   // Inviting one person: the copy to send them (a web page, or a file for the
   // app) and a message to go with it.
+  import { judgeSteps } from '../lib/judge';
   import { invitation, type InviteKind } from '../lib/people';
   import type { Evaluator, Project } from '../lib/types';
 
@@ -8,12 +9,14 @@
     project,
     person,
     busy,
+    error = '',
     onsend,
     onclose,
   }: {
     project: Project;
     person: Evaluator;
     busy: boolean;
+    error?: string;
     onsend: (kind: InviteKind) => void;
     onclose: () => void;
   } = $props();
@@ -25,7 +28,8 @@
 
   let deadline = $state('');
   let kind = $state<InviteKind>('page');
-  let copied = $state(false);
+  let copied = $state<boolean | null>(null);
+  const nothing = $derived(judgeSteps(project, person).length === 0);
   // Signed by the first person, the one running the decision, unless they're still called "Me".
   const from = $derived(((name) => (name === 'Me' ? '' : name))(project.evaluators[0]?.name.trim() ?? ''));
   const message = $derived(invitation(project, person, { from, kind, deadline }));
@@ -35,7 +39,7 @@
       await navigator.clipboard.writeText(message);
       copied = true;
     } catch {
-      copied = false;
+      copied = false; // not allowed here: the message can still be selected and copied by hand
     }
   }
 
@@ -52,13 +56,21 @@
       <button class="btn quiet close" aria-label="Close" onclick={onclose}>✕</button>
     </header>
 
+    {#if nothing}
+      <p class="problem">
+        {person.name} has nothing to answer yet: their role covers no comparisons or ratings. Change what they judge, or add criteria to
+        score, then invite them.
+      </p>
+    {/if}
+    {#if error}<p class="problem" role="alert">{error}</p>{/if}
+
     <div class="choices">
       <div class="choice" class:on={kind === 'page'}>
-        <button class="btn primary" disabled={busy} onclick={() => send('page')}>Download web page</button>
+        <button class="btn primary" disabled={busy || nothing} onclick={() => send('page')}>Download web page</button>
         <p class="small muted">Recommended. {person.name} opens it in any browser and answers there; there's nothing to install.</p>
       </div>
       <div class="choice" class:on={kind === 'app'}>
-        <button class="btn" disabled={busy} onclick={() => send('app')}>Download app file</button>
+        <button class="btn" disabled={busy || nothing} onclick={() => send('app')}>Download app file</button>
         <p class="small muted">For people who use AHP Matrix: they open it with Import file.</p>
       </div>
     </div>
@@ -73,6 +85,7 @@
       <span class="small">Message to send</span>
       <textarea class="field" rows="6" readonly value={message}></textarea>
     </label>
+    {#if copied === false}<p class="small problem" role="alert">Couldn't copy here. Select the message above and copy it yourself.</p>{/if}
     <p class="small muted">Attach the downloaded file to an email or chat with this message. Their answers come back as a file to merge here.</p>
   </div>
   <footer>
@@ -114,6 +127,12 @@
   }
   .close {
     padding: 0.2rem 0.5rem;
+  }
+  .problem {
+    margin: 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-s);
+    background: var(--rust-wash);
   }
   .choices {
     display: grid;
