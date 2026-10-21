@@ -1,0 +1,46 @@
+web/e2e/robustness.spec.ts
+  s_65743add7cce22::t_b6f0ca8b62b5fe 43
+web/src/components/Score.svelte
+  s_65743add7cce22::t_c5eb0c5d9d0362 143
+web/src/components/PairCompare.svelte
+  s_65743add7cce22::t_9452023572b001 11,119
+  s_65743add7cce22::t_cd3d28829ebada 122
+web/e2e/guidance.spec.ts
+  s_65743add7cce22::t_b6f0ca8b62b5fe 26-34,36,39-40,45-57,59-73
+  s_65743add7cce22::t_3ad98ef001ca3f 44
+  s_65743add7cce22::t_cd3d28829ebada 35,37-38,41-43,58
+web/src/components/PairList.svelte
+  s_65743add7cce22::t_c5eb0c5d9d0362 54
+  s_65743add7cce22::t_f7764373f78c80 1-53,55-86,89-174,176-179,181,185-216
+  s_65743add7cce22::t_07ed18b3b6609d 87-88,175,180,182-184
+web/src/components/Balance.svelte
+  s_65743add7cce22::t_66bb350d039fbc 3-6,31,36,61-71,154,156
+web/src/components/compare.test.ts
+  s_65743add7cce22::t_c5eb0c5d9d0362 85-90
+  s_65743add7cce22::t_b6b3151f1dfa89 5,27-57
+web/src/components/ConsistencyMeter.svelte
+  s_65743add7cce22::t_cd3d28829ebada 11,18,43
+web/src/components/StrengthScale.svelte
+  s_65743add7cce22::t_66bb350d039fbc 1-142
+web/src/components/StrengthWords.svelte
+  s_65743add7cce22::t_c5eb0c5d9d0362 8-10,13-16,20
+  s_65743add7cce22::t_66bb350d039fbc 1-7,11-12,17-19,21-48
+web/src/components/Weigh.svelte
+  s_65743add7cce22::t_c5eb0c5d9d0362 78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "491f48d509437c3cfbfd529bfe092df1df623191",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "unknown"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
