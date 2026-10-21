@@ -1,0 +1,26 @@
+web/src/components/PeopleScale.svelte
+  s_65743add7cce22::t_322b7a47ebc56a 28-29,39
+web/src/lib/peoplescale.ts
+  s_65743add7cce22::t_322b7a47ebc56a 21-34,39
+web/src/lib/peoplescale.test.ts
+  s_65743add7cce22::t_2bb5968c82c9f6 36
+  s_65743add7cce22::t_322b7a47ebc56a 30-35,37-38
+README.md
+  s_65743add7cce22::t_09dcd6ec0b1162 59-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5039dc956e2a3060068dae8bf7646084cfb173eb",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
