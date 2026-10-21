@@ -20,7 +20,7 @@ test('a returned file dropped on the decision shows what it holds, then merges',
   await expect(dialog).toContainText('2 answers');
   await expect(dialog).toContainText('New here');
   await dialog.getByRole('button', { name: 'Merge' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 2 judgments from Carol.');
+  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 2 answers from Carol.');
   await expect(personRow(page, 'Carol')).toContainText('Returned');
   await expect(personRow(page, 'Carol')).toContainText('2 of 3 done');
 });
@@ -66,7 +66,7 @@ test('Import file recognises answers sent back and offers to merge them', async 
   await expect(page.getByText('carol.ahp.json looks like answers sent back for Recognised.')).toBeVisible();
   await page.getByRole('button', { name: 'Merge into Recognised' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Merge' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 1 judgment from Carol.');
+  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 1 answer from Carol.');
   await expect(page.getByRole('link', { name: /Recognised/ })).toHaveCount(1); // no duplicate made
 });
 

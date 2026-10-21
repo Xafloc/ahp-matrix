@@ -61,7 +61,7 @@ test("a colleague's returned copy merges back, after asking", async ({ page }, i
   await expect(dialog).toContainText('Replaces the answers they already have here');
   await dialog.getByRole('button', { name: 'Replace their answers' }).click();
   // 6 criteria pairs + 4 × 3 option pairs
-  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 18 judgments from Product manager.');
+  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 18 answers from Product manager.');
 });
 
 test('↑ and ↓ move the balance like → and ←', async ({ page }) => {
@@ -96,7 +96,7 @@ test("someone's first returned copy merges without asking", async ({ page }, inf
 
   await page.getByLabel('Returned decision file to merge').setInputFiles(path);
   await page.getByRole('dialog').getByRole('button', { name: 'Merge' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 1 judgment from Carol.');
+  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 1 answer from Carol.');
   await expect(personRow(page, 'Carol')).toContainText('Returned');
 });
 

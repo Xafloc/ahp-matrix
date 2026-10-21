@@ -47,7 +47,7 @@ export function mergedText(report: MergeReport): string {
   if (who.length === 0) return 'Nothing merged: the current answers were kept.';
   const left = report.dropped.length;
   return (
-    `Merged ${count(report.judgments, 'judgment')} from ${list(who)}.` +
+    `Merged ${count(report.judgments, 'answer')} from ${list(who)}.` +
     (left ? ` ${count(left, 'answer')} about things no longer in this decision ${left === 1 ? 'was' : 'were'} left out.` : '')
   );
 }

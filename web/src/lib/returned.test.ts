@@ -55,9 +55,9 @@ describe('mergeTarget', () => {
 describe('after merging', () => {
   it('says what came across, and what was left out', async () => {
     const { mergedText } = await import('./returned');
-    expect(mergedText({ added: ['Priya'], replaced: [], skipped: [], judgments: 18, dropped: [] })).toBe('Merged 18 judgments from Priya.');
+    expect(mergedText({ added: ['Priya'], replaced: [], skipped: [], judgments: 18, dropped: [] })).toBe('Merged 18 answers from Priya.');
     expect(mergedText({ added: [], replaced: ['Bob'], skipped: [], judgments: 1, dropped: ['x', 'y'] })).toBe(
-      "Merged 1 judgment from Bob. 2 answers about things no longer in this decision were left out.",
+      "Merged 1 answer from Bob. 2 answers about things no longer in this decision were left out.",
     );
     expect(mergedText({ added: [], replaced: [], skipped: ['Bob'], judgments: 0, dropped: [] })).toBe('Nothing merged: the current answers were kept.');
   });
