@@ -1,0 +1,25 @@
+internal/server/invite.go
+  s_65743add7cce22::t_10427f2a7bfe09 1-48
+internal/server/exchange.go
+  s_65743add7cce22::t_10427f2a7bfe09 27
+internal/server/invite_test.go
+  s_65743add7cce22::t_f5f671a1e49475 1-65
+internal/server/server_test.go
+  s_65743add7cce22::t_f5f671a1e49475 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5b7bd1a0ff1890a559d600f3fc8f41a6cf36c087",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
