@@ -835,19 +835,22 @@
             "a": "t",
             "b": "b",
             "current": 4.217163326508746,
-            "suggested": 1
+            "suggested": 1,
+            "crAfter": 0.5131601963123552
           },
           {
             "a": "t",
             "b": "s",
             "current": 0.13137734173243426,
-            "suggested": 0.5
+            "suggested": 0.5,
+            "crAfter": 0.5632541147414375
           },
           {
             "a": "b",
             "b": "s",
             "current": 1.2599210498948732,
-            "suggested": 0.3333333333333333
+            "suggested": 0.3333333333333333,
+            "crAfter": 0.5667039241835016
           }
         ],
         "matrix": [
@@ -892,19 +895,22 @@
             "a": "t1",
             "b": "t2",
             "current": 8.276772529143365,
-            "suggested": 2
+            "suggested": 2,
+            "crAfter": 1.4139119206888875
           },
           {
             "a": "t1",
             "b": "t3",
             "current": 0.2811442217672498,
-            "suggested": 2
+            "suggested": 2,
+            "crAfter": 0.9891714373812445
           },
           {
             "a": "t2",
             "b": "t3",
             "current": 5.241482788417793,
-            "suggested": 1
+            "suggested": 1,
+            "crAfter": 1.2169155279211938
           }
         ],
         "matrix": [
@@ -982,19 +988,22 @@
             "a": "a4",
             "b": "a5",
             "current": 0.21839511618407476,
-            "suggested": 1
+            "suggested": 1,
+            "crAfter": 0.40288707912918353
           },
           {
             "a": "a2",
             "b": "a4",
             "current": 3.1748021039363987,
-            "suggested": 0.5
+            "suggested": 0.5,
+            "crAfter": 0.5141223693999056
           },
           {
             "a": "a1",
             "b": "a5",
             "current": 6.257324745675973,
-            "suggested": 1
+            "suggested": 1,
+            "crAfter": 0.4447132287178162
           }
         ],
         "matrix": [
@@ -1063,19 +1072,22 @@
             "a": "a1",
             "b": "a3",
             "current": 0.13137734173243426,
-            "suggested": 1
+            "suggested": 1,
+            "crAfter": 0.4641968802295775
           },
           {
             "a": "a1",
             "b": "a5",
             "current": 8.276772529143365,
-            "suggested": 2
+            "suggested": 2,
+            "crAfter": 0.43343936028469426
           },
           {
             "a": "a2",
             "b": "a4",
             "current": 5.241482788417793,
-            "suggested": 1
+            "suggested": 1,
+            "crAfter": 0.6221497422245063
           }
         ],
         "matrix": [

@@ -3,6 +3,7 @@ import { expect, test } from 'vitest';
 import Balance from './Balance.svelte';
 import ConsistencyMeter from './ConsistencyMeter.svelte';
 import PairList from './PairList.svelte';
+import WhyDialog from './WhyDialog.svelte';
 
 const text = (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
@@ -26,7 +27,7 @@ test('an unanswered balance sits level and says so', () => {
 
 const report = (consistent: boolean) => ({
   context: 'criteria:root', items: ['a', 'b', 'c'], weights: [0.5, 0.3, 0.2], cr: consistent ? 0.01 : 0.3, threshold: 0.05, consistent,
-  complete: true, connected: true, missing: 0, pairs: 3, suggestions: [{ a: 'a', b: 'c', current: 0.25, suggested: 3 }], matrix: [],
+  complete: true, connected: true, missing: 0, pairs: 3, suggestions: [{ a: 'a', b: 'c', current: 0.25, suggested: 3, crAfter: 0.04 }], matrix: [],
 });
 const listProps = (consistent: boolean) => ({
   items: [{ id: 'a', name: 'Alpha' }, { id: 'b', name: 'Beta' }, { id: 'c', name: 'Gamma' }],
@@ -60,7 +61,7 @@ test('rows are flagged only when the answers actually contradict each other', ()
 test('the consistency meter explains contradictions and offers fixes', () => {
   const report = {
     context: 'alts:x', items: ['a', 'b', 'c'], weights: [0.5, 0.3, 0.2], cr: 0.3, threshold: 0.05, consistent: false,
-    complete: true, connected: true, missing: 0, pairs: 3, suggestions: [{ a: 'a', b: 'c', current: 0.25, suggested: 3 }], matrix: [],
+    complete: true, connected: true, missing: 0, pairs: 3, suggestions: [{ a: 'a', b: 'c', current: 0.25, suggested: 3, crAfter: 0.04 }], matrix: [],
   };
   const { body } = render(ConsistencyMeter, {
     props: { report, items: [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }], kind: 'alternatives', scale: 'saaty9', onfix: () => {} },
@@ -87,4 +88,23 @@ test('the pair list header names only the main strengths, so the words never col
   const t = text(render(PairList, { props: listProps(true) }).body);
   expect(t).not.toContain('Very strong');
   expect(t.match(/Strong/g)).toHaveLength(2);
+});
+
+test('the Why? explanation walks through the contradiction in plain words', () => {
+  const items = ['td', 'sd', 'co', 'tf'].map((id, i) => ({ id, name: ['Technical depth', 'System design', 'Communication', 'Team fit'][i] }));
+  const report = {
+    context: 'criteria:root', items: items.map((x) => x.id), weights: [0.35, 0.292, 0.123, 0.235], cr: 0.098, threshold: 0.08,
+    consistent: false, complete: true, connected: true, missing: 0, pairs: 6, suggestions: [],
+    matrix: [[1, 1, 5, 1], [1, 1, 3, 1], [0.2, 1 / 3, 1, 1], [1, 1, 1, 1]],
+  };
+  const suggestion = { a: 'td', b: 'co', current: 5, suggested: 3, crAfter: 0.057 };
+  const t = text(render(WhyDialog, { props: { open: true, items, report, suggestion, scale: 'saaty9', kind: 'criteria', onuse: () => {}, onclose: () => {} } }).body);
+  expect(t).toContain('You said: Technical depth matters strongly more than Communication (5).');
+  expect(t).toContain('Technical depth and Team fit matter equally.');
+  expect(t).toContain('Team fit and Communication matter equally.');
+  expect(t).toContain('Together, these mean Technical depth and Communication should matter about equally.');
+  expect(t).toContain('about 2.8×');
+  expect(t).toContain('the consistency ratio goes from 0.10 to 0.06, within the 0.08 limit');
+  expect(t).toContain('Use the suggestion');
+  expect(t).toContain('Keep my answer');
 });

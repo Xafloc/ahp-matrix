@@ -274,3 +274,32 @@ func TestComputeReportsTheCombinedMatrix(t *testing.T) {
 		t.Errorf("unjudged cell = %v, want 0", got)
 	}
 }
+
+func TestSuggestionsSayWhatTheConsistencyRatioWouldBecome(t *testing.T) {
+	// The case from the hiring screenshot: Technical depth = System design =
+	// Team fit = Communication, except Technical depth is 5× Communication
+	// and System design 3× Communication. CR ≈ 0.098.
+	p := New("Why")
+	p.Evaluators = []Evaluator{{ID: "e", Name: "E", Weight: 1}}
+	p.Criteria = []Criterion{{ID: "td", Name: "Technical depth"}, {ID: "sd", Name: "System design"}, {ID: "co", Name: "Communication"}, {ID: "tf", Name: "Team fit"}}
+	for _, j := range []struct {
+		a, b string
+		v    float64
+	}{{"td", "sd", 1}, {"td", "co", 5}, {"td", "tf", 1}, {"sd", "co", 3}, {"sd", "tf", 1}, {"co", "tf", 1}} {
+		p.Pairwise = append(p.Pairwise, PairwiseJudgment{EvaluatorID: "e", Context: CriteriaContext(""), A: j.a, B: j.b, Value: j.v})
+	}
+	r, _ := Compute(p, "e")
+	m := r.Matrices[0]
+	approx(t, "CR", m.CR, 0.098, 0.001)
+	want := map[string]float64{"td|co": 0.057, "td|tf": 0.066, "co|tf": 0.030}
+	if len(m.Suggestions) != 3 {
+		t.Fatalf("suggestions = %+v", m.Suggestions)
+	}
+	for _, s := range m.Suggestions {
+		w, ok := want[s.A+"|"+s.B]
+		if !ok {
+			t.Fatalf("unexpected suggestion %+v", s)
+		}
+		approx(t, "crAfter "+s.A+"|"+s.B, s.CRAfter, w, 0.001)
+	}
+}

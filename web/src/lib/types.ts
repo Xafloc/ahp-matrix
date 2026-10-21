@@ -88,6 +88,8 @@ export interface PairSuggestion {
   b: string;
   current: number;
   suggested: number;
+  /** The consistency ratio if the suggestion replaced the current answer. */
+  crAfter: number;
 }
 
 export interface MatrixReport {
