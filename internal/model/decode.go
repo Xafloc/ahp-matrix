@@ -31,11 +31,11 @@ func Decode(data []byte) (*Project, error) {
 	case head.SchemaVersion > SchemaVersion:
 		return nil, &FutureVersionError{Version: head.SchemaVersion}
 	}
-	// Version 1 is current. A future version 2 adds a case here that decodes
-	// the version 1 shape and converts it.
 	var p Project
 	if err := json.Unmarshal(data, &p); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrNotProject, err)
 	}
+	// Version 1 → 2 only added optional fields, so nothing needs converting.
+	p.SchemaVersion = SchemaVersion
 	return &p, nil
 }

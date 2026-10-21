@@ -42,11 +42,28 @@ never overrides: if your answer is what you believe, keep it and change another.
 The winner and the full ranking, where each score comes from, how much each criterion counts, and a what-if view for testing
 how robust the winner is.
 
+## Judging with several people
+
+The **People** step lists everyone whose judgments count, what each person is asked to judge (everything, only the criteria,
+only the options, or a custom set), how far they've got, and where their copy is.
+
+1. **Invite** someone. It downloads a copy with only their part, for them to open with Import file in AHP Matrix.
+2. They make their comparisons and press **Send your answers back**. Their copy can't change the options or criteria, so
+   their answers always fit yours.
+3. **Drop the returned file** anywhere on the decision (or on its row in the library). A preview shows whose answers it holds,
+   whether it replaces earlier ones, and anything that can't come across because you've since removed it. Merge, and
+   **Undo** if you change your mind.
+
+If you change the decision after sending a copy, that person shows as **Out of date**, with **Send updated copy**. Answers can
+be combined in two ways: **combine answers** (the AHP standard: each comparison is averaged across people first) or
+**combine rankings** (each person gets their own ranking, and the rankings are averaged), which suits people who each judge
+a different part.
+
 ## Features
 
 - **Pairs, ratings or measurements.** Each criterion can be compared in pairs, rated 1–10, or given measured values such as price ("lower is better").
 - **Grouped criteria,** so you only compare criteria that belong together.
-- **Several people.** Everyone judges separately; results combine them with a weighted geometric mean (the AHP standard, so opposite answers cancel to equal) and show where people disagree most. Send someone their own copy, then merge it back when they return it.
+- **Several people.** Everyone judges separately, each on the part you ask of them; results combine them with a weighted geometric mean (the AHP standard, so opposite answers cancel to equal) and show where people disagree most.
 - **What if?** Drag a criterion's weight and watch the ranking change. Each criterion shows how far it can move before the winner changes.
 - **Bring your spreadsheet.** Import workbooks made with the classic "Priority Matrix" Excel template, and export results to Excel or CSV.
 - **Examples and templates** to start from, including vendor selection with the spreadsheet's 23 criteria, grouped.

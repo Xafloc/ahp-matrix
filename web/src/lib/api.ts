@@ -1,4 +1,4 @@
-import type { ImportReport, MergeReport, Project, ProjectSummary, Results, StarterEntry } from './types';
+import type { ImportReport, MergePreview, MergeReport, Project, ProjectSummary, Results, StarterEntry } from './types';
 
 /** An error response from the API: {"error": {"code", "message", "details"}}. */
 export class ApiError extends Error {
@@ -51,6 +51,7 @@ export interface Client {
   importFile(file: File): Promise<{ project: Project; report?: ImportReport }>;
   /** Merges the judgments in a returned file. Without a policy, people already present cause an ApiError 'evaluator-exists'. */
   mergeFile(id: string, file: File, existing?: MergePolicy): Promise<{ project: Project; report: MergeReport }>;
+  previewMerge(id: string, file: File): Promise<MergePreview>;
   samples(): Promise<StarterEntry[]>;
   templates(): Promise<StarterEntry[]>;
 }
@@ -79,6 +80,7 @@ export const api: Client = {
   },
   mergeFile: (id, file, existing) =>
     call('POST', `/api/projects/${encodeURIComponent(id)}/merge${existing ? `?existing=${existing}` : ''}`, upload(file), false),
+  previewMerge: (id, file) => call('POST', `/api/projects/${encodeURIComponent(id)}/merge/preview`, upload(file), false),
   samples: () => call('GET', '/api/samples'),
   templates: () => call('GET', '/api/templates'),
 };

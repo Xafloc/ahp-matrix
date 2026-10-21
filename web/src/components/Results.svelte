@@ -47,7 +47,7 @@
         <button role="tab" class="btn quiet" aria-selected={viewing === e.id} onclick={() => (viewing = e.id)}>{e.name}</button>
       {/each}
     </div>
-    {#if viewing === ALL_EVALUATORS}<p class="small muted combine">{combineNote}</p>{/if}
+    {#if viewing === ALL_EVALUATORS}<p class="small muted combine">{combineNote(r?.method ?? p.aggregation)}</p>{/if}
   {/if}
 
   {#if !r}

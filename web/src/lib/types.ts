@@ -27,7 +27,37 @@ export interface Evaluator {
   id: string;
   name: string;
   weight: number;
+  /** What they're asked to judge; omitted means everything. */
+  tasks?: Tasks;
+  /** Set once a copy has been sent to them. */
+  invite?: Invite;
 }
+
+export interface Tasks {
+  /** Compare the criteria in every sibling group. */
+  weigh: boolean;
+  /** Score the options on every leaf criterion... */
+  scoreAll: boolean;
+  /** ...or only on these leaves. */
+  score?: string[];
+}
+
+export interface Invite {
+  sentAt: string;
+  /** Fingerprint of the decision when the copy was made. */
+  structure: string;
+  returnedAt?: string;
+}
+
+/** Only in a copy sent to someone. */
+export interface PacketInfo {
+  for: string;
+  from: string;
+  sentAt: string;
+  structure: string;
+}
+
+export type Aggregation = 'judgments' | 'priorities';
 
 export interface PairwiseJudgment {
   evaluatorId: string;
@@ -66,6 +96,9 @@ export interface Project {
   pairwise: PairwiseJudgment[];
   ratings: Rating[];
   values: Value[];
+  origin?: string;
+  aggregation?: Aggregation;
+  packet?: PacketInfo;
 }
 
 export interface AltScore {
@@ -133,6 +166,22 @@ export interface Results {
   disagreements: Disagreement[];
   completeness: number;
   consistent: boolean;
+  people: PersonProgress[];
+  values: Progress;
+  method: Aggregation;
+}
+
+export interface Progress {
+  done: number;
+  total: number;
+}
+
+export interface PersonProgress extends Progress {
+  id: string;
+  finished: boolean;
+  consistent: boolean;
+  structure: string;
+  outOfDate: boolean;
 }
 
 export interface RankedName {
@@ -152,6 +201,8 @@ export interface ProjectSummary {
   ranking: RankedName[];
   completeness: number;
   consistent: boolean;
+  /** A copy someone sent to be judged. */
+  received?: boolean;
   error?: string;
 }
 
@@ -178,7 +229,27 @@ export interface MergeReport {
   replaced: string[];
   skipped: string[];
   judgments: number;
-  dropped: number;
+  /** Judgments that couldn't come across, in words. */
+  dropped: string[];
+}
+
+/** What merging a file would do (model.MergePreview). */
+export interface MergePreview {
+  id: string;
+  name: string;
+  people: PreviewPerson[];
+  dropped: string[];
+  outOfDate: boolean;
+}
+
+export interface PreviewPerson {
+  id: string;
+  name: string;
+  judgments: number;
+  replacesExisting: boolean;
+  previouslyReturnedAt?: string;
+  /** Their answers that can't come across, in words. */
+  dropped: string[];
 }
 
 export const ALL_EVALUATORS = 'all';

@@ -1,19 +1,22 @@
 import { expect, test } from '@playwright/test';
-import { addAll, createDecision, saved } from './helpers';
+import { addAll, createDecision, openPeople, saved } from './helpers';
 
 test('leaving with changes that could not be saved asks first, and can go back to them', async ({ page }) => {
   await createDecision(page, 'Risky');
+  await openPeople(page);
   await addAll(page, 'New person', ['Priya']);
   await saved(page);
   await page.getByLabel('Weight').nth(1).fill('-1'); // the server rejects this
   await page.getByLabel('Weight').nth(1).blur(); // weights apply when you finish editing them
   await expect(page.getByText("Priya's weight must be more than 0.")).toBeVisible();
+  await page.getByRole('link', { name: /Set up/ }).click();
   await page.getByLabel('What is this decision about?').fill('Notes I care about');
   await page.getByRole('link', { name: 'All decisions' }).click();
 
   await expect(page.getByRole('heading', { name: 'Your changes to Risky aren’t saved' })).toBeVisible();
   await page.getByRole('button', { name: 'Go back to Risky' }).click();
   await expect(page.getByLabel('What is this decision about?')).toHaveValue('Notes I care about');
+  await openPeople(page);
 
   await page.getByLabel('Weight').nth(1).fill('1');
   await page.getByLabel('Weight').nth(1).blur();
@@ -24,6 +27,7 @@ test('leaving with changes that could not be saved asks first, and can go back t
 
 test('closing the tab with unsaved changes asks for confirmation', async ({ page }) => {
   await createDecision(page, 'Closing');
+  await openPeople(page);
   await page.getByLabel('Weight').first().fill('-1');
   await page.getByLabel('Weight').first().blur();
   await expect(page.getByText('Not saved.')).toBeVisible();
@@ -77,6 +81,7 @@ test('the printed report is dark ink on white, with its bars, even in dark mode'
 test('people can be switched on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await createDecision(page, 'Phone judges');
+  await openPeople(page);
   await addAll(page, 'New person', ['Priya']);
   await saved(page);
   await expect(page.getByLabel('Judging as')).toBeVisible();

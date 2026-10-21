@@ -186,3 +186,67 @@ func TestCSVOpensCleanlyInExcel(t *testing.T) {
 		t.Error("CSV lacks the UTF-8 byte-order mark Excel needs to read “›” and accents")
 	}
 }
+
+func TestMergePreviewSaysWhatWouldHappenWithoutSaving(t *testing.T) {
+	h, _ := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	packet := readAll(t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body)
+
+	rec := upload(t, h, "/api/projects/"+owner.ID+"/merge/preview", "back.ahp.json", packet)
+	pv := decode[model.MergePreview](t, rec.Body.Bytes())
+	if rec.Code != http.StatusOK || pv.ID != owner.ID || len(pv.People) != 1 || pv.People[0].Name != "Product manager" || !pv.People[0].ReplacesExisting || pv.People[0].Judgments == 0 {
+		t.Fatalf("preview: %d %s", rec.Code, rec.Body.String())
+	}
+	if pv.Dropped == nil || pv.OutOfDate {
+		t.Errorf("preview dropped %v, outOfDate %v", pv.Dropped, pv.OutOfDate)
+	}
+	after := decode[*model.Project](t, request(t, h, "GET", "/api/projects/"+owner.ID, nil).Body.Bytes())
+	if after.Version != owner.Version {
+		t.Errorf("previewing saved the project: version %d → %d", owner.Version, after.Version)
+	}
+
+	other := readAll(t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"family-car"}`)).Body)
+	rec = upload(t, h, "/api/projects/"+owner.ID+"/merge/preview", "car.ahp.json", other)
+	if rec.Code != http.StatusBadRequest || errorCode(t, rec) != "different-project" {
+		t.Errorf("previewing another decision: %d %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestMergeRecordsTheReturn(t *testing.T) {
+	h, _ := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	packet := readAll(t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body)
+	rec := upload(t, h, "/api/projects/"+owner.ID+"/merge?existing=replace", "back.ahp.json", packet)
+	body := decode[struct{ Project *model.Project }](t, rec.Body.Bytes())
+	for _, e := range body.Project.Evaluators {
+		if e.ID == "pm" && (e.Invite == nil || e.Invite.ReturnedAt == nil) {
+			t.Errorf("pm invite after merge = %+v", e.Invite)
+		}
+	}
+}
+
+func TestLibraryMarksReceivedCopies(t *testing.T) {
+	h, _ := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	packet := readAll(t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body)
+	copy := decode[*model.Project](t, upload(t, h, "/api/import/ahp", "copy.ahp.json", packet).Body.Bytes())
+
+	list := decode[struct{ Projects []projectSummary }](t, request(t, h, "GET", "/api/projects", nil).Body.Bytes())
+	for _, s := range list.Projects {
+		if want := s.ID == copy.ID; s.Received != want {
+			t.Errorf("%s (%s): received = %v, want %v", s.Name, s.ID, s.Received, want)
+		}
+	}
+}
+
+func TestSendingAnswersBackNamesThePerson(t *testing.T) {
+	h, _ := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	packet := readAll(t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body)
+	copy := decode[*model.Project](t, upload(t, h, "/api/import/ahp", "copy.ahp.json", packet).Body.Bytes())
+
+	rec := request(t, h, "GET", "/api/projects/"+copy.ID+"/export.ahp.json", nil)
+	if cd := rec.Header().Get("Content-Disposition"); !strings.Contains(cd, "hiring-a-senior-engineer-answers-from-product-manager.ahp.json") {
+		t.Errorf("received copy's export filename: %q", cd)
+	}
+}

@@ -1,6 +1,6 @@
 {
   "project": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "01GOLDENFIXTURE0000000000A",
     "version": 0,
     "name": "Fixture",
@@ -8,6 +8,7 @@
     "createdAt": "2026-10-15T12:00:00Z",
     "updatedAt": "2026-10-15T12:00:00Z",
     "scale": "saaty9",
+    "aggregation": "judgments",
     "alternatives": [
       {
         "id": "a1",
@@ -315,7 +316,32 @@
     ],
     "issues": [],
     "disagreements": [],
-    "completeness": 1,
-    "consistent": true
+    "completeness": 0.5789473684210527,
+    "consistent": true,
+    "people": [
+      {
+        "id": "e1",
+        "done": 8,
+        "total": 8,
+        "finished": true,
+        "consistent": true,
+        "structure": "293112a6118c",
+        "outOfDate": false
+      },
+      {
+        "id": "e2",
+        "done": 0,
+        "total": 8,
+        "finished": false,
+        "consistent": true,
+        "structure": "293112a6118c",
+        "outOfDate": false
+      }
+    ],
+    "values": {
+      "done": 3,
+      "total": 3
+    },
+    "method": "judgments"
   }
 }

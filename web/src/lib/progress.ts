@@ -1,5 +1,6 @@
 import { altsContext, criteriaContext, getJudgment, getRating, getValue } from './edits';
 import { pairCount } from './pairs';
+import { assigns, weighs } from './people';
 import { groups, leaves } from './tree';
 import type { Criterion, Project } from './types';
 
@@ -24,14 +25,18 @@ export function leafProgress(p: Project, evaluatorId: string, c: Criterion): Pro
   return pairProgress(p, evaluatorId, altsContext(c.id), alts);
 }
 
-/** Progress weighing criteria: every sibling group's comparisons. */
+const tasksOf = (p: Project, evaluatorId: string) => p.evaluators.find((e) => e.id === evaluatorId)?.tasks;
+
+/** Progress weighing criteria: every sibling group's comparisons, if the person weighs them. */
 export function weighProgress(p: Project, evaluatorId: string): Progress {
+  if (!weighs(tasksOf(p, evaluatorId))) return { done: 0, total: 0 };
   return sum(groups(p).map((g) => pairProgress(p, evaluatorId, criteriaContext(g.parentId), g.items.map((c) => c.id))));
 }
 
-/** Progress scoring alternatives on every leaf. */
+/** Progress scoring alternatives on every leaf the person scores. */
 export function scoreProgress(p: Project, evaluatorId: string): Progress {
-  return sum(leaves(p).map((c) => leafProgress(p, evaluatorId, c)));
+  const tasks = tasksOf(p, evaluatorId);
+  return sum(leaves(p).filter((c) => assigns(tasks, c)).map((c) => leafProgress(p, evaluatorId, c)));
 }
 
 function sum(ps: Progress[]): Progress {

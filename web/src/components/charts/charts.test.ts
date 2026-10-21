@@ -28,6 +28,9 @@ const results: Results = {
   disagreements: [],
   completeness: 1,
   consistent: true,
+  people: [],
+  values: { done: 0, total: 0 },
+  method: 'judgments',
 };
 
 test('priority bars label every bar and can rank them', () => {

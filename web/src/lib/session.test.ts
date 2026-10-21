@@ -21,7 +21,8 @@ function fakeClient() {
     duplicateProject: async () => fixture(),
     results: async (_id, ev) => ({ evaluator: ev }) as Results,
     importFile: async () => ({ project: fixture() }),
-    mergeFile: async () => ({ project: fixture(), report: { added: [], replaced: [], skipped: [], judgments: 0, dropped: 0 } }),
+    mergeFile: async () => ({ project: fixture(), report: { added: [], replaced: [], skipped: [], judgments: 0, dropped: [] } }),
+    previewMerge: async () => ({ id: '', name: '', people: [], dropped: [], outOfDate: false }),
     samples: async () => [],
     templates: async () => [],
   };

@@ -23,6 +23,7 @@ func (s *server) exchangeRoutes() {
 	s.mux.HandleFunc("GET /api/projects/{id}/export.xlsx", s.exportWorkbook)
 	s.mux.HandleFunc("GET /api/projects/{id}/export.csv", s.exportCSV)
 	s.mux.HandleFunc("POST /api/projects/{id}/merge", s.mergeProject)
+	s.mux.HandleFunc("POST /api/projects/{id}/merge/preview", s.previewMerge)
 }
 
 // importWorkbook creates a project from a workbook made with the original
@@ -141,6 +142,34 @@ func (s *server) mergeProject(w http.ResponseWriter, r *http.Request) {
 		s.internalError(w, err)
 	default:
 		writeJSON(w, http.StatusOK, map[string]any{"project": owner, "report": rep})
+	}
+}
+
+// previewMerge says what merging the uploaded file would do, without saving.
+func (s *server) previewMerge(w http.ResponseWriter, r *http.Request) {
+	owner, ok := s.load(w, r)
+	if !ok {
+		return
+	}
+	data, ok := readUpload(w, r)
+	if !ok {
+		return
+	}
+	packet, ok := decodeProject(w, data)
+	if !ok {
+		return
+	}
+	pv, err := model.PreviewMerge(owner, packet)
+	var invalid *model.ValidationError
+	switch {
+	case errors.Is(err, model.ErrDifferentProject):
+		writeError(w, http.StatusBadRequest, "different-project", err.Error(), nil)
+	case errors.As(err, &invalid):
+		writeError(w, http.StatusUnprocessableEntity, "invalid", invalid.Error(), invalid.Problems)
+	case err != nil:
+		s.internalError(w, err)
+	default:
+		writeJSON(w, http.StatusOK, pv)
 	}
 }
 

@@ -1,5 +1,5 @@
-export type Step = 'setup' | 'weigh' | 'score' | 'results' | 'sensitivity';
-export const STEPS: Step[] = ['setup', 'weigh', 'score', 'results', 'sensitivity'];
+export type Step = 'setup' | 'people' | 'weigh' | 'score' | 'results' | 'sensitivity';
+export const STEPS: Step[] = ['setup', 'people', 'weigh', 'score', 'results', 'sensitivity'];
 
 export type Route = { name: 'library' } | { name: 'project'; id: string; step: Step; sub: string } | { name: 'report'; id: string };
 

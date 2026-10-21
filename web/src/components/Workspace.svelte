@@ -3,7 +3,15 @@
   import { scoreProgress, weighProgress } from '../lib/progress';
   import { href, type Step } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
+  import { ALL_EVALUATORS, type MergeReport, type Project } from '../lib/types';
+  import { api, exportUrl } from '../lib/api';
+  import { slug } from '../lib/format';
+  import { sender, weighs } from '../lib/people';
+  import { mergedText, undoMerge } from '../lib/returned';
   import Mark from './Mark.svelte';
+  import MergeDialog from './MergeDialog.svelte';
+  import Toast from './Toast.svelte';
+  import PeopleStep from './PeopleStep.svelte';
   import Results from './Results.svelte';
   import Score from './Score.svelte';
   import Sensitivity from './Sensitivity.svelte';
@@ -16,15 +24,95 @@
 
   const weigh = $derived(weighProgress(p, session.scoringAs));
   const score = $derived(scoreProgress(p, session.scoringAs));
+  const judge = $derived(p.evaluators.find((e) => e.id === session.scoringAs));
   const ready = $derived(p.alternatives.length >= 2 && p.criteria.length >= 1);
+  const people = $derived(session.results[ALL_EVALUATORS]?.people ?? []);
+  const finished = $derived(people.filter((x) => x.finished).length);
 
   const steps = $derived([
     { id: 'setup' as Step, label: 'Set up', detail: `${count(p.alternatives.length, 'option')}, ${count(p.criteria.length, 'criterion', 'criteria')}`, done: ready },
-    { id: 'weigh' as Step, label: 'Weigh criteria', detail: weigh.total ? `${weigh.done} of ${weigh.total} compared` : 'Nothing to compare yet', done: weigh.total > 0 && weigh.done === weigh.total },
-    { id: 'score' as Step, label: 'Score options', detail: score.total ? `${score.done} of ${score.total} judged` : 'Nothing to score yet', done: score.total > 0 && score.done === score.total },
+    {
+      id: 'people' as Step,
+      label: 'People',
+      detail: p.evaluators.length === 1 ? 'Just you' : `${count(p.evaluators.length, 'person', 'people')}, ${finished} finished`,
+      done: p.evaluators.length > 1 && finished === p.evaluators.length,
+    },
+    { id: 'weigh' as Step, label: 'Weigh criteria', detail: weigh.total ? `${weigh.done} of ${weigh.total} compared` : weighs(judge?.tasks) ? 'Nothing to compare yet' : 'Not assigned', done: weigh.total > 0 && weigh.done === weigh.total },
+    { id: 'score' as Step, label: 'Score options', detail: score.total ? `${score.done} of ${score.total} judged` : judge?.tasks && !judge.tasks.scoreAll && !judge.tasks.score?.length ? 'Not assigned' : 'Nothing to score yet', done: score.total > 0 && score.done === score.total },
     { id: 'results' as Step, label: 'Results', detail: '', done: false },
     { id: 'sensitivity' as Step, label: 'What if', detail: 'How robust is the winner?', done: false },
   ]);
+
+  // Merging returned answers: from the People step's button, or a file dropped anywhere.
+  let merging = $state<File | null>(null);
+  let dragging = $state(false);
+  let toast = $state<{ text: string; undo?: { before: Project; version: number } } | null>(null);
+  const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files');
+
+  // A copy someone sent to be judged.
+  const received = $derived(p.packet ? { from: sender(p.packet), me: p.evaluators[0]?.name ?? '' } : null);
+  let sentBack = $state('');
+
+  async function sendBack() {
+    await session.flush();
+    if (session.unsaved) {
+      toast = { text: 'Fix the unsaved changes first; then send your answers back.' };
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = exportUrl(p.id, 'ahp.json');
+    a.download = '';
+    a.click();
+    sentBack = `${slug(p.name)}-answers-from-${slug(received?.me ?? '')}.ahp.json`;
+  }
+
+  async function startMerge(file: File) {
+    if (received) {
+      toast = { text: "This is a copy you were sent, so there's nothing to merge into it." };
+      return;
+    }
+    await session.flush();
+    if (session.unsaved) {
+      toast = { text: 'Fix the unsaved changes first; then merge.' };
+      return;
+    }
+    merging = file;
+  }
+
+  async function merged(r: { project: Project; report: MergeReport; before: Project }) {
+    merging = null;
+    await session.reload();
+    toast = { text: mergedText(r.report), undo: r.report.judgments ? { before: r.before, version: r.project.version } : undefined };
+  }
+
+  // Undo restores the decision as it was before the merge, so it's only
+  // offered until the decision changes again.
+  $effect(() => {
+    if (toast?.undo && session.saveState !== 'saved') toast = { text: toast.text };
+  });
+
+  async function undo() {
+    const u = toast?.undo;
+    if (!u) return;
+    await session.flush();
+    if (session.unsaved || session.project.version !== u.version) {
+      toast = { text: "You've changed the decision since merging, so the merge can't be undone." };
+      return;
+    }
+    try {
+      await undoMerge(api, u.before, u.version);
+      await session.reload();
+      toast = { text: 'Merge undone.' };
+    } catch (e) {
+      toast = { text: `Couldn't undo: ${e instanceof Error ? e.message : e}` };
+    }
+  }
+
+  $effect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => (toast = null), toast.undo ? 20000 : 8000);
+    return () => clearTimeout(t);
+  });
 
   const saveLabel = $derived(
     {
@@ -37,7 +125,25 @@
   );
 </script>
 
-<div class="shell">
+<div
+  class="shell"
+  role="presentation"
+  ondragover={(e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragging = true;
+  }}
+  ondragleave={(e) => {
+    if (!e.relatedTarget) dragging = false;
+  }}
+  ondrop={(e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragging = false;
+    const file = e.dataTransfer?.files[0];
+    if (file) startMerge(file);
+  }}
+>
   <header class="bar no-print">
     <a class="home" href="#/" title="All decisions" aria-label="All decisions"><Mark size={26} /></a>
     <input
@@ -59,6 +165,23 @@
     <ThemeToggle />
   </header>
 
+  <div class="banners">
+  {#if received}
+    <div class="received no-print">
+      <p>
+        {received.from ? `${received.from} asked you to judge this decision.` : 'You were asked to judge this decision.'}
+        You're judging as {received.me}.
+      </p>
+      <button class="btn primary small" onclick={sendBack}>Send your answers back</button>
+      {#if sentBack}
+        <p class="small next" role="status">
+          Downloaded. Email {sentBack} to {received.from || 'whoever sent you this decision'}. It holds only
+          your answers; they'll merge it into theirs.
+        </p>
+      {/if}
+    </div>
+  {/if}
+
   {#if session.saveState === 'conflict'}
     <div class="banner no-print" role="alert">
       <span>{session.error} Keep your version, or load the other one and lose your recent edits?</span>
@@ -71,6 +194,7 @@
       <button class="btn" onclick={() => session.retry()}>Try again</button>
     </div>
   {/if}
+  </div>
 
   <nav class="rail no-print" aria-label="Steps">
     <ol>
@@ -92,6 +216,8 @@
   <main class="content">
     {#if step === 'setup'}
       <Setup {session} />
+    {:else if step === 'people'}
+      <PeopleStep {session} onmerge={startMerge} />
     {:else if step === 'weigh'}
       <Weigh {session} {sub} />
     {:else if step === 'score'}
@@ -103,6 +229,18 @@
     {/if}
   </main>
 </div>
+
+{#if dragging}
+  <div class="drop no-print" aria-hidden="true">
+    <p>Drop to merge returned answers into <strong>{p.name}</strong></p>
+  </div>
+{/if}
+{#if merging}
+  <MergeDialog target={{ id: p.id, name: p.name }} file={merging} onclose={() => (merging = null)} ondone={merged} />
+{/if}
+{#if toast}
+  <Toast text={toast.text} action={toast.undo ? 'Undo' : ''} onaction={undo} ondismiss={() => (toast = null)} />
+{/if}
 
 <style>
   .shell {
@@ -153,7 +291,6 @@
     width: auto;
   }
   .banner {
-    grid-area: banner;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -161,6 +298,25 @@
     background: var(--rust-wash);
     border-bottom: 1px solid var(--line);
     flex-wrap: wrap;
+  }
+  .banners {
+    grid-area: banner;
+  }
+  .received {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 1rem;
+    padding: 0.6rem clamp(0.75rem, 2vw, 1.5rem);
+    background: var(--brass-wash);
+    border-bottom: 1px solid var(--line);
+  }
+  .received p {
+    margin: 0;
+  }
+  .received .next {
+    flex-basis: 100%;
+    color: var(--ink-2);
   }
   .rail {
     grid-area: rail;
@@ -226,6 +382,22 @@
     grid-area: content;
     padding: 2rem clamp(1rem, 3vw, 3rem) 4rem;
     min-width: 0;
+  }
+  .drop {
+    position: fixed;
+    inset: 0.75rem;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    border: 2px dashed var(--brass);
+    border-radius: var(--radius-m);
+    background: color-mix(in oklab, var(--paper) 88%, transparent);
+    pointer-events: none;
+  }
+  .drop p {
+    font-size: 1.15rem;
+    max-width: 24rem;
+    text-align: center;
   }
   @media (max-width: 820px) {
     .shell {

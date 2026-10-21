@@ -38,8 +38,28 @@ type Results struct {
 	Matrices      []MatrixReport    `json:"matrices"`  // one per pairwise comparison group
 	Issues        []Issue           `json:"issues"`
 	Disagreements []Disagreement    `json:"disagreements"` // most contested pairs first
-	Completeness  float64           `json:"completeness"`  // share of required judgments made, 0–1
+	Completeness  float64           `json:"completeness"`  // share of the assigned judgments made (everyone's, or one person's), plus measured values; 0–1
 	Consistent    bool              `json:"consistent"`    // every connected matrix is within its threshold
+	People        []PersonProgress  `json:"people"`        // each person's progress on their own tasks
+	Values        Progress          `json:"values"`        // measured values entered, shared by everyone
+	Method        string            `json:"method"`        // how Scores combine people: AggregateJudgments or AggregatePriorities
+}
+
+// Progress counts judgments made out of judgments asked for.
+type Progress struct {
+	Done  int `json:"done"`
+	Total int `json:"total"`
+}
+
+// PersonProgress is one person's progress on the tasks assigned to them.
+type PersonProgress struct {
+	ID         string `json:"id"`
+	Done       int    `json:"done"`
+	Total      int    `json:"total"`
+	Finished   bool   `json:"finished"`   // every assigned judgment made
+	Consistent bool   `json:"consistent"` // their own comparisons are within the thresholds
+	Structure  string `json:"structure"`  // Fingerprint of their copy as it would be sent now
+	OutOfDate  bool   `json:"outOfDate"`  // the copy they were sent no longer matches the decision
 }
 
 // AltScore is an alternative's overall score (all scores sum to 1) and rank (1 is best).
@@ -109,10 +129,34 @@ type Disagreement struct {
 
 // Compute derives weights, scores and diagnostics for a prepared project
 // (see Prepare), combining all evaluators or using one evaluator's judgments.
+// With AggregatePriorities, the combined Scores are a weighted geometric mean
+// of each person's own scores; everything else describes the combined answers.
 func Compute(p *Project, evaluator string) (*Results, error) {
+	res, err := computeFor(p, evaluator, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	res.People, res.Values = progress(p)
+	res.Completeness = completeness(res.People, res.Values, evaluator)
+	res.Method = AggregateJudgments
+	if evaluator == AllEvaluators && p.Aggregation == AggregatePriorities {
+		if scores, ok := combineRankings(p); ok {
+			res.Scores, res.Method = scores, AggregatePriorities
+		}
+	}
+	return res, nil
+}
+
+// computeFor runs the calculation with the judgments of one evaluator (or
+// all). When mine is set, contexts it rejects use the fallback evaluators'
+// judgments instead: a person's view, filled in from the group where their
+// tasks don't reach.
+func computeFor(p *Project, evaluator string, mine func(context string) bool, fallback map[string]float64) (*Results, error) {
 	c := &computer{
-		p:       p,
-		weights: map[string]float64{},
+		p:        p,
+		mine:     mine,
+		fallback: fallback,
+		weights:  map[string]float64{},
 		res: &Results{
 			Evaluator: evaluator, Scores: []AltScore{}, Criteria: []CriterionResult{},
 			Matrices: []MatrixReport{}, Issues: []Issue{}, Disagreements: []Disagreement{},
@@ -141,10 +185,18 @@ func Compute(p *Project, evaluator string) (*Results, error) {
 type computer struct {
 	p        *Project
 	weights  map[string]float64 // evaluator ID → weight, for the evaluators being combined
+	mine     func(context string) bool
+	fallback map[string]float64 // weights for contexts mine rejects
 	altIDs   []string
 	res      *Results
-	required int // judgments needed for a complete project
-	answered int // judgments made
+}
+
+// weightsFor is the evaluators whose judgments count in a context.
+func (c *computer) weightsFor(context string) map[string]float64 {
+	if c.mine == nil || c.mine(context) {
+		return c.weights
+	}
+	return c.fallback
 }
 
 type vote struct {
@@ -227,10 +279,6 @@ func (c *computer) run() (*Results, error) {
 		c.res.Criteria = append(c.res.Criteria, r)
 	}
 
-	c.res.Completeness = 1
-	if c.required > 0 {
-		c.res.Completeness = float64(c.answered) / float64(c.required)
-	}
 	c.res.Consistent = true
 	for _, m := range c.res.Matrices {
 		if m.Connected && !m.Consistent {
@@ -285,7 +333,7 @@ func (c *computer) compare(context string, items []string, code, criterionID str
 	}
 	votes := map[[2]int][]vote{}
 	for _, j := range c.p.Pairwise {
-		w, ok := c.weights[j.EvaluatorID]
+		w, ok := c.weightsFor(context)[j.EvaluatorID]
 		if !ok || j.Context != context {
 			continue
 		}
@@ -318,8 +366,6 @@ func (c *computer) compare(context string, items []string, code, criterionID str
 		}
 	}
 	pairs := n * (n - 1) / 2
-	c.required += pairs
-	c.answered += len(votes)
 
 	a := ahp.Analyze(m)
 	rep := MatrixReport{
@@ -355,7 +401,7 @@ func (c *computer) ratingPriorities(cr Criterion) []float64 {
 	votes := make([][]ahp.Weighted, len(c.altIDs))
 	pos := c.altPositions()
 	for _, r := range c.p.Ratings {
-		w, ok := c.weights[r.EvaluatorID]
+		w, ok := c.weightsFor(AltsContext(cr.ID))[r.EvaluatorID]
 		a, okA := pos[r.AlternativeID]
 		if ok && okA && r.CriterionID == cr.ID {
 			votes[a] = append(votes[a], ahp.Weighted{Value: r.Value, Weight: w})
@@ -428,8 +474,6 @@ func (c *computer) fillMissing(raw []float64, have []bool, cr Criterion, code, v
 			n++
 		}
 	}
-	c.required += len(raw)
-	c.answered += n
 	if n == len(raw) {
 		return true
 	}
@@ -495,4 +539,193 @@ func crWith(m ahp.Matrix, i, j int, v float64) float64 {
 	}
 	trial.Set(i, j, v)
 	return ahp.Analyze(trial).CR
+}
+
+// group is one set of things compared with each other: a sibling group of criteria.
+type group struct {
+	context string
+	items   []string
+}
+
+// assigned lists the sibling groups a person weighs and the leaves they score.
+func assigned(p *Project, e Evaluator) ([]group, []Criterion) {
+	kids := p.childrenOf()
+	var groups []group
+	if e.Tasks == nil || e.Tasks.Weigh {
+		parents := append([]string{""}, criteriaIDs(p)...)
+		for _, parent := range parents {
+			if k := kids[parent]; len(k) >= 2 {
+				groups = append(groups, group{context: CriteriaContext(parent), items: criteriaIDs(&Project{Criteria: k})})
+			}
+		}
+	}
+	var leaves []Criterion
+	only := map[string]bool{}
+	if e.Tasks != nil {
+		for _, id := range e.Tasks.Score {
+			only[id] = true
+		}
+	}
+	for _, c := range p.Criteria {
+		if len(kids[c.ID]) > 0 {
+			continue
+		}
+		if e.Tasks == nil || e.Tasks.ScoreAll || only[c.ID] {
+			leaves = append(leaves, c)
+		}
+	}
+	return groups, leaves
+}
+
+func criteriaIDs(p *Project) []string {
+	ids := make([]string, len(p.Criteria))
+	for i, c := range p.Criteria {
+		ids[i] = c.ID
+	}
+	return ids
+}
+
+// progress counts each person's judgments against their tasks, and the
+// measured values (which are shared, not anyone's).
+func progress(p *Project) ([]PersonProgress, Progress) {
+	nAlt := len(p.Alternatives)
+	alts := map[string]bool{}
+	for _, a := range p.Alternatives {
+		alts[a.ID] = true
+	}
+	pairsDone := func(ev, context string, items map[string]bool) int {
+		seen := map[string]bool{}
+		for _, j := range p.Pairwise {
+			if j.EvaluatorID != ev || j.Context != context || !items[j.A] || !items[j.B] || j.A == j.B {
+				continue
+			}
+			lo, hi := j.A, j.B
+			if lo > hi {
+				lo, hi = hi, lo
+			}
+			seen[lo+"|"+hi] = true
+		}
+		return len(seen)
+	}
+	people := make([]PersonProgress, 0, len(p.Evaluators))
+	for _, e := range p.Evaluators {
+		pp := PersonProgress{ID: e.ID, Structure: Fingerprint(p, e.ID)}
+		groups, leaves := assigned(p, e)
+		for _, g := range groups {
+			items := map[string]bool{}
+			for _, id := range g.items {
+				items[id] = true
+			}
+			pp.Total += len(g.items) * (len(g.items) - 1) / 2
+			pp.Done += pairsDone(e.ID, g.context, items)
+		}
+		for _, c := range leaves {
+			switch c.Method {
+			case MethodRating:
+				pp.Total += nAlt
+				rated := map[string]bool{}
+				for _, r := range p.Ratings {
+					if r.EvaluatorID == e.ID && r.CriterionID == c.ID && alts[r.AlternativeID] {
+						rated[r.AlternativeID] = true
+					}
+				}
+				pp.Done += len(rated)
+			case MethodValue:
+				// measured values are counted once, below
+			default:
+				pp.Total += nAlt * (nAlt - 1) / 2
+				pp.Done += pairsDone(e.ID, AltsContext(c.ID), alts)
+			}
+		}
+		pp.Finished = pp.Total > 0 && pp.Done >= pp.Total
+		if own, err := computeFor(p, e.ID, nil, nil); err == nil {
+			pp.Consistent = own.Consistent
+		}
+		pp.OutOfDate = e.Invite != nil && e.Invite.Structure != pp.Structure
+		people = append(people, pp)
+	}
+	var values Progress
+	kids := p.childrenOf()
+	for _, c := range p.Criteria {
+		if len(kids[c.ID]) > 0 || c.Method != MethodValue {
+			continue
+		}
+		values.Total += nAlt
+		for _, v := range p.Values {
+			if v.CriterionID == c.ID && alts[v.AlternativeID] {
+				values.Done++
+			}
+		}
+	}
+	return people, values
+}
+
+// completeness is the share of assigned judgments made: one person's, or
+// everyone's together, plus the measured values.
+func completeness(people []PersonProgress, values Progress, evaluator string) float64 {
+	done, total := values.Done, values.Total
+	for _, pp := range people {
+		if evaluator == AllEvaluators || pp.ID == evaluator {
+			done += pp.Done
+			total += pp.Total
+		}
+	}
+	if total == 0 {
+		return 1
+	}
+	return float64(done) / float64(total)
+}
+
+// combineRankings works out each person's own scores (using the group's
+// combined answers where their tasks don't reach) and combines them with a
+// weighted geometric mean. People who haven't judged anything are left out.
+func combineRankings(p *Project) ([]AltScore, bool) {
+	everyone := map[string]float64{}
+	for _, e := range p.Evaluators {
+		everyone[e.ID] = e.Weight
+	}
+	judged := map[string]bool{}
+	for _, j := range p.Pairwise {
+		judged[j.EvaluatorID] = true
+	}
+	for _, r := range p.Ratings {
+		judged[r.EvaluatorID] = true
+	}
+	n := len(p.Alternatives)
+	logSum := make([]float64, n)
+	totalWeight := 0.0
+	for _, e := range p.Evaluators {
+		if !judged[e.ID] {
+			continue
+		}
+		groups, leaves := assigned(p, e)
+		mine := map[string]bool{}
+		for _, g := range groups {
+			mine[g.context] = true
+		}
+		for _, c := range leaves {
+			mine[AltsContext(c.ID)] = true
+		}
+		r, err := computeFor(p, e.ID, func(ctx string) bool { return mine[ctx] }, everyone)
+		if err != nil || len(r.Scores) != n {
+			return nil, false
+		}
+		for a, s := range r.Scores {
+			logSum[a] += e.Weight * math.Log(math.Max(s.Score, 1e-300))
+		}
+		totalWeight += e.Weight
+	}
+	if totalWeight == 0 || n == 0 {
+		return nil, false
+	}
+	raw := make([]float64, n)
+	for a := range raw {
+		raw[a] = math.Exp(logSum[a] / totalWeight)
+	}
+	combined := normalize(raw)
+	scores := make([]AltScore, n)
+	for a, alt := range p.Alternatives {
+		scores[a] = AltScore{ID: alt.ID, Score: combined[a], Rank: rank(combined, a)}
+	}
+	return scores, true
 }

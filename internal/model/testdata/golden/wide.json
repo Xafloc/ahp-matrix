@@ -1,6 +1,6 @@
 {
   "project": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "01GOLDENWIDE00000000000000",
     "version": 0,
     "name": "Wide",
@@ -8,6 +8,7 @@
     "createdAt": "2026-10-15T12:00:00Z",
     "updatedAt": "2026-10-15T12:00:00Z",
     "scale": "saaty9",
+    "aggregation": "judgments",
     "alternatives": [
       {
         "id": "a1",
@@ -1233,6 +1234,31 @@
       }
     ],
     "completeness": 1,
-    "consistent": false
+    "consistent": false,
+    "people": [
+      {
+        "id": "e1",
+        "done": 37,
+        "total": 37,
+        "finished": true,
+        "consistent": false,
+        "structure": "cf4c9169abb3",
+        "outOfDate": false
+      },
+      {
+        "id": "e2",
+        "done": 37,
+        "total": 37,
+        "finished": true,
+        "consistent": false,
+        "structure": "cf4c9169abb3",
+        "outOfDate": false
+      }
+    ],
+    "values": {
+      "done": 10,
+      "total": 10
+    },
+    "method": "judgments"
   }
 }

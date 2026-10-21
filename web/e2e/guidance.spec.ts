@@ -19,9 +19,9 @@ test('the results say how several people are combined', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
   await expect(page.getByText('Comparisons are combined with a weighted geometric mean')).toBeVisible();
-  await page.getByRole('link', { name: /Set up/ }).click();
-  await page.getByText('How are people combined?').click();
-  await expect(page.getByText('Comparisons are combined with a weighted geometric mean')).toBeVisible();
+  await page.getByRole('link', { name: /People/ }).click();
+  await expect(page.getByRole('radio', { name: /Combine answers/ })).toBeChecked();
+  await expect(page.getByRole('radio', { name: /Combine answers/ })).toContainText('weighted geometric mean');
 });
 
 test('all pairs can be weighed on one screen', async ({ page }) => {
@@ -153,4 +153,34 @@ test('on a phone, the Why? actions are visible without scrolling', async ({ page
   await page.locator('li.flag').first().getByRole('button', { name: 'Why?' }).click();
   await expect(page.getByRole('button', { name: 'Use the suggestion' })).toBeInViewport({ ratio: 1 });
   await expect(page.getByRole('button', { name: 'Keep my answer' })).toBeInViewport({ ratio: 1 });
+});
+
+test('the balance names fewer strengths on a phone, so the words never overlap', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await createDecision(page, 'Phone balance');
+  await addAll(page, 'New criterion', ['Speed', 'Price']);
+  await saved(page);
+  await page.getByRole('link', { name: /Weigh criteria/ }).click();
+  const words = page.locator('.words span').filter({ hasText: /\S/ });
+  const boxes = await words.evaluateAll((els) =>
+    els.filter((e) => getComputedStyle(e).visibility !== 'hidden').map((e) => {
+      const r = document.createRange();
+      r.selectNodeContents(e);
+      const b = r.getBoundingClientRect();
+      return [b.left, b.right];
+    }),
+  );
+  for (let i = 1; i < boxes.length; i++) expect(boxes[i][0], `label ${i} overlaps the one before`).toBeGreaterThanOrEqual(boxes[i - 1][1]);
+});
+
+test('with rankings combined, What if and the report say they use the combined answers', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
+  await page.getByRole('link', { name: /People/ }).click();
+  await page.getByRole('radio', { name: /Combine rankings/ }).click();
+  await saved(page);
+  await page.getByRole('link', { name: /What if/ }).click();
+  await expect(page.getByText("What if works from everyone's answers combined")).toBeVisible();
+  await page.getByRole('link', { name: 'Printable report' }).click();
+  await expect(page.getByText("The ranking combines each person's own ranking")).toBeVisible();
 });

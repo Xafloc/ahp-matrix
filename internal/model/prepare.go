@@ -62,6 +62,9 @@ func (p *Project) fillDefaults() {
 	if p.Scale == "" {
 		p.Scale = ScaleSaaty9
 	}
+	if p.Aggregation == "" {
+		p.Aggregation = AggregateJudgments
+	}
 	if p.Alternatives == nil {
 		p.Alternatives = []Alternative{}
 	}
@@ -177,6 +180,16 @@ func (p *Project) prune() {
 		values = append(values, v)
 	}
 	p.Values = values
+
+	// Tasks may only name leaf criteria that still exist.
+	kids := p.childrenOf()
+	for i := range p.Evaluators {
+		t := p.Evaluators[i].Tasks
+		if t == nil {
+			continue
+		}
+		t.Score = keep(t.Score, func(id string) bool { return k.crit[id] && len(kids[id]) == 0 })
+	}
 }
 
 // known is a snapshot of a project's ids, for checking what judgments refer to.
@@ -237,6 +250,9 @@ func (p *Project) Validate() error {
 	}
 	if !p.Scale.Valid() {
 		add("scale", "must be %q or %q", ScaleSaaty9, ScaleClassic5)
+	}
+	if p.Aggregation != AggregateJudgments && p.Aggregation != AggregatePriorities {
+		add("aggregation", "must be %q or %q", AggregateJudgments, AggregatePriorities)
 	}
 
 	seen := map[string]bool{}

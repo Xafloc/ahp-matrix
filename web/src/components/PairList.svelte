@@ -207,7 +207,7 @@
     .head span {
       display: none;
     }
-    .head :global(.words),
+    .head :global(.fit),
     .control,
     .sentence,
     .fix {
