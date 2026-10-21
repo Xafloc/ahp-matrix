@@ -1,0 +1,48 @@
+web/src/components/MergeDialog.svelte
+  s_65743add7cce22::t_2b3cf3b92d7a7e 1-211
+web/e2e/merge.spec.ts
+  s_65743add7cce22::t_f15f308f008372 1-24,26-33,35-37,39-80
+  s_65743add7cce22::t_2fd861b9588e04 25,34,38
+web/src/lib/returned.ts
+  s_65743add7cce22::t_219c2ffb3912b9 4-37,59
+  s_65743add7cce22::t_807b71169cdcd2 1-3,38-58
+web/src/components/Toast.svelte
+  s_65743add7cce22::t_4a51dc89abc144 1-43
+internal/server/exchange_test.go
+  s_65743add7cce22::t_187194f5673fa4 227-240
+web/src/lib/types.ts
+  s_65743add7cce22::t_a00430986a8f81 204-205
+web/src/lib/returned.test.ts
+  s_65743add7cce22::t_a00430986a8f81 1-44
+  s_65743add7cce22::t_807b71169cdcd2 45-65
+web/e2e/helpers.ts
+  s_65743add7cce22::t_f15f308f008372 1-3,32-64
+web/src/components/PeopleStep.svelte
+  s_65743add7cce22::t_45d8518bb55b62 4,6,13-14,236,240,249-251,417-418
+internal/server/projects.go
+  s_65743add7cce22::t_a00430986a8f81 44
+  s_65743add7cce22::t_187194f5673fa4 43,81
+web/src/components/Workspace.svelte
+  s_65743add7cce22::t_45d8518bb55b62 6-8,10-11,43-81,93-111,167,180-191,315-330
+web/src/components/Library.svelte
+  s_65743add7cce22::t_393fe1e87b5ff1 6-7,9-10,25-26,28-55,104-107,109-115,192-203,242-259,329-335,337-341
+  s_65743add7cce22::t_f9067f973dfb3c 27,108
+web/e2e/exchange.spec.ts
+  s_65743add7cce22::t_f15f308f008372 60-62,98,100,103,116-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3abe61a278684f6fbea63502d41cd67c63b6ea6c",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
