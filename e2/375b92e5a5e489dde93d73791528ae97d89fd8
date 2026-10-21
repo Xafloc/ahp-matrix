@@ -1,0 +1,47 @@
+web/e2e/received.spec.ts
+  s_65743add7cce22::t_a5c42862a172ae 16
+  s_65743add7cce22::t_8a9a2485fa20e1 17
+internal/model/project.go
+  s_65743add7cce22::t_a59b2b21a02003 102
+web/src/components/InviteDialog.svelte
+  s_65743add7cce22::t_32c8a180dd103e 4,29-30
+  s_65743add7cce22::t_e5cbe664b6c6ac 1-3,5-28,31-163
+web/e2e/helpers.ts
+  s_65743add7cce22::t_a5c42862a172ae 57
+  s_65743add7cce22::t_8a9a2485fa20e1 58
+web/e2e/people.spec.ts
+  s_65743add7cce22::t_a5c42862a172ae 26,72-87,89
+  s_65743add7cce22::t_8a9a2485fa20e1 27,88
+  s_65743add7cce22::t_4f6d9c9ee6123b 90
+web/src/lib/types.ts
+  s_65743add7cce22::t_a59b2b21a02003 50-51
+web/src/components/PeopleStep.svelte
+  s_65743add7cce22::t_47431ed85efa99 4-5,8,62-65,77-81,89,99-100,240,242,312-321
+  s_65743add7cce22::t_fac5907631272c 322
+web/e2e/exchange.spec.ts
+  s_65743add7cce22::t_8a9a2485fa20e1 55,92,114
+  s_65743add7cce22::t_a5c42862a172ae 54,91,113
+web/src/lib/api.ts
+  s_65743add7cce22::t_a59b2b21a02003 88-91
+web/src/lib/people.test.ts
+  s_65743add7cce22::t_7e2c57524f3ffa 102-112,114-126
+  s_65743add7cce22::t_9cb08042305796 113
+web/src/lib/people.ts
+  s_65743add7cce22::t_9a513a7e557a96 1,61-68,70,78-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e2375b92e5a5e489dde93d73791528ae97d89fd8",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
