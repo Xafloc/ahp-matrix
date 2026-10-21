@@ -1,0 +1,38 @@
+web/src/components/charts/charts.test.ts
+  s_65743add7cce22::t_4759f46d398be0 31-33
+web/src/components/Setup.svelte
+  s_65743add7cce22::t_113cd817d93692 43
+web/src/lib/session.test.ts
+  s_65743add7cce22::t_113cd817d93692 24
+  s_65743add7cce22::t_4759f46d398be0 25
+internal/model/merge_test.go
+  s_65743add7cce22::t_00be9f3ec5a136 85,171-213,217-242
+  s_65743add7cce22::t_3c460caaa2dc1a 214-216
+internal/server/exchange.go
+  s_65743add7cce22::t_c23b10b50b9ae9 26,148-173
+  s_65743add7cce22::t_1661af8fa6c56a 174-175
+internal/server/exchange_test.go
+  s_65743add7cce22::t_e2b8da5d429936 189-226
+web/src/lib/api.ts
+  s_65743add7cce22::t_113cd817d93692 1,54,83
+internal/model/merge.go
+  s_65743add7cce22::t_d5353a2609c062 37-105,163,193,201,211,217-230,267-334
+web/src/lib/types.ts
+  s_65743add7cce22::t_113cd817d93692 30-33,36-61,99-101,169-184,230-248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ed555aa941d78826b1ad3a7d44fc4a6fb29ae32c",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
