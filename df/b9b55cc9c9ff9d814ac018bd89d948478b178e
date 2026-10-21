@@ -1,0 +1,21 @@
+web/e2e/judge.spec.ts
+  s_65743add7cce22::t_6dfc021640cf42 1-71
+README.md
+  s_65743add7cce22::t_0ee5b2bbe937a9 50-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dfb9b55cc9c9ff9d814ac018bd89d948478b178e",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
