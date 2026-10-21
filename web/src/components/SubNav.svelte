@@ -7,6 +7,7 @@
     total: number;
     flag?: boolean; // contradictions to review
     detail?: string;
+    off?: string; // greyed out, with the reason: "Not assigned to Priya"
   }
   let { entries, current, label }: { entries: Entry[]; current: string; label: string } = $props();
 </script>
@@ -15,14 +16,16 @@
   <ul>
     {#each entries as e (e.key)}
       <li>
-        <a href={e.href} class:current={e.key === current} aria-current={e.key === current ? 'true' : undefined}>
+        <a href={e.href} class:current={e.key === current} class:off={!!e.off} aria-current={e.key === current ? 'true' : undefined}>
           <span class="text">
             <span class="name">{e.label}</span>
-            {#if e.detail}<span class="small muted">{e.detail}</span>{/if}
+            {#if e.off}<span class="small muted">{e.off}</span>{:else if e.detail}<span class="small muted">{e.detail}</span>{/if}
           </span>
-          <span class="small count" class:complete={e.total > 0 && e.done === e.total} class:flag={e.flag}>
-            {#if e.flag}Review{:else if e.total > 0 && e.done === e.total}Done{:else}{e.done}/{e.total}{/if}
-          </span>
+          {#if !e.off}
+            <span class="small count" class:complete={e.total > 0 && e.done === e.total} class:flag={e.flag}>
+              {#if e.flag}Review{:else if e.total > 0 && e.done === e.total}Done{:else}{e.done}/{e.total}{/if}
+            </span>
+          {/if}
         </a>
       </li>
     {/each}
@@ -62,6 +65,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  a.off .name {
+    color: var(--ink-3);
+    font-weight: 450;
   }
   .count {
     flex: none;

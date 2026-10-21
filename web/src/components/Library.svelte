@@ -4,6 +4,7 @@
   import { href, router } from '../lib/router.svelte';
   import { count } from '../lib/format';
   import type { ImportReport, MergeReport, Project, ProjectSummary, StarterEntry } from '../lib/types';
+  import { firstTask } from '../lib/people';
   import { mergedText, mergeTarget, peek, undoMerge } from '../lib/returned';
   import Mark from './Mark.svelte';
   import MergeDialog from './MergeDialog.svelte';
@@ -119,6 +120,10 @@
         // A spreadsheet: say what came across before opening it.
         imported = { id: project.id, name: project.name, report };
         await load();
+      } else if (project.packet && project.evaluators[0]) {
+        // A copy someone sent: start on the first thing they asked for.
+        const t = firstTask(project, project.evaluators[0]);
+        router.go(href(project.id, t.step, t.sub));
       } else {
         router.go(href(project.id, 'results'));
       }

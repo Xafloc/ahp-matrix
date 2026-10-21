@@ -53,3 +53,49 @@ describe('reminder', () => {
     expect(text).toContain('Darren');
   });
 });
+
+describe('assigned work', () => {
+  it('opens a person on the first thing they were asked to do', async () => {
+    const { firstTask } = await import('./people');
+    const { fixture } = await import('./fixture.test-helper');
+    const p = fixture();
+    const bob = p.evaluators[1];
+    expect(firstTask(p, bob)).toEqual({ step: 'weigh', sub: 'root' });
+    bob.tasks = { weigh: false, scoreAll: true };
+    expect(firstTask(p, bob)).toEqual({ step: 'score', sub: 'c2' });
+    bob.tasks = { weigh: false, scoreAll: false, score: ['c3'] };
+    expect(firstTask(p, bob)).toEqual({ step: 'score', sub: 'c3' });
+    bob.tasks = { weigh: false, scoreAll: false, score: [] };
+    expect(firstTask(p, bob)).toEqual({ step: 'results', sub: '' });
+  });
+
+  it('says whether a leaf is theirs to score', async () => {
+    const { assigns } = await import('./people');
+    const { fixture } = await import('./fixture.test-helper');
+    const p = fixture();
+    const [perf, sec, cost] = [p.criteria[1], p.criteria[2], p.criteria[3]];
+    expect([perf, sec, cost].map((c) => assigns(undefined, c))).toEqual([true, true, true]);
+    expect([perf, sec, cost].map((c) => assigns({ weigh: true, scoreAll: false, score: ['c3'] }, c))).toEqual([false, true, false]);
+    expect([perf, sec, cost].map((c) => assigns({ weigh: true, scoreAll: false }, c))).toEqual([false, false, false]);
+  });
+});
+
+describe('received copies', () => {
+  it('names the sender, unless they never named themselves', async () => {
+    const { sender } = await import('./people');
+    expect(sender({ for: 'e2', from: 'Darren', sentAt: '', structure: '' })).toBe('Darren');
+    expect(sender({ for: 'e2', from: 'Me', sentAt: '', structure: '' })).toBe('');
+    expect(sender(undefined)).toBe('');
+  });
+
+  it('describes what someone was asked to do', async () => {
+    const { describeTasks } = await import('./people');
+    const { fixture } = await import('./fixture.test-helper');
+    const p = fixture();
+    expect(describeTasks(p, undefined)).toBe('weigh the criteria and score the options on every criterion');
+    expect(describeTasks(p, { weigh: true, scoreAll: false })).toBe('weigh the criteria');
+    expect(describeTasks(p, { weigh: false, scoreAll: true })).toBe('score the options on every criterion');
+    expect(describeTasks(p, { weigh: false, scoreAll: false, score: ['c2', 'c3'] })).toBe('score the options on Performance and Security');
+    expect(describeTasks(p, { weigh: false, scoreAll: false, score: [] })).toBe('nothing yet');
+  });
+});

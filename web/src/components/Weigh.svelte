@@ -4,6 +4,7 @@
   import { pairProgress } from '../lib/progress';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
+  import { weighs } from '../lib/people';
   import { groups, path } from '../lib/tree';
   import PairCompare from './PairCompare.svelte';
   import SubNav from './SubNav.svelte';
@@ -14,6 +15,8 @@
   const key = (parentId: string) => parentId || 'root';
   const group = $derived(all.find((g) => key(g.parentId) === sub) ?? all[0]);
   const results = $derived(session.results[session.scoringAs]);
+  const me = $derived(p.evaluators.find((e) => e.id === session.scoringAs));
+  const mine = $derived(weighs(me?.tasks));
 
   const entries = $derived(
     all.map((g) => {
@@ -28,6 +31,7 @@
         total: prog.total,
         flag: !!report && report.connected && !report.consistent,
         detail: count(g.items.length, 'criterion', 'criteria'),
+        off: mine ? undefined : `Not assigned to ${me?.name}`,
       };
     }),
   );
@@ -45,6 +49,9 @@
       <SubNav label="Criteria groups" {entries} current={key(group.parentId)} />
     {/if}
     <section class="main">
+      {#if !mine}
+        <p class="unassigned">{me?.name} isn't asked to weigh the criteria. Anything entered here still counts.</p>
+      {/if}
       <h1>
         {group.parentId
           ? `Within ${p.criteria.find((c) => c.id === group.parentId)?.name}, which matters more, and by how much?`
@@ -63,6 +70,14 @@
 {/if}
 
 <style>
+  .unassigned {
+    margin: 0;
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--radius-s);
+    background: var(--paper);
+    border: 1px dashed var(--line-strong);
+    color: var(--ink-2);
+  }
   .layout {
     display: grid;
     grid-template-columns: 15rem minmax(0, 1fr);

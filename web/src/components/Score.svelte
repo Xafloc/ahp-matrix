@@ -4,6 +4,7 @@
   import { leafProgress } from '../lib/progress';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
+  import { assigns, sender } from '../lib/people';
   import { leaves, path } from '../lib/tree';
   import type { Direction } from '../lib/types';
   import PriorityBars from './charts/PriorityBars.svelte';
@@ -13,8 +14,12 @@
   let { session, sub }: { session: ProjectSession; sub: string } = $props();
   const p = $derived(session.project);
   const all = $derived(leaves(p));
-  const leaf = $derived(all.find((c) => c.id === sub) ?? all[0]);
   const ev = $derived(session.scoringAs);
+  const me = $derived(p.evaluators.find((e) => e.id === ev));
+  // With no leaf chosen, open the first one this person is asked to score.
+  const first = $derived(all.find((c) => assigns(me?.tasks, c) && c.method !== 'value') ?? all.find((c) => assigns(me?.tasks, c)) ?? all[0]);
+  const leaf = $derived(all.find((c) => c.id === sub) ?? first);
+  const locked = $derived(!!p.packet); // measured values are the sender's to enter
   $effect(() => session.watch(ev));
   const results = $derived(session.results[ev]);
   const priorities = $derived(results?.criteria.find((c) => c.id === leaf?.id)?.subtree);
@@ -32,6 +37,7 @@
         total: prog.total,
         flag: !!report && report.connected && !report.consistent,
         detail: methodLabel[c.method ?? 'pairwise'],
+        off: assigns(me?.tasks, c) ? undefined : `Not assigned to ${me?.name}`,
       };
     }),
   );
@@ -57,6 +63,9 @@
   <div class="layout">
     <SubNav label="Criteria to score" {entries} current={leaf.id} />
     <section class="main">
+      {#if !assigns(me?.tasks, leaf)}
+        <p class="unassigned">{me?.name} isn't asked to score the options on {leaf.name}. Anything entered here still counts.</p>
+      {/if}
       {#if leaf.method === 'rating'}
         <h1>Rate each option on {leaf.name}</h1>
         <p class="muted">1 is poor, 10 is excellent.</p>
@@ -81,6 +90,7 @@
               role="radio"
               aria-checked={(leaf.direction ?? 'higher') === d}
               class="btn quiet"
+              disabled={locked}
               onclick={() => {
                 setDirection(session.project, leaf.id, d as Direction);
                 session.changed();
@@ -99,6 +109,7 @@
                   class="field"
                   type="number"
                   step="any"
+                  disabled={locked}
                   value={v ?? ''}
                   oninput={(e) => measure(a.id, e.currentTarget.value)}
                 />
@@ -107,7 +118,13 @@
             </li>
           {/each}
         </ul>
-        <p class="small muted">Measured values are shared by everyone; they aren't anyone's opinion.</p>
+        <p class="small muted">
+          {#if locked}
+            Measured values are entered by {sender(p.packet) || 'the person who sent you this decision'}; they aren't anyone's opinion.
+          {:else}
+            Measured values are shared by everyone; they aren't anyone's opinion.
+          {/if}
+        </p>
       {:else}
         <h1>Which is better on {leaf.name}, and by how much?</h1>
         {#key leaf.id}
@@ -131,6 +148,14 @@
 {/if}
 
 <style>
+  .unassigned {
+    margin: 0;
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--radius-s);
+    background: var(--paper);
+    border: 1px dashed var(--line-strong);
+    color: var(--ink-2);
+  }
   .layout {
     display: grid;
     grid-template-columns: 15rem minmax(0, 1fr);

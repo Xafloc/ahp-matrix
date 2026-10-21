@@ -226,6 +226,10 @@ func (s *server) exportProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filename := model.Slug(p.Name) + ".ahp.json"
+	if p.Packet != nil && len(p.Evaluators) == 1 {
+		// A copy someone was sent: what goes back is their answers.
+		filename = model.Slug(p.Name) + "-answers-from-" + model.Slug(p.Evaluators[0].Name) + ".ahp.json"
+	}
 	// ?evaluator= exports that person's packet: everything but other people's judgments.
 	if ev := r.URL.Query().Get("evaluator"); ev != "" {
 		packet, err := model.Packet(p, ev)

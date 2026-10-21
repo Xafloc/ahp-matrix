@@ -26,3 +26,25 @@ export function relativeTime(iso: string, now = Date.now()): string {
   if (d < 7) return `${d} days ago`;
   return new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: d > 300 ? 'numeric' : undefined });
 }
+
+/** A file-name-safe form of a name, as the server makes them (model.Slug). */
+export function slug(name: string): string {
+  let out = '';
+  let dash = false;
+  for (const ch of name.toLowerCase()) {
+    if (out.length >= 40) break;
+    if (/[a-z0-9]/.test(ch)) {
+      out += ch;
+      dash = false;
+    } else if (out.length > 0 && !dash) {
+      out += '-';
+      dash = true;
+    }
+  }
+  return out.replace(/-+$/, '') || 'project';
+}
+
+/** "Priya", "Priya and Bob", "Priya, Bob and Ann". */
+export function list(names: string[]): string {
+  return names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}

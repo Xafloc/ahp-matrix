@@ -2,8 +2,7 @@
   // Shows what merging a returned file would do (who, how many answers,
   // whose answers it replaces, what can't come across) before doing it.
   import { api } from '../lib/api';
-  import { count, relativeTime } from '../lib/format';
-  import { list } from '../lib/returned';
+  import { count, list, relativeTime } from '../lib/format';
   import type { MergePreview, MergeReport, Project } from '../lib/types';
 
   let {

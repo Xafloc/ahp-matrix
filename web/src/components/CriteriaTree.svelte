@@ -6,7 +6,7 @@
   import { childrenOf, descendants, flatten, isLeaf } from '../lib/tree';
   import type { Direction, Method } from '../lib/types';
 
-  let { session }: { session: ProjectSession } = $props();
+  let { session, locked = false }: { session: ProjectSession; locked?: boolean } = $props();
   const p = $derived(session.project);
   const rows = $derived(flatten(p));
 
@@ -94,7 +94,7 @@
       >
         <span
           class="grip"
-          draggable="true"
+          draggable={locked ? 'false' : 'true'}
           role="button"
           tabindex="-1"
           aria-label="Drag {c.name}"

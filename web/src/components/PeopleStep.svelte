@@ -4,7 +4,7 @@
   import { exportUrl } from '../lib/api';
   import { addEvaluator, removeEvaluator, setEvaluatorWeight } from '../lib/edits';
   import { relativeTime } from '../lib/format';
-  import { reminder, ROLES, roleOf, statusOf, tasksFor, type Role, type Status } from '../lib/people';
+  import { describeTasks, reminder, ROLES, roleOf, sender, statusOf, tasksFor, type Role, type Status } from '../lib/people';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import { leaves } from '../lib/tree';
@@ -134,146 +134,168 @@
 <div class="people">
   <header>
     <h2>Who is judging</h2>
-    <p class="muted">
-      Everyone whose judgments count. Each person compares on their own, and the results combine them by weight. Ask someone to judge only part of
-      the decision, like weighing the criteria or scoring the options, if that's where their expertise is.
-    </p>
+    {#if !p.packet}
+      <p class="muted">
+        Everyone whose judgments count. Each person compares on their own, and the results combine them by weight. Ask someone to judge only part
+        of the decision, like weighing the criteria or scoring the options, if that's where their expertise is.
+      </p>
+    {/if}
   </header>
 
-  <ul class="list">
-    {#each p.evaluators as e, i (e.id)}
-      {@const prog = progressOf(e.id)}
-      {@const status = statusOf(e, prog, i === 0)}
-      {@const role = roleOf(e.tasks)}
-      <li class="person">
-        <div class="top">
-          <input class="field inline name" aria-label="Person's name" bind:value={e.name} oninput={() => session.changed()} />
-          <span class="status small" class:late={status.kind === 'out-of-date'} class:back={status.kind === 'returned'}>{statusText(status)}</span>
-          <button
-            class="btn quiet"
-            aria-label="Remove {e.name}"
-            title={p.evaluators.length === 1 ? 'A decision needs at least one person' : 'Remove, with their judgments'}
-            disabled={p.evaluators.length === 1}
-            onclick={() =>
-              edit(() => {
-                removeEvaluator(session.project, e.id);
-                if (session.scoringAs === e.id) session.scoringAs = session.project.evaluators[0].id;
-              })}>✕</button
-          >
-        </div>
-
-        <div class="work">
-          <label class="small muted field-label">
-            Judges
-            <select class="field" aria-label="What {e.name} judges" value={role} onchange={(ev) => setRole(e, ev.currentTarget.value as Role)}>
-              {#each ROLES as r (r.id)}<option value={r.id}>{r.label}</option>{/each}
-            </select>
-          </label>
-          <label class="small muted field-label">
-            Weight
-            <input
-              class="field weight"
-              type="number"
-              min="0.1"
-              step="0.1"
-              value={e.weight}
-              onchange={(ev) => edit(() => setEvaluatorWeight(session.project, e.id, ev.currentTarget.valueAsNumber))}
-            />
-          </label>
+  {#if p.packet}
+    {@const me = p.evaluators[0]}
+    {@const prog = me ? progressOf(me.id) : undefined}
+    {#if me}
+      <div class="mine">
+        <p>
+          You're judging as <strong>{me.name}</strong>. {sender(p.packet) || 'The person who sent this'} asked you to
+          {describeTasks(p, me.tasks)}.
+        </p>
+        {#if prog && prog.total > 0}
           <div class="progress small">
-            {#if prog && prog.total > 0}
-              <span class="bar" aria-hidden="true"><span style:width="{(prog.done / prog.total) * 100}%" class:full={prog.finished}></span></span>
-              <span>{prog.done} of {prog.total} done</span>
-              {#if prog.done > 1}
-                <span class:good={prog.consistent} class:rust={!prog.consistent}>{prog.consistent ? 'Consistent' : 'Has contradictions'}</span>
+            <span class="bar" aria-hidden="true"><span style:width="{(prog.done / prog.total) * 100}%" class:full={prog.finished}></span></span>
+            <span>{prog.done} of {prog.total} done</span>
+          </div>
+        {/if}
+        <p class="small muted">Other people's answers aren't in your copy; they're combined when your answers are merged back.</p>
+      </div>
+    {/if}
+  {:else}
+  <ul class="list">
+      {#each p.evaluators as e, i (e.id)}
+        {@const prog = progressOf(e.id)}
+        {@const status = statusOf(e, prog, i === 0)}
+        {@const role = roleOf(e.tasks)}
+        <li class="person">
+          <div class="top">
+            <input class="field inline name" aria-label="Person's name" bind:value={e.name} oninput={() => session.changed()} />
+            <span class="status small" class:late={status.kind === 'out-of-date'} class:back={status.kind === 'returned'}>{statusText(status)}</span>
+            <button
+              class="btn quiet"
+              aria-label="Remove {e.name}"
+              title={p.evaluators.length === 1 ? 'A decision needs at least one person' : 'Remove, with their judgments'}
+              disabled={p.evaluators.length === 1}
+              onclick={() =>
+                edit(() => {
+                  removeEvaluator(session.project, e.id);
+                  if (session.scoringAs === e.id) session.scoringAs = session.project.evaluators[0].id;
+                })}>✕</button
+            >
+          </div>
+  
+          <div class="work">
+            <label class="small muted field-label">
+              Judges
+              <select class="field" aria-label="What {e.name} judges" value={role} onchange={(ev) => setRole(e, ev.currentTarget.value as Role)}>
+                {#each ROLES as r (r.id)}<option value={r.id}>{r.label}</option>{/each}
+              </select>
+            </label>
+            <label class="small muted field-label">
+              Weight
+              <input
+                class="field weight"
+                type="number"
+                min="0.1"
+                step="0.1"
+                value={e.weight}
+                onchange={(ev) => edit(() => setEvaluatorWeight(session.project, e.id, ev.currentTarget.valueAsNumber))}
+              />
+            </label>
+            <div class="progress small">
+              {#if prog && prog.total > 0}
+                <span class="bar" aria-hidden="true"><span style:width="{(prog.done / prog.total) * 100}%" class:full={prog.finished}></span></span>
+                <span>{prog.done} of {prog.total} done</span>
+                {#if prog.done > 1}
+                  <span class:good={prog.consistent} class:rust={!prog.consistent}>{prog.consistent ? 'Consistent' : 'Has contradictions'}</span>
+                {/if}
+              {:else if prog}
+                <span class="muted">Nothing to judge yet</span>
               {/if}
-            {:else if prog}
-              <span class="muted">Nothing to judge yet</span>
-            {/if}
+            </div>
           </div>
+  
+          {#if role === 'custom' && e.tasks}
+            <fieldset class="tasks small">
+              <legend class="sr-only">What {e.name} judges</legend>
+              <label><input type="checkbox" checked={e.tasks.weigh} onchange={(ev) => toggleWeigh(e, ev.currentTarget.checked)} /> Weigh the criteria</label>
+              {#each judged as c (c.id)}
+                <label>
+                  <input type="checkbox" checked={e.tasks.score?.includes(c.id) ?? false} onchange={(ev) => toggleLeaf(e, c.id, ev.currentTarget.checked)} />
+                  Score on {c.name}
+                </label>
+              {/each}
+            </fieldset>
+          {/if}
+  
+          {#if i > 0}
+            <div class="actions">
+              {#if status.kind === 'out-of-date'}
+                <button class="btn small" disabled={busy === e.id} onclick={() => invite(e)}>Send updated copy</button>
+              {:else}
+                <button class="btn small" class:quiet={status.kind !== 'not-invited'} disabled={busy === e.id} onclick={() => invite(e)}>
+                  {status.kind === 'not-invited' ? 'Invite' : 'Invite again'}
+                </button>
+              {/if}
+              {#if status.kind !== 'not-invited' && !prog?.finished}
+                <button class="btn quiet small" onclick={() => copyReminder(e)}>Copy reminder</button>
+              {/if}
+            </div>
+          {/if}
+          {#if notice?.id === e.id}<p class="small notice" role="status">{notice.text}</p>{/if}
+        </li>
+      {/each}
+    </ul>
+    <form class="add" onsubmit={submitPerson}>
+      <input class="field" placeholder="Add a person" aria-label="New person" bind:value={newPerson} />
+      <button class="btn" type="submit" disabled={!newPerson.trim()}>Add</button>
+    </form>
+  
+    {#if p.evaluators.length > 1}
+      <section>
+        <header>
+          <h3>Collecting answers</h3>
+          <p class="muted small">When someone sends their file back, merge it here. You'll see whose answers it holds before anything changes.</p>
+        </header>
+        <div class="remote">
+          <button class="btn" onclick={() => mergeInput?.click()}>Merge returned answers</button>
+          <span class="small muted">or drop the file anywhere on this page</span>
+          <input
+            bind:this={mergeInput}
+            type="file"
+            accept=".json,application/json"
+            class="sr-only"
+            tabindex="-1"
+            aria-label="Returned decision file to merge"
+            onchange={() => {
+              const file = mergeInput?.files?.[0];
+              if (mergeInput) mergeInput.value = '';
+              if (file) onmerge(file);
+            }}
+          />
         </div>
-
-        {#if role === 'custom' && e.tasks}
-          <fieldset class="tasks small">
-            <legend class="sr-only">What {e.name} judges</legend>
-            <label><input type="checkbox" checked={e.tasks.weigh} onchange={(ev) => toggleWeigh(e, ev.currentTarget.checked)} /> Weigh the criteria</label>
-            {#each judged as c (c.id)}
-              <label>
-                <input type="checkbox" checked={e.tasks.score?.includes(c.id) ?? false} onchange={(ev) => toggleLeaf(e, c.id, ev.currentTarget.checked)} />
-                Score on {c.name}
-              </label>
-            {/each}
-          </fieldset>
-        {/if}
-
-        {#if i > 0}
-          <div class="actions">
-            {#if status.kind === 'out-of-date'}
-              <button class="btn small" disabled={busy === e.id} onclick={() => invite(e)}>Send updated copy</button>
-            {:else}
-              <button class="btn small" class:quiet={status.kind !== 'not-invited'} disabled={busy === e.id} onclick={() => invite(e)}>
-                {status.kind === 'not-invited' ? 'Invite' : 'Invite again'}
-              </button>
-            {/if}
-            {#if status.kind !== 'not-invited' && !prog?.finished}
-              <button class="btn quiet small" onclick={() => copyReminder(e)}>Copy reminder</button>
-            {/if}
-          </div>
-        {/if}
-        {#if notice?.id === e.id}<p class="small notice" role="status">{notice.text}</p>{/if}
-      </li>
-    {/each}
-  </ul>
-  <form class="add" onsubmit={submitPerson}>
-    <input class="field" placeholder="Add a person" aria-label="New person" bind:value={newPerson} />
-    <button class="btn" type="submit" disabled={!newPerson.trim()}>Add</button>
-  </form>
-
-  {#if p.evaluators.length > 1}
+      </section>
+    {/if}
+  
     <section>
       <header>
-        <h3>Collecting answers</h3>
-        <p class="muted small">When someone sends their file back, merge it here. You'll see whose answers it holds before anything changes.</p>
+        <h3>How people are combined</h3>
       </header>
-      <div class="remote">
-        <button class="btn" onclick={() => mergeInput?.click()}>Merge returned answers</button>
-        <span class="small muted">or drop the file anywhere on this page</span>
-        <input
-          bind:this={mergeInput}
-          type="file"
-          accept=".json,application/json"
-          class="sr-only"
-          tabindex="-1"
-          aria-label="Returned decision file to merge"
-          onchange={() => {
-            const file = mergeInput?.files?.[0];
-            if (mergeInput) mergeInput.value = '';
-            if (file) onmerge(file);
-          }}
-        />
+      <div class="methods" role="radiogroup" aria-label="How people are combined">
+        {#each methods as m (m.id)}
+          <button
+            class="method"
+            role="radio"
+            aria-checked={method === m.id}
+            onclick={() =>
+              edit(() => (session.project.aggregation = m.id))}
+          >
+            <strong>{m.name}</strong>
+            <span class="small muted">{m.detail}</span>
+          </button>
+        {/each}
       </div>
     </section>
   {/if}
-
-  <section>
-    <header>
-      <h3>How people are combined</h3>
-    </header>
-    <div class="methods" role="radiogroup" aria-label="How people are combined">
-      {#each methods as m (m.id)}
-        <button
-          class="method"
-          role="radio"
-          aria-checked={method === m.id}
-          onclick={() =>
-            edit(() => (session.project.aggregation = m.id))}
-        >
-          <strong>{m.name}</strong>
-          <span class="small muted">{m.detail}</span>
-        </button>
-      {/each}
-    </div>
-  </section>
 
   {#if p.alternatives.length >= 2 && p.criteria.length >= 1}
     <a class="btn primary next" href={href(p.id, 'weigh')}>Next: weigh the criteria</a>
@@ -300,6 +322,17 @@
     padding: 0;
     display: grid;
     border-top: 1px solid var(--line);
+  }
+  .mine {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    background: var(--paper);
+  }
+  .mine p {
+    margin: 0;
   }
   .person {
     display: grid;

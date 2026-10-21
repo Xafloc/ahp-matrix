@@ -1,6 +1,7 @@
 <script lang="ts">
     import { addAlternative, changeScale, removeAlternative } from '../lib/edits';
   import { colorOf } from '../lib/format';
+  import { sender } from '../lib/people';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import type { Scale } from '../lib/types';
@@ -48,67 +49,75 @@
     ></textarea>
   </section>
 
-  <section>
-    <header>
-      <h2>Options</h2>
-      <p class="muted">The things you're choosing between.</p>
-    </header>
-    <ul class="list">
-      {#each p.alternatives as a (a.id)}
-        <li class="item">
-          <span class="chip" style:background={colorOf(a.color)} aria-hidden="true"></span>
-          <input class="field inline name" aria-label="Option name" bind:value={a.name} oninput={() => session.changed()} />
-          <input
-            class="field inline desc"
-            aria-label="Notes about {a.name}"
-            placeholder="Notes"
-            bind:value={a.description}
-            oninput={() => session.changed()}
-          />
-          <button class="btn quiet" aria-label="Remove {a.name}" title="Remove" onclick={() => edit(() => removeAlternative(session.project, a.id))}>✕</button>
-        </li>
-      {/each}
-    </ul>
-    <form class="add" onsubmit={submitAlt}>
-      <input class="field" placeholder="Add an option, then press Enter" aria-label="New option" bind:value={newAlt} />
-      <button class="btn" type="submit" disabled={!newAlt.trim()}>Add</button>
-    </form>
-  </section>
+  {#if p.packet}
+    <p class="locked-note">
+      The options and criteria are set by {sender(p.packet) || 'the person who sent you this decision'}, so your answers can be merged
+      back into theirs. If something's missing or wrong, tell them and they'll send an updated copy.
+    </p>
+  {/if}
+  <fieldset class="structure" disabled={!!p.packet}>
+    <section>
+      <header>
+        <h2>Options</h2>
+        <p class="muted">The things you're choosing between.</p>
+      </header>
+      <ul class="list">
+        {#each p.alternatives as a (a.id)}
+          <li class="item">
+            <span class="chip" style:background={colorOf(a.color)} aria-hidden="true"></span>
+            <input class="field inline name" aria-label="Option name" bind:value={a.name} oninput={() => session.changed()} />
+            <input
+              class="field inline desc"
+              aria-label="Notes about {a.name}"
+              placeholder="Notes"
+              bind:value={a.description}
+              oninput={() => session.changed()}
+            />
+            <button class="btn quiet" aria-label="Remove {a.name}" title="Remove" onclick={() => edit(() => removeAlternative(session.project, a.id))}>✕</button>
+          </li>
+        {/each}
+      </ul>
+      <form class="add" onsubmit={submitAlt}>
+        <input class="field" placeholder="Add an option, then press Enter" aria-label="New option" bind:value={newAlt} />
+        <button class="btn" type="submit" disabled={!newAlt.trim()}>Add</button>
+      </form>
+    </section>
 
-  <section>
-    <header>
-      <h2>Criteria</h2>
-      <p class="muted">What matters. Group related criteria by dragging one onto another; you'll only compare criteria within the same group.</p>
-    </header>
-    <CriteriaTree {session} />
-  </section>
+    <section>
+      <header>
+        <h2>Criteria</h2>
+        <p class="muted">What matters. Group related criteria by dragging one onto another; you'll only compare criteria within the same group.</p>
+      </header>
+      <CriteriaTree {session} locked={!!p.packet} />
+    </section>
 
-  <section>
-    <header>
-      <h2>Comparison scale</h2>
-    </header>
-    <div class="scales" role="radiogroup" aria-label="Comparison scale">
-      {#each scales as s}
-        <button class="scale" role="radio" aria-checked={p.scale === s.id} onclick={() => pickScale(s.id)}>
-          <strong>{s.name}</strong>
-          <span class="small muted">{s.detail}</span>
-        </button>
-      {/each}
-    </div>
-    {#if pendingScale}
-      <div class="confirm" role="alert">
-        <span>Existing comparisons will be rounded to the nearest value on the new scale.</span>
-        <button
-          class="btn"
-          onclick={() => {
-            edit(() => changeScale(session.project, pendingScale!));
-            pendingScale = null;
-          }}>Change scale</button
-        >
-        <button class="btn quiet" onclick={() => (pendingScale = null)}>Cancel</button>
+    <section>
+      <header>
+        <h2>Comparison scale</h2>
+      </header>
+      <div class="scales" role="radiogroup" aria-label="Comparison scale">
+        {#each scales as s}
+          <button class="scale" role="radio" aria-checked={p.scale === s.id} onclick={() => pickScale(s.id)}>
+            <strong>{s.name}</strong>
+            <span class="small muted">{s.detail}</span>
+          </button>
+        {/each}
       </div>
-    {/if}
-  </section>
+      {#if pendingScale}
+        <div class="confirm" role="alert">
+          <span>Existing comparisons will be rounded to the nearest value on the new scale.</span>
+          <button
+            class="btn"
+            onclick={() => {
+              edit(() => changeScale(session.project, pendingScale!));
+              pendingScale = null;
+            }}>Change scale</button
+          >
+          <button class="btn quiet" onclick={() => (pendingScale = null)}>Cancel</button>
+        </div>
+      {/if}
+    </section>
+  </fieldset>
 
   {#if p.alternatives.length >= 2 && p.criteria.length >= 1}
     <a class="btn primary next" href={href(p.id, p.evaluators.length > 1 ? 'people' : 'weigh')}>
@@ -130,6 +139,20 @@
   header {
     display: grid;
     gap: 0.25rem;
+  }
+  .structure {
+    display: grid;
+    gap: 2.5rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .locked-note {
+    margin: 0;
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-s);
+    background: var(--brass-wash);
   }
   .about textarea {
     resize: vertical;

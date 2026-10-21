@@ -20,7 +20,13 @@ const packet = { for: 'e2', from: 'Darren', sentAt: '2026-10-20T10:00:00Z', stru
 
 describe('peek', () => {
   it('reads the id, origin and packet of a decision file', async () => {
-    expect(await peek(file({ id: 'P1', origin: 'P0', name: 'Laptops', packet }))).toEqual({ id: 'P1', origin: 'P0', name: 'Laptops', packet });
+    expect(await peek(file({ id: 'P1', origin: 'P0', name: 'Laptops', packet, pairwise: [{}, {}], ratings: [{}] }))).toEqual({
+      id: 'P1',
+      origin: 'P0',
+      name: 'Laptops',
+      packet,
+      answers: 3,
+    });
   });
   it('gives up quietly on spreadsheets and broken files', async () => {
     expect(await peek(new File(['PK'], 'pm.xlsx'))).toBeNull();
@@ -32,14 +38,17 @@ describe('peek', () => {
 describe('mergeTarget', () => {
   const library = [summary('P1'), summary('P2', true)];
   it('finds the decision a returned copy came from, by id or by origin', () => {
-    expect(mergeTarget({ id: 'P1', name: '', packet }, library)?.id).toBe('P1');
-    expect(mergeTarget({ id: 'NEW', origin: 'P1', name: '', packet }, library)?.id).toBe('P1');
+    expect(mergeTarget({ id: 'P1', name: '', packet, answers: 2 }, library)?.id).toBe('P1');
+    expect(mergeTarget({ id: 'NEW', origin: 'P1', name: '', packet, answers: 2 }, library)?.id).toBe('P1');
   });
   it("doesn't offer to merge a file that isn't a sent copy", () => {
-    expect(mergeTarget({ id: 'P1', name: '' }, library)).toBeNull();
+    expect(mergeTarget({ id: 'P1', name: '', answers: 2 }, library)).toBeNull();
   });
   it("doesn't offer to merge into a copy you were sent yourself", () => {
-    expect(mergeTarget({ id: 'P2', name: '', packet }, library)).toBeNull();
+    expect(mergeTarget({ id: 'P2', name: '', packet, answers: 2 }, library)).toBeNull();
+  });
+  it("treats an invitation with no answers yet as a copy to judge, not answers to merge", () => {
+    expect(mergeTarget({ id: 'P1', name: '', packet, answers: 0 }, library)).toBeNull();
   });
 });
 

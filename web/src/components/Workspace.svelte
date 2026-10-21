@@ -4,7 +4,9 @@
   import { href, type Step } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import { ALL_EVALUATORS, type MergeReport, type Project } from '../lib/types';
-  import { api } from '../lib/api';
+  import { api, exportUrl } from '../lib/api';
+  import { slug } from '../lib/format';
+  import { sender, weighs } from '../lib/people';
   import { mergedText, undoMerge } from '../lib/returned';
   import Mark from './Mark.svelte';
   import MergeDialog from './MergeDialog.svelte';
@@ -22,6 +24,7 @@
 
   const weigh = $derived(weighProgress(p, session.scoringAs));
   const score = $derived(scoreProgress(p, session.scoringAs));
+  const judge = $derived(p.evaluators.find((e) => e.id === session.scoringAs));
   const ready = $derived(p.alternatives.length >= 2 && p.criteria.length >= 1);
   const people = $derived(session.results[ALL_EVALUATORS]?.people ?? []);
   const finished = $derived(people.filter((x) => x.finished).length);
@@ -34,8 +37,8 @@
       detail: p.evaluators.length === 1 ? 'Just you' : `${count(p.evaluators.length, 'person', 'people')}, ${finished} finished`,
       done: p.evaluators.length > 1 && finished === p.evaluators.length,
     },
-    { id: 'weigh' as Step, label: 'Weigh criteria', detail: weigh.total ? `${weigh.done} of ${weigh.total} compared` : 'Nothing to compare yet', done: weigh.total > 0 && weigh.done === weigh.total },
-    { id: 'score' as Step, label: 'Score options', detail: score.total ? `${score.done} of ${score.total} judged` : 'Nothing to score yet', done: score.total > 0 && score.done === score.total },
+    { id: 'weigh' as Step, label: 'Weigh criteria', detail: weigh.total ? `${weigh.done} of ${weigh.total} compared` : weighs(judge?.tasks) ? 'Nothing to compare yet' : 'Not assigned', done: weigh.total > 0 && weigh.done === weigh.total },
+    { id: 'score' as Step, label: 'Score options', detail: score.total ? `${score.done} of ${score.total} judged` : judge?.tasks && !judge.tasks.scoreAll && !judge.tasks.score?.length ? 'Not assigned' : 'Nothing to score yet', done: score.total > 0 && score.done === score.total },
     { id: 'results' as Step, label: 'Results', detail: '', done: false },
     { id: 'sensitivity' as Step, label: 'What if', detail: 'How robust is the winner?', done: false },
   ]);
@@ -46,7 +49,28 @@
   let toast = $state<{ text: string; undo?: { before: Project; version: number } } | null>(null);
   const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files');
 
+  // A copy someone sent to be judged.
+  const received = $derived(p.packet ? { from: sender(p.packet), me: p.evaluators[0]?.name ?? '' } : null);
+  let sentBack = $state('');
+
+  async function sendBack() {
+    await session.flush();
+    if (session.unsaved) {
+      toast = { text: 'Fix the unsaved changes first; then send your answers back.' };
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = exportUrl(p.id, 'ahp.json');
+    a.download = '';
+    a.click();
+    sentBack = `${slug(p.name)}-answers-from-${slug(received?.me ?? '')}.ahp.json`;
+  }
+
   async function startMerge(file: File) {
+    if (received) {
+      toast = { text: "This is a copy you were sent, so there's nothing to merge into it." };
+      return;
+    }
     await session.flush();
     if (session.unsaved) {
       toast = { text: 'Fix the unsaved changes first; then merge.' };
@@ -130,6 +154,23 @@
     <ThemeToggle />
   </header>
 
+  <div class="banners">
+  {#if received}
+    <div class="received no-print">
+      <p>
+        {received.from ? `${received.from} asked you to judge this decision.` : 'You were asked to judge this decision.'}
+        You're judging as {received.me}.
+      </p>
+      <button class="btn primary small" onclick={sendBack}>Send your answers back</button>
+      {#if sentBack}
+        <p class="small next" role="status">
+          Downloaded. Email {sentBack} to {received.from || 'whoever sent you this decision'}. It holds only
+          your answers; they'll merge it into theirs.
+        </p>
+      {/if}
+    </div>
+  {/if}
+
   {#if session.saveState === 'conflict'}
     <div class="banner no-print" role="alert">
       <span>{session.error} Keep your version, or load the other one and lose your recent edits?</span>
@@ -142,6 +183,7 @@
       <button class="btn" onclick={() => session.retry()}>Try again</button>
     </div>
   {/if}
+  </div>
 
   <nav class="rail no-print" aria-label="Steps">
     <ol>
@@ -238,7 +280,6 @@
     width: auto;
   }
   .banner {
-    grid-area: banner;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -246,6 +287,25 @@
     background: var(--rust-wash);
     border-bottom: 1px solid var(--line);
     flex-wrap: wrap;
+  }
+  .banners {
+    grid-area: banner;
+  }
+  .received {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 1rem;
+    padding: 0.6rem clamp(0.75rem, 2vw, 1.5rem);
+    background: var(--brass-wash);
+    border-bottom: 1px solid var(--line);
+  }
+  .received p {
+    margin: 0;
+  }
+  .received .next {
+    flex-basis: 100%;
+    color: var(--ink-2);
   }
   .rail {
     grid-area: rail;

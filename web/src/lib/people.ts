@@ -1,5 +1,7 @@
-import type { Evaluator, PersonProgress, Tasks } from './types';
 import type { Progress } from './progress';
+import { groups, leaves } from './tree';
+import { list } from './format';
+import type { Criterion, Evaluator, PacketInfo, PersonProgress, Project, Tasks } from './types';
 
 /** What a person is asked to judge, as the People step offers it. */
 export type Role = 'all' | 'weigh' | 'score' | 'custom';
@@ -65,4 +67,45 @@ export function reminder(decision: string, person: string, progress: Progress, f
         ? "It looks like you've finished: could you send the file back?"
         : `You've got ${left} of ${progress.total} comparisons left.`;
   return `Hi ${person}, a reminder about "${decision}". ${where} Open the file I sent with Import file in AHP Matrix, then export it from the library and send it back to me. Thanks, ${from}`;
+}
+
+/** Whether someone with these tasks compares the criteria. */
+export const weighs = (tasks: Tasks | undefined) => !tasks || tasks.weigh;
+
+/**
+ * Whether someone with these tasks scores the options on leaf c. Measured
+ * values go with scoring everything: they're entered once, not judged.
+ */
+export function assigns(tasks: Tasks | undefined, c: Criterion): boolean {
+  if (!tasks || tasks.scoreAll) return true;
+  return c.method !== 'value' && (tasks.score ?? []).includes(c.id);
+}
+
+/** Where to open the decision for someone: their first assigned task. */
+export function firstTask(p: Project, e: Evaluator): { step: 'weigh' | 'score' | 'results'; sub: string } {
+  const g = groups(p);
+  if (weighs(e.tasks) && g.length) return { step: 'weigh', sub: g[0].parentId || 'root' };
+  const mine = leaves(p).filter((c) => assigns(e.tasks, c));
+  const leaf = mine.find((c) => c.method !== 'value') ?? mine[0];
+  return leaf ? { step: 'score', sub: leaf.id } : { step: 'results', sub: '' };
+}
+
+/** Who sent a copy, if they named themselves (new decisions start with "Me"). */
+export function sender(packet: PacketInfo | undefined): string {
+  const from = packet?.from.trim() ?? '';
+  return from === 'Me' ? '' : from;
+}
+
+/** "weigh the criteria and score the options on Speed and Cost". */
+export function describeTasks(p: Project, tasks: Tasks | undefined): string {
+  const parts: string[] = [];
+  if (weighs(tasks)) parts.push('weigh the criteria');
+  if (!tasks || tasks.scoreAll) parts.push('score the options on every criterion');
+  else {
+    const names = leaves(p)
+      .filter((c) => tasks.score?.includes(c.id))
+      .map((c) => c.name);
+    if (names.length) parts.push(`score the options on ${list(names)}`);
+  }
+  return parts.length ? parts.join(' and ') : 'nothing yet';
 }

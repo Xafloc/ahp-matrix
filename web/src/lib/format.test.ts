@@ -25,3 +25,12 @@ test('count pluralizes', () => {
   expect(count(6, 'criterion', 'criteria')).toBe('6 criteria');
   expect(count(0, 'option')).toBe('0 options');
 });
+
+test('slug matches the server’s file names', async () => {
+  const { slug } = await import('./format');
+  expect(slug('Hiring a senior engineer')).toBe('hiring-a-senior-engineer');
+  expect(slug("  Priya's  answers!! ")).toBe('priya-s-answers');
+  expect(slug('Ünïcode only ☃')).toBe('n-code-only');
+  expect(slug('!!!')).toBe('project');
+  expect(slug('a'.repeat(50))).toHaveLength(40);
+});
