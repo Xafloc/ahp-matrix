@@ -1,0 +1,47 @@
+web/src/components/Results.svelte
+  s_65743add7cce22::t_842d71b52c0a26 3,47-49,120,128-129
+web/src/components/compare.test.ts
+  s_65743add7cce22::t_ca342cf8d0c033 132-135
+web/src/lib/peoplescale.test.ts
+  s_65743add7cce22::t_ca342cf8d0c033 2,56-62
+  s_65743add7cce22::t_8ded26fb459e73 63
+web/src/lib/peoplescale.ts
+  s_65743add7cce22::t_2d67129a9a2902 56-62
+web/e2e/discussion.spec.ts
+  s_65743add7cce22::t_be438b9d1e1d81 69-79
+internal/model/group_test.go
+  s_65743add7cce22::t_d40b41a0ef8b03 235-251
+web/src/components/PeopleScale.svelte
+  s_65743add7cce22::t_2d67129a9a2902 4-7,30-33,36-39,47,51-63,66-79,86,107-108,125-134
+internal/server/projects.go
+  s_65743add7cce22::t_abc4a2cb396d17 261-266,281-315,321-338
+  s_65743add7cce22::t_21134f9fcc2f6c 316-320
+  s_65743add7cce22::t_0566f035fc4b39 339
+web/src/lib/agreement.test.ts
+  s_65743add7cce22::t_a3be2cb638c9e4 2,45-61
+  s_65743add7cce22::t_d295aaaede1ba1 62
+internal/model/compute.go
+  s_65743add7cce22::t_6f0a173ff7c11c 67-68,153,712-719,744
+web/src/lib/agreement.ts
+  s_65743add7cce22::t_facf95d94216b6 42-57
+internal/server/exchange_test.go
+  s_65743add7cce22::t_d9d2369faafbf8 5,13
+  s_65743add7cce22::t_e85ad9c7cf0c0b 302-317
+  s_65743add7cce22::t_a8232af1160444 255-301
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "24f515b256174ec7bf4107878657dbfb4b2e9b04",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
