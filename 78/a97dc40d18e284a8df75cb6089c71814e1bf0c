@@ -1,0 +1,60 @@
+web/src/lib/agreement.ts
+  s_65743add7cce22::t_58d13a374bed9c 29-31
+web/src/lib/peoplescale.test.ts
+  s_65743add7cce22::t_986c2a80c7cf56 39-51,53-55
+  s_65743add7cce22::t_d603e4092f155d 52
+web/src/components/Hidden.svelte
+  s_65743add7cce22::t_c4c6ffd8f7f375 9,17-18,20-21
+internal/model/testdata/golden/wide-e1.json
+  s_65743add7cce22::t_a040d855214f2d 1145-1146,1155-1156
+internal/model/testdata/golden/fixture.json
+  s_65743add7cce22::t_a040d855214f2d 329-347,356-357
+web/src/components/Results.svelte
+  s_65743add7cce22::t_cc34b3f65157b6 186
+  s_65743add7cce22::t_c4c6ffd8f7f375 7,46-47,50,117,133-134,189-191,199,201
+web/src/lib/independence.test.ts
+  s_65743add7cce22::t_cc34b3f65157b6 6
+internal/model/compute.go
+  s_65743add7cce22::t_ceb4e645790683 63-68,148-158,699-700,708-730,738
+web/src/lib/types.ts
+  s_65743add7cce22::t_c4c6ffd8f7f375 187-190
+internal/model/group_test.go
+  s_65743add7cce22::t_2662bbca4847f6 208-234
+web/src/lib/peoplescale.ts
+  s_65743add7cce22::t_58d13a374bed9c 24-28,37,39-45,48-49,51-52,54
+web/src/components/PeopleScale.svelte
+  s_65743add7cce22::t_c4c6ffd8f7f375 46-47,68,100-101,105,107,110-111,120-121,126,128,130,133
+  s_65743add7cce22::t_0a9d4ea1546ac3 104,106,112,127,131,134
+  s_65743add7cce22::t_b18e13490182dd 132
+web/src/lib/people.test.ts
+  s_65743add7cce22::t_cc34b3f65157b6 28
+web/src/App.svelte
+  s_65743add7cce22::t_c4c6ffd8f7f375 92
+internal/model/testdata/golden/wide.json
+  s_65743add7cce22::t_a040d855214f2d 1246-1274,1283-1311
+web/e2e/discussion.spec.ts
+  s_65743add7cce22::t_4ef81b1c180133 27,30,61-67
+  s_65743add7cce22::t_26d5aea716dcb0 68
+web/src/components/PairCompare.svelte
+  s_65743add7cce22::t_c4c6ffd8f7f375 41,48-50
+web/src/lib/agreement.test.ts
+  s_65743add7cce22::t_986c2a80c7cf56 39-44
+internal/model/testdata/golden/fixture-e1.json
+  s_65743add7cce22::t_a040d855214f2d 329-330,339-340
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "78a97dc40d18e284a8df75cb6089c71814e1bf0c",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
