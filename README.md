@@ -60,7 +60,8 @@ Answers stay independent: while someone still has comparisons to make, their res
 so others' answers don't sway theirs. Once everyone's in, Results shows each person's ranking beside the combined one, says
 whether they agree on the winner, and puts everyone's answer to each contested pair on one scale, with **Revise my answer**.
 
-If you change the decision after sending a copy, that person shows as **Out of date**, with **Send updated copy**. Answers can
+If you change the decision after sending a copy, that person shows as **Out of date**, with **Send updated copy**. Importing
+the updated copy in the app updates the one they have, keeping the answers they've already given. Answers can
 be combined in two ways: **combine answers** (the AHP standard: each comparison is averaged across people first) or
 **combine rankings** (each person gets their own ranking, and the rankings are averaged), which suits people who each judge
 a different part.
