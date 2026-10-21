@@ -104,7 +104,9 @@
     if (!file) return;
     if (fileInput) fileInput.value = '';
     const info = await peek(file);
-    const target = info && mergeTarget(info, projects ?? []);
+    // Match against the library as it is now, even if it hadn't loaded yet.
+    const library = info?.packet ? await api.listProjects().catch(() => projects ?? []) : [];
+    const target = info && mergeTarget(info, library);
     if (info && target) {
       offer = { target: { id: target.id!, name: target.name }, file };
       return;
