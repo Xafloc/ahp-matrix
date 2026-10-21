@@ -3,7 +3,9 @@
   import { scoreProgress, weighProgress } from '../lib/progress';
   import { href, type Step } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
+  import { ALL_EVALUATORS } from '../lib/types';
   import Mark from './Mark.svelte';
+  import PeopleStep from './PeopleStep.svelte';
   import Results from './Results.svelte';
   import Score from './Score.svelte';
   import Sensitivity from './Sensitivity.svelte';
@@ -17,9 +19,17 @@
   const weigh = $derived(weighProgress(p, session.scoringAs));
   const score = $derived(scoreProgress(p, session.scoringAs));
   const ready = $derived(p.alternatives.length >= 2 && p.criteria.length >= 1);
+  const people = $derived(session.results[ALL_EVALUATORS]?.people ?? []);
+  const finished = $derived(people.filter((x) => x.finished).length);
 
   const steps = $derived([
     { id: 'setup' as Step, label: 'Set up', detail: `${count(p.alternatives.length, 'option')}, ${count(p.criteria.length, 'criterion', 'criteria')}`, done: ready },
+    {
+      id: 'people' as Step,
+      label: 'People',
+      detail: p.evaluators.length === 1 ? 'Just you' : `${count(p.evaluators.length, 'person', 'people')}, ${finished} finished`,
+      done: p.evaluators.length > 1 && finished === p.evaluators.length,
+    },
     { id: 'weigh' as Step, label: 'Weigh criteria', detail: weigh.total ? `${weigh.done} of ${weigh.total} compared` : 'Nothing to compare yet', done: weigh.total > 0 && weigh.done === weigh.total },
     { id: 'score' as Step, label: 'Score options', detail: score.total ? `${score.done} of ${score.total} judged` : 'Nothing to score yet', done: score.total > 0 && score.done === score.total },
     { id: 'results' as Step, label: 'Results', detail: '', done: false },
@@ -92,6 +102,8 @@
   <main class="content">
     {#if step === 'setup'}
       <Setup {session} />
+    {:else if step === 'people'}
+      <PeopleStep {session} />
     {:else if step === 'weigh'}
       <Weigh {session} {sub} />
     {:else if step === 'score'}

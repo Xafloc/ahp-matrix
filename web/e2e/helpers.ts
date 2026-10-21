@@ -17,3 +17,13 @@ export async function addAll(page: Page, field: string, names: string[]) {
 }
 
 export const saved = (page: Page) => expect(page.getByText('All changes saved')).toBeVisible();
+
+/** Opens the People step of the open decision. */
+export async function openPeople(page: Page) {
+  await page.getByRole('navigation', { name: 'Steps' }).getByRole('link', { name: /People/ }).click();
+  await expect(page.getByRole('heading', { name: 'Who is judging' })).toBeVisible();
+}
+
+/** The People step's row for one person. */
+export const personRow = (page: Page, name: string) =>
+  page.getByRole('listitem').filter({ has: page.getByRole('button', { name: `Remove ${name}` }) });

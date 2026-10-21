@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addAll, createDecision, saved } from './helpers';
+import { addAll, createDecision, openPeople, saved } from './helpers';
 
 test('a decision from an empty library to a robust answer', async ({ page }) => {
   await createDecision(page, 'Lunch spot');
@@ -102,11 +102,13 @@ test('leaving right after an edit still saves it', async ({ page }) => {
 
 test('removing the person you are judging as switches to someone else', async ({ page }) => {
   await createDecision(page, 'Two judges');
+  await openPeople(page);
   await addAll(page, 'New person', ['Priya']);
   await page.getByLabel('Judging as').selectOption({ label: 'Priya' });
   await page.getByRole('button', { name: 'Remove Priya' }).click();
   await saved(page);
   await expect(page.getByLabel('Judging as')).toHaveCount(0); // only one person left
+  await page.getByRole('link', { name: /Set up/ }).click();
   await addAll(page, 'New option', ['X', 'Y']);
   await addAll(page, 'New criterion', ['Speed', 'Cost']);
   await page.getByRole('link', { name: /Weigh criteria/ }).click();

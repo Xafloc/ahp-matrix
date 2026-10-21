@@ -19,9 +19,9 @@ test('the results say how several people are combined', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
   await expect(page.getByText('Comparisons are combined with a weighted geometric mean')).toBeVisible();
-  await page.getByRole('link', { name: /Set up/ }).click();
-  await page.getByText('How are people combined?').click();
-  await expect(page.getByText('Comparisons are combined with a weighted geometric mean')).toBeVisible();
+  await page.getByRole('link', { name: /People/ }).click();
+  await expect(page.getByRole('radio', { name: /Combine answers/ })).toBeChecked();
+  await expect(page.getByRole('radio', { name: /Combine answers/ })).toContainText('weighted geometric mean');
 });
 
 test('all pairs can be weighed on one screen', async ({ page }) => {

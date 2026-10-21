@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { ApiError, api, exportUrl, type MergePolicy } from '../lib/api';
-  import { addAlternative, addEvaluator, changeScale, removeAlternative, removeEvaluator, setEvaluatorWeight } from '../lib/edits';
-  import { combineNote } from '../lib/copy';
-  import { colorOf, count } from '../lib/format';
+    import { addAlternative, changeScale, removeAlternative } from '../lib/edits';
+  import { colorOf } from '../lib/format';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import type { Scale } from '../lib/types';
@@ -12,48 +10,7 @@
   const p = $derived(session.project);
 
   let newAlt = $state('');
-  let newEvaluator = $state('');
   let pendingScale = $state<Scale | null>(null);
-  let mergeInput = $state<HTMLInputElement | undefined>();
-  let mergeFile = $state<File | null>(null);
-  let mergeConflict = $state<string[]>([]);
-  let mergeNote = $state('');
-  let mergeError = $state('');
-
-  // Brings a returned file's judgments in. Unsaved edits are saved first; if
-  // the file holds judgments for people already here, ask before replacing.
-  async function merge(existing?: MergePolicy) {
-    const file = mergeFile;
-    if (!file) return;
-    mergeError = mergeNote = '';
-    await session.flush();
-    if (session.unsaved) {
-      mergeError = 'Fix the unsaved changes first; then merge.';
-      return;
-    }
-    try {
-      const { report } = await api.mergeFile(p.id, file, existing);
-      await session.reload();
-      mergeConflict = [];
-      const who = [...report.added, ...report.replaced];
-      mergeNote =
-        who.length === 0
-          ? 'Nothing merged: the current judgments were kept.'
-          : `Merged ${count(report.judgments, 'judgment')} from ${who.join(', ')}.` +
-            (report.dropped.length ? ` ${count(report.dropped.length, 'judgment')} about options or criteria no longer in this decision ${report.dropped.length === 1 ? 'was' : 'were'} left out.` : '');
-      mergeFile = null;
-    } catch (e) {
-      if (e instanceof ApiError && e.code === 'evaluator-exists') {
-        mergeConflict = (e.details as { evaluators: string[] }).evaluators;
-      } else {
-        mergeConflict = []; // the question no longer applies
-        mergeError = `${file.name} couldn't be merged: ${e instanceof Error ? e.message : e}`;
-        mergeFile = null;
-      }
-    }
-    if (mergeInput) mergeInput.value = '';
-  }
-
   function edit(fn: () => void) {
     fn();
     session.changed();
@@ -64,13 +21,6 @@
     if (!newAlt.trim()) return;
     edit(() => addAlternative(session.project, newAlt));
     newAlt = '';
-  }
-
-  function submitEvaluator(e: SubmitEvent) {
-    e.preventDefault();
-    if (!newEvaluator.trim()) return;
-    edit(() => addEvaluator(session.project, newEvaluator));
-    newEvaluator = '';
   }
 
   function pickScale(s: Scale) {
@@ -135,84 +85,6 @@
 
   <section>
     <header>
-      <h2>People</h2>
-      <p class="muted">Everyone whose judgments count. Each person compares on their own; results combine them, weighted.</p>
-      <details class="how small">
-        <summary>How are people combined?</summary>
-        <p class="muted">{combineNote}</p>
-      </details>
-    </header>
-    <ul class="list">
-      {#each p.evaluators as e (e.id)}
-        <li class="item">
-          <input class="field inline name" aria-label="Person's name" bind:value={e.name} oninput={() => session.changed()} />
-          <label class="small muted weight">
-            Weight
-            <input
-              class="field"
-              type="number"
-              min="0.1"
-              step="0.1"
-              value={e.weight}
-              onchange={(ev) => edit(() => setEvaluatorWeight(session.project, e.id, ev.currentTarget.valueAsNumber))}
-            />
-          </label>
-          <a class="btn quiet small" href={exportUrl(p.id, 'ahp.json', e.id)} download title="A copy with only {e.name}'s judgments, for them to fill in">
-            Send their copy
-          </a>
-          <button
-            class="btn quiet"
-            aria-label="Remove {e.name}"
-            title={p.evaluators.length === 1 ? 'A decision needs at least one person' : 'Remove, with their judgments'}
-            disabled={p.evaluators.length === 1}
-            onclick={() =>
-              edit(() => {
-                removeEvaluator(session.project, e.id);
-                if (session.scoringAs === e.id) session.scoringAs = session.project.evaluators[0].id;
-              })}>✕</button
-          >
-        </li>
-      {/each}
-    </ul>
-    <form class="add" onsubmit={submitEvaluator}>
-      <input class="field" placeholder="Add a person" aria-label="New person" bind:value={newEvaluator} />
-      <button class="btn" type="submit" disabled={!newEvaluator.trim()}>Add</button>
-    </form>
-    <div class="remote">
-      <p class="small muted">
-        Someone judging remotely? Send them their copy. They open it with Import file in their own AHP Matrix, make their comparisons,
-        export it from the library, and send it back for you to merge.
-      </p>
-      <button class="btn" onclick={() => mergeInput?.click()}>Merge a returned file</button>
-      <input
-        bind:this={mergeInput}
-        type="file"
-        accept=".json,application/json"
-        class="sr-only"
-        tabindex="-1"
-        aria-label="Returned decision file to merge"
-        onchange={() => {
-          mergeFile = mergeInput?.files?.[0] ?? null;
-          merge();
-        }}
-      />
-      {#if mergeConflict.length}
-        <div class="confirm" role="alert">
-          <span>
-            {mergeConflict.join(', ')} already {mergeConflict.length === 1 ? 'has' : 'have'} judgments here. Replace them with the ones in
-            {mergeFile?.name}, or keep the current ones?
-          </span>
-          <button class="btn" onclick={() => merge('replace')}>Replace</button>
-          <button class="btn quiet" onclick={() => merge('skip')}>Keep current</button>
-        </div>
-      {/if}
-      {#if mergeNote}<p class="small" role="status">{mergeNote}</p>{/if}
-      {#if mergeError}<p class="small rust" role="alert">{mergeError}</p>{/if}
-    </div>
-  </section>
-
-  <section>
-    <header>
       <h2>Comparison scale</h2>
     </header>
     <div class="scales" role="radiogroup" aria-label="Comparison scale">
@@ -239,7 +111,9 @@
   </section>
 
   {#if p.alternatives.length >= 2 && p.criteria.length >= 1}
-    <a class="btn primary next" href={href(p.id, 'weigh')}>Next: weigh the criteria</a>
+    <a class="btn primary next" href={href(p.id, p.evaluators.length > 1 ? 'people' : 'weigh')}>
+      {p.evaluators.length > 1 ? 'Next: check who is judging' : 'Next: weigh the criteria'}
+    </a>
   {/if}
 </div>
 
@@ -289,34 +163,10 @@
     flex: 2 1 14rem;
     color: var(--ink-2);
   }
-  .weight {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .weight input {
-    width: 5rem;
-  }
   .add {
     display: flex;
     gap: 0.5rem;
     max-width: 30rem;
-  }
-  .how summary {
-    cursor: pointer;
-    color: var(--ink-2);
-    width: fit-content;
-  }
-  .how p {
-    margin-top: 0.3rem;
-  }
-  .remote {
-    display: grid;
-    gap: 0.5rem;
-    justify-items: start;
-  }
-  .rust {
-    color: var(--rust);
   }
   .scales {
     display: grid;

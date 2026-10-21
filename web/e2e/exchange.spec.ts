@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { addAll, createDecision, saved } from './helpers';
+import { addAll, createDecision, openPeople, personRow, saved } from './helpers';
 
 const fixture = fileURLToPath(new URL('./fixtures/Priority Matrix - Example.xlsx', import.meta.url));
 
@@ -47,10 +47,10 @@ test('results download as Excel and CSV', async ({ page }) => {
 test("a colleague's returned copy merges back, after asking", async ({ page }, info) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
-  await page.getByRole('link', { name: /Set up/ }).click();
+  await openPeople(page);
 
   const download = page.waitForEvent('download');
-  await page.getByRole('listitem').filter({ has: page.getByRole('button', { name: 'Remove Product manager' }) }).getByRole('link', { name: 'Send their copy' }).click();
+  await personRow(page, 'Product manager').getByRole('button', { name: 'Invite' }).click();
   const copy = await download;
   expect(copy.suggestedFilename()).toBe('hiring-a-senior-engineer-for-product-manager.ahp.json');
   const path = info.outputPath(copy.suggestedFilename());
@@ -60,7 +60,7 @@ test("a colleague's returned copy merges back, after asking", async ({ page }, i
   await expect(page.getByRole('alert')).toContainText('Product manager already has judgments here.');
   await page.getByRole('button', { name: 'Replace' }).click();
   // 6 criteria pairs + 4 × 3 option pairs
-  await expect(page.getByRole('status')).toContainText('Merged 18 judgments from Product manager.');
+  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 18 judgments from Product manager.');
 });
 
 test('↑ and ↓ move the balance like → and ←', async ({ page }) => {
@@ -80,10 +80,11 @@ test("someone's first returned copy merges without asking", async ({ page }, inf
   await createDecision(page, 'First return');
   await addAll(page, 'New option', ['X', 'Y']);
   await addAll(page, 'New criterion', ['Only']);
+  await openPeople(page);
   await addAll(page, 'New person', ['Carol']);
   await saved(page);
   const download = page.waitForEvent('download');
-  await page.getByRole('listitem').filter({ has: page.getByRole('button', { name: 'Remove Carol' }) }).getByRole('link', { name: 'Send their copy' }).click();
+  await personRow(page, 'Carol').getByRole('button', { name: 'Invite' }).click();
   const path = info.outputPath('carol.ahp.json');
   await (await download).saveAs(path);
   // Carol fills in her one comparison.
@@ -93,16 +94,16 @@ test("someone's first returned copy merges without asking", async ({ page }, inf
   writeFileSync(path, JSON.stringify(copy));
 
   await page.getByLabel('Returned decision file to merge').setInputFiles(path);
-  await expect(page.getByRole('status')).toContainText('Merged 1 judgment from Carol.');
+  await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 1 judgment from Carol.');
   await expect(page.getByText('already has judgments here')).toHaveCount(0);
 });
 
 test('a returned file that fails to merge clears the question and says why', async ({ page }, info) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
-  await page.getByRole('link', { name: /Set up/ }).click();
+  await openPeople(page);
   const download = page.waitForEvent('download');
-  await page.getByRole('listitem').filter({ has: page.getByRole('button', { name: 'Remove Product manager' }) }).getByRole('link', { name: 'Send their copy' }).click();
+  await personRow(page, 'Product manager').getByRole('button', { name: 'Invite' }).click();
   const path = info.outputPath('pm.ahp.json');
   await (await download).saveAs(path);
   const copy = JSON.parse(readFileSync(path, 'utf8'));
