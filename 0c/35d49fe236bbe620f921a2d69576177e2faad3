@@ -1,0 +1,48 @@
+internal/model/testdata/golden/wide.json
+  s_65743add7cce22::t_713cc470247e3e 838-839,845-846,852-853,898-899,905-906,912-913,991-992,998-999,1005-1006,1075-1076,1082-1083,1089-1090
+web/src/lib/types.ts
+  s_65743add7cce22::t_6317b01de3e51e 91-92
+web/src/components/compare.test.ts
+  s_65743add7cce22::t_6317b01de3e51e 6,92-109
+  s_65743add7cce22::t_0604b2a3fe9af8 30,64
+  s_65743add7cce22::t_0e2e671809eac2 110
+web/src/components/WhyDialog.svelte
+  s_65743add7cce22::t_1b26fdfe3542a5 1-51,55-103,114-126,132-137,141-207,211-212
+  s_65743add7cce22::t_a33c8f4c0e2076 52-54
+  s_65743add7cce22::t_7363184af851ef 104-113,127-131,138-140,208-210
+internal/model/compute.go
+  s_65743add7cce22::t_713cc470247e3e 90,345-347,489-497
+  s_65743add7cce22::t_afb0dfa0210d82 498
+web/src/components/PairList.svelte
+  s_65743add7cce22::t_ddc683a40ce641 7,10,39-41,93,101-105,196-198
+  s_65743add7cce22::t_057571acc951fa 199
+web/e2e/guidance.spec.ts
+  s_65743add7cce22::t_a33c8f4c0e2076 126-141
+  s_65743add7cce22::t_7230309483311a 154-155
+  s_65743add7cce22::t_a6b9f49b537047 74-125
+  s_65743add7cce22::t_7363184af851ef 142-153,156
+web/src/lib/why.ts
+  s_65743add7cce22::t_1b26fdfe3542a5 1-31
+internal/model/compute_test.go
+  s_65743add7cce22::t_ab7d76526e109a 277-305
+web/src/lib/why.test.ts
+  s_65743add7cce22::t_6317b01de3e51e 1-24
+web/src/components/ConsistencyMeter.svelte
+  s_65743add7cce22::t_ddc683a40ce641 3-4,22,53-56,63-66,120,123-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0c35d49fe236bbe620f921a2d69576177e2faad3",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
