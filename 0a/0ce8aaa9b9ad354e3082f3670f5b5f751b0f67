@@ -1,0 +1,32 @@
+web/src/lib/returned.ts
+  s_65743add7cce22::t_1909252e7dff45 50
+web/src/components/StrengthWords.svelte
+  s_65743add7cce22::t_69a55b51775967 9,13,16,19,23-26,47-51
+  s_65743add7cce22::t_d270e7ada41b02 17-18
+web/e2e/exchange.spec.ts
+  s_65743add7cce22::t_1909252e7dff45 64,99
+web/e2e/merge.spec.ts
+  s_65743add7cce22::t_1909252e7dff45 23,69
+web/e2e/guidance.spec.ts
+  s_65743add7cce22::t_e4f4dc6fb042b3 157-174
+web/src/components/PairList.svelte
+  s_65743add7cce22::t_dc266d2ca9eaec 210
+web/src/lib/returned.test.ts
+  s_65743add7cce22::t_1909252e7dff45 58,60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a0ce8aaa9b9ad354e3082f3670f5b5f751b0f67",
+  "prompts": {},
+  "sessions": {
+    "s_65743add7cce22": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e042824e-4fb0-4eae-864a-61ca554e1b80",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Darren <darren@aims.to>"
+    }
+  }
+}
