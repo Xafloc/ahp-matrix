@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { agreement } from './agreement';
+import { agreement, rankers } from './agreement';
 
 const names = new Map([
   ['a1', 'MacBook Pro'],
@@ -41,4 +41,22 @@ test('a tie everyone shares is agreement, not disagreement', () => {
   expect(agreement([person('Darren', [0.4, 0.4, 0.2]), person('Priya', [0.4, 0.4, 0.2])], names)).toBe(
     'Both people put MacBook Pro and ThinkPad X1 level at the top.',
   );
+});
+
+test('rankers leaves out people with nothing to judge, and keeps people yet to answer', () => {
+  const evaluators = [
+    { id: 'e1', name: 'Darren' },
+    { id: 'e2', name: 'Priya' },
+    { id: 'e3', name: 'Sam' },
+  ];
+  const scores = [{ id: 'a1', score: 1, rank: 1 }];
+  const people = [
+    { id: 'e1', done: 3, total: 3, answered: true, scores },
+    { id: 'e2', done: 0, total: 0, answered: true }, // nothing to judge, though they answered once
+    { id: 'e3', done: 0, total: 3, answered: false },
+  ];
+  expect(rankers(evaluators, people)).toEqual([
+    { id: 'e1', name: 'Darren', scores },
+    { id: 'e3', name: 'Sam', scores: null },
+  ]);
 });

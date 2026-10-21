@@ -66,3 +66,14 @@ test('the discussion views fit a phone without scrolling sideways', async ({ pag
   await expect(page.getByRole('region', { name: 'Where people disagree most' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
 });
+
+test('each answer on the people scale can be reached by keyboard and read out', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
+  const first = page.getByRole('region', { name: 'Where people disagree most' }).getByRole('listitem').first();
+  const marker = first.getByRole('img', { name: /^Product manager: / });
+  await marker.focus();
+  await expect(marker).toBeFocused();
+  const said = (await marker.getAttribute('aria-label'))!;
+  await expect(first.locator('.readout')).toHaveText(said);
+});

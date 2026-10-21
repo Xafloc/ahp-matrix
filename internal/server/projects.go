@@ -258,6 +258,12 @@ func (s *server) importProject(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+	if p.Packet != nil {
+		if have := s.receivedCopy(r, p); have != nil {
+			s.updateReceived(w, r, have, p)
+			return
+		}
+	}
 	if !model.ValidID(p.ID) {
 		p.ID = model.NewProjectID()
 	} else if _, err := s.cfg.Store.Get(r.Context(), p.ID); err == nil {
@@ -270,6 +276,65 @@ func (s *server) importProject(w http.ResponseWriter, r *http.Request) {
 	}
 	p.CreatedAt = time.Time{}
 	s.createNew(w, r, p, http.StatusCreated)
+}
+
+// receivedCopy finds the copy of the same invitation you already have: one
+// sent to the same person, for the same decision. Nil if there's none.
+func (s *server) receivedCopy(r *http.Request, p *model.Project) *model.Project {
+	entries, err := s.cfg.Store.List(r.Context())
+	if err != nil {
+		return nil
+	}
+	root := func(q *model.Project) string {
+		if q.Origin != "" {
+			return q.Origin
+		}
+		return q.ID
+	}
+	var have *model.Project
+	for _, e := range entries {
+		q := e.Project
+		if e.Err != nil || q.Packet == nil || q.Packet.For != p.Packet.For || root(q) != root(p) {
+			continue
+		}
+		if have == nil || q.UpdatedAt.After(have.UpdatedAt) {
+			have = q
+		}
+	}
+	return have
+}
+
+// updateReceived brings a newer invitation into the copy you already have,
+// keeping the answers you've given so far that still fit. An older or the
+// same invitation just opens your copy as it is.
+func (s *server) updateReceived(w http.ResponseWriter, r *http.Request, have, p *model.Project) {
+	if !p.Packet.SentAt.After(have.Packet.SentAt) {
+		writeJSON(w, http.StatusOK, have)
+		return
+	}
+	p.ID, p.Origin, p.CreatedAt = have.ID, have.Origin, have.CreatedAt
+	if len(have.Pairwise)+len(have.Ratings) > 0 {
+		if _, err := model.Merge(p, have, model.MergeReplace); err != nil {
+			s.internalError(w, err)
+			return
+		}
+	}
+	for i := range p.Evaluators {
+		p.Evaluators[i].Invite = nil // a sender's bookkeeping, not the recipient's
+	}
+	if !prepare(w, p) {
+		return
+	}
+	err := s.cfg.Store.Save(r.Context(), p, have.Version)
+	var ce *store.ConflictError
+	switch {
+	case errors.As(err, &ce):
+		writeError(w, http.StatusConflict, "conflict", "your copy was changed while updating it; try again", map[string]int{"currentVersion": ce.Current})
+	case err != nil:
+		s.internalError(w, err)
+	default:
+		writeJSON(w, http.StatusOK, p)
+	}
 }
 
 // load fetches the project named in the URL, writing a 404 if it is missing.

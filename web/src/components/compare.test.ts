@@ -129,4 +129,8 @@ test("the people scale puts everyone's answer on one scale, named, with the comb
   expect(body.match(/class="marker combined/g)).toHaveLength(1);
   expect(text(body)).toMatch(/Ann.*Bob.*Cy/);
   expect(body).toContain('aria-label="Bob: Cost matters strongly more than Speed"');
+  // Keyboard users can reach each marker to read its answer.
+  expect(body.match(/class="marker [^"]*"[^>]*tabindex="0"/g)).toHaveLength(4);
+  // Ann's 3 sits in the middle of the seventh of 17 strength words, as the words lay out.
+  expect(body).toContain(`left: ${(6.5 / 17) * 100}%`);
 });

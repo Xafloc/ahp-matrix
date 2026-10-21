@@ -64,7 +64,8 @@ type PersonProgress struct {
 
 	// Their own ranking, with the group's answers filling in what their role
 	// doesn't cover: the ranking "combine rankings" uses. Only in the
-	// everyone-combined results, and only for people who have answered.
+	// everyone-combined results, and only for people who have answered and
+	// whose role covers something.
 	Scores []AltScore `json:"scores,omitempty"`
 }
 
@@ -149,7 +150,7 @@ func Compute(p *Project, evaluator string) (*Results, error) {
 		judged := judgedBy(p)
 		for i := range res.People {
 			pp := &res.People[i]
-			if pp.Answered = judged[pp.ID]; pp.Answered {
+			if pp.Answered = judged[pp.ID]; pp.Answered && covers(p, p.Evaluators[i]) {
 				if own, err := ownRanking(p, p.Evaluators[i]); err == nil {
 					pp.Scores = own.Scores
 				}
@@ -708,6 +709,14 @@ func judgedBy(p *Project) map[string]bool {
 	return judged
 }
 
+// covers reports whether e's role asks them to judge anything at all. Someone
+// whose role covers nothing has no ranking of their own: it would only be the
+// group's, counted again.
+func covers(p *Project, e Evaluator) bool {
+	groups, leaves := assigned(p, e)
+	return len(groups) > 0 || len(leaves) > 0
+}
+
 // ownRanking is e's results from their own answers on the parts their role
 // covers, and everyone's combined answers on the rest.
 func ownRanking(p *Project, e Evaluator) (*Results, error) {
@@ -732,7 +741,7 @@ func combineRankings(p *Project) ([]AltScore, bool) {
 	logSum := make([]float64, n)
 	totalWeight := 0.0
 	for _, e := range p.Evaluators {
-		if !judged[e.ID] {
+		if !judged[e.ID] || !covers(p, e) {
 			continue
 		}
 		r, err := ownRanking(p, e)

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { placeMarkers, scaleX } from './peoplescale';
+import { onStops, placeMarkers, scaleX } from './peoplescale';
 import { parse } from './router.svelte';
 
 test('answers sit where the balance would put them: the first item preferred is to the left', () => {
@@ -52,4 +52,12 @@ test('names at the ends hang inwards, and stacking allows for it', () => {
     ['start', 1],
     ['end', 0],
   ]);
+});
+
+test('a place on the scale lands in the middle of its strength word, as the words are laid out', () => {
+  // 17 stops, each word centred in an equal column.
+  expect(onStops(0, 17)).toBeCloseTo(0.5 / 17);
+  expect(onStops(0.5, 17)).toBeCloseTo(0.5);
+  expect(onStops(1, 17)).toBeCloseTo(16.5 / 17);
+  expect(onStops(6 / 16, 17)).toBeCloseTo(6.5 / 17);
 });

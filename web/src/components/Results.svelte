@@ -1,6 +1,6 @@
 <script lang="ts">
   import { exportUrl } from '../lib/api';
-  import { agreement } from '../lib/agreement';
+  import { agreement, rankers } from '../lib/agreement';
   import { combineNote } from '../lib/copy';
   import { colorOf, percent } from '../lib/format';
   import { href } from '../lib/router.svelte';
@@ -44,13 +44,9 @@
     return m && i >= 0 && j >= 0 && m.matrix[i][j] ? m.matrix[i][j] : undefined;
   }
   // Everyone's own ranking, as combining rankings would use it, for comparing side by side.
-  const own = (id: string) => session.results[ALL_EVALUATORS]?.people.find((x) => x.id === id);
-  const headline = $derived(
-    agreement(
-      p.evaluators.map((e) => ({ name: e.name, scores: own(e.id)?.answered ? (own(e.id)?.scores ?? null) : null })),
-      new Map(p.alternatives.map((a) => [a.id, a.name])),
-    ),
-  );
+  // People with nothing to judge have no ranking of their own, so they're left out.
+  const others = $derived(rankers(p.evaluators, session.results[ALL_EVALUATORS]?.people ?? []));
+  const headline = $derived(agreement(others, new Map(p.alternatives.map((a) => [a.id, a.name]))));
   const disagreements = $derived((r?.disagreements ?? []).filter((d) => d.spread >= 1.4).slice(0, 6));
   const lead = $derived(ranked.length >= 2 ? ranked[1].score > 0 ? (ranked[0].score - ranked[1].score) / ranked[0].score : 1 : 0);
 </script>
@@ -121,7 +117,7 @@
               <tr>
                 <th scope="col">Option</th>
                 <th scope="col">Everyone combined</th>
-                {#each p.evaluators as e (e.id)}<th scope="col">{e.name}</th>{/each}
+                {#each others as e (e.id)}<th scope="col">{e.name}</th>{/each}
               </tr>
             </thead>
             <tbody>
@@ -129,8 +125,8 @@
                 <tr>
                   <th scope="row"><span class="dot" style:background={colorOf(p.alternatives.find((a) => a.id === s.id)?.color ?? '')}></span>{altName(s.id)}</th>
                   <td><strong>{s.rank}</strong> <span class="muted small">{percent(s.score, 0)}</span></td>
-                  {#each p.evaluators as e (e.id)}
-                    {@const mine = own(e.id)?.answered ? own(e.id)?.scores?.find((x) => x.id === s.id) : undefined}
+                  {#each others as e (e.id)}
+                    {@const mine = e.scores?.find((x) => x.id === s.id)}
                     <td>{#if mine}<strong>{mine.rank}</strong> <span class="muted small">{percent(mine.score, 0)}</span>{:else}<span class="muted small">No answers yet</span>{/if}</td>
                   {/each}
                 </tr>
