@@ -156,7 +156,8 @@
     <span class="spacer"></span>
     {#if p.evaluators.length > 1}
       <label class="small who">
-        Judging as
+        <span class="initial" aria-hidden="true">{(judge?.name.trim()[0] ?? '?').toUpperCase()}</span>
+        Now judging as
         <select class="field" bind:value={session.scoringAs}>
           {#each p.evaluators as e (e.id)}<option value={e.id}>{e.name}</option>{/each}
         </select>
@@ -287,8 +288,27 @@
     gap: 0.4rem;
     color: var(--ink-2);
   }
+  .who {
+    padding: 0.2rem 0.25rem 0.2rem 0.3rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--fog);
+  }
   .who select {
     width: auto;
+    font-weight: 600;
+    border-radius: 999px;
+  }
+  .initial {
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+    font-size: 0.8rem;
   }
   .banner {
     display: flex;

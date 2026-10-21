@@ -64,6 +64,7 @@
   <div class="layout">
     <SubNav label="Criteria to score" {entries} current={leaf.id} />
     <section class="main">
+      {#if p.evaluators.length > 1}<p class="as small">Answering as <strong>{me?.name}</strong></p>{/if}
       {#if !assigns(me?.tasks, leaf)}
         <p class="unassigned">{me?.name} isn't asked to score the options on {leaf.name}. Anything entered here still counts.</p>
       {/if}
@@ -137,6 +138,10 @@
 {/if}
 
 <style>
+  .as {
+    margin: 0;
+    color: var(--ink-2);
+  }
   .unassigned {
     margin: 0;
     padding: 0.6rem 0.85rem;
