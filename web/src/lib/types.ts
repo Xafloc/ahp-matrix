@@ -201,6 +201,8 @@ export interface ProjectSummary {
   ranking: RankedName[];
   completeness: number;
   consistent: boolean;
+  /** A copy someone sent to be judged. */
+  received?: boolean;
   error?: string;
 }
 

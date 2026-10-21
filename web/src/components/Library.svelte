@@ -3,8 +3,11 @@
   import { colorOf, percent, relativeTime } from '../lib/format';
   import { href, router } from '../lib/router.svelte';
   import { count } from '../lib/format';
-  import type { ImportReport, ProjectSummary, StarterEntry } from '../lib/types';
+  import type { ImportReport, MergeReport, Project, ProjectSummary, StarterEntry } from '../lib/types';
+  import { mergedText, mergeTarget, peek, undoMerge } from '../lib/returned';
   import Mark from './Mark.svelte';
+  import MergeDialog from './MergeDialog.svelte';
+  import Toast from './Toast.svelte';
   import ThemeToggle from './ThemeToggle.svelte';
 
   let projects = $state<ProjectSummary[] | null>(null);
@@ -18,6 +21,37 @@
   let templates = $state<StarterEntry[]>([]);
   let examples = $state<StarterEntry[]>([]);
   let imported = $state<{ id: string; name: string; report: ImportReport } | null>(null);
+
+  // Returned answers: dropped on a decision's row, or recognised by Import file.
+  let merging = $state<{ target: { id: string; name: string }; file: File } | null>(null);
+  let offer = $state<{ target: { id: string; name: string }; file: File } | null>(null);
+  let dropOn = $state('');
+  let toast = $state<{ text: string; open?: string; undo?: { before: Project; version: number } } | null>(null);
+  const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files');
+
+  async function merged(r: { project: Project; report: MergeReport; before: Project }) {
+    merging = null;
+    await load();
+    toast = { text: mergedText(r.report), undo: r.report.judgments ? { before: r.before, version: r.project.version } : undefined };
+  }
+
+  async function undo() {
+    const u = toast?.undo;
+    if (!u) return;
+    try {
+      await undoMerge(api, u.before, u.version);
+      await load();
+      toast = { text: 'Merge undone.' };
+    } catch (e) {
+      toast = { text: `Couldn't undo: ${e instanceof Error ? e.message : e}` };
+    }
+  }
+
+  $effect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => (toast = null), toast.undo ? 20000 : 8000);
+    return () => clearTimeout(t);
+  });
 
   api.templates().then((t) => (templates = t), () => {});
   api.samples().then((s) => (examples = s), () => {});
@@ -67,6 +101,18 @@
   async function importChosen() {
     const file = fileInput?.files?.[0];
     if (!file) return;
+    if (fileInput) fileInput.value = '';
+    const info = await peek(file);
+    const target = info && mergeTarget(info, projects ?? []);
+    if (info && target) {
+      offer = { target: { id: target.id!, name: target.name }, file };
+      return;
+    }
+    await importFile(file);
+  }
+
+  async function importFile(file: File) {
+    offer = null;
     try {
       const { project, report } = await api.importFile(file);
       if (report) {
@@ -79,7 +125,6 @@
     } catch (e) {
       error = `${file.name} couldn't be imported: ${e instanceof Error ? e.message : e}`;
     }
-    if (fileInput) fileInput.value = '';
   }
 
   // Ring geometry for the completeness indicator.
@@ -144,6 +189,18 @@
     </section>
   {/if}
 
+  {#if offer}
+    {@const o = offer}
+    <section class="notice panel" role="alert">
+      <p><strong>{o.file.name}</strong> looks like answers sent back for <strong>{o.target.name}</strong>.</p>
+      <div class="actions">
+        <button class="btn primary" onclick={() => ((merging = { target: o.target, file: o.file }), (offer = null))}>Merge into {o.target.name}</button>
+        <button class="btn" onclick={() => importFile(o.file)}>Import as a separate copy</button>
+        <button class="btn quiet" onclick={() => (offer = null)}>Cancel</button>
+      </div>
+    </section>
+  {/if}
+
   {#if error}
     <p class="error" role="alert">{error}</p>
   {/if}
@@ -182,7 +239,24 @@
     {/if}
     <ul class="rows">
       {#each shown as p (p.file)}
-        <li class="row" class:broken={!!p.error}>
+        <li
+          class="row"
+          class:broken={!!p.error}
+          class:target={dropOn === p.id}
+          ondragover={(e) => {
+            if (p.error || p.received || !hasFiles(e)) return;
+            e.preventDefault();
+            dropOn = p.id!;
+          }}
+          ondragleave={() => dropOn === p.id && (dropOn = '')}
+          ondrop={(e) => {
+            if (p.error || p.received || !hasFiles(e)) return;
+            e.preventDefault();
+            dropOn = '';
+            const file = e.dataTransfer?.files[0];
+            if (file) merging = { target: { id: p.id!, name: p.name }, file };
+          }}
+        >
           {#if p.error}
             <div class="name">
               <span>{p.file}</span>
@@ -252,7 +326,19 @@
   {/if}
 </main>
 
+{#if merging}
+  <MergeDialog target={merging.target} file={merging.file} onclose={() => (merging = null)} ondone={merged} />
+{/if}
+{#if toast}
+  <Toast text={toast.text} action={toast.undo ? 'Undo' : ''} onaction={undo} ondismiss={() => (toast = null)} />
+{/if}
+
 <style>
+  .row.target {
+    outline: 2px dashed var(--brass);
+    outline-offset: -2px;
+    background: var(--brass-wash);
+  }
   .top {
     display: flex;
     justify-content: space-between;

@@ -57,8 +57,9 @@ test("a colleague's returned copy merges back, after asking", async ({ page }, i
   await copy.saveAs(path);
 
   await page.getByLabel('Returned decision file to merge').setInputFiles(path);
-  await expect(page.getByRole('alert')).toContainText('Product manager already has judgments here.');
-  await page.getByRole('button', { name: 'Replace' }).click();
+  const dialog = page.getByRole('dialog', { name: "Merge Product manager's answers into Hiring a senior engineer?" });
+  await expect(dialog).toContainText('Replaces the answers they already have here');
+  await dialog.getByRole('button', { name: 'Replace their answers' }).click();
   // 6 criteria pairs + 4 × 3 option pairs
   await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 18 judgments from Product manager.');
 });
@@ -94,11 +95,12 @@ test("someone's first returned copy merges without asking", async ({ page }, inf
   writeFileSync(path, JSON.stringify(copy));
 
   await page.getByLabel('Returned decision file to merge').setInputFiles(path);
+  await page.getByRole('dialog').getByRole('button', { name: 'Merge' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Merged' })).toContainText('Merged 1 judgment from Carol.');
-  await expect(page.getByText('already has judgments here')).toHaveCount(0);
+  await expect(personRow(page, 'Carol')).toContainText('Returned');
 });
 
-test('a returned file that fails to merge clears the question and says why', async ({ page }, info) => {
+test('a returned file that can\'t be merged says why, and offers nothing to do', async ({ page }, info) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Hiring a senior engineer/ }).first().click();
   await openPeople(page);
@@ -111,7 +113,6 @@ test('a returned file that fails to merge clears the question and says why', asy
   writeFileSync(path, JSON.stringify(copy));
 
   await page.getByLabel('Returned decision file to merge').setInputFiles(path);
-  await page.getByRole('button', { name: 'Replace' }).click();
-  await expect(page.getByRole('alert')).toContainText("pm.ahp.json couldn't be merged");
-  await expect(page.getByRole('button', { name: 'Replace' })).toHaveCount(0);
+  await expect(page.getByRole('dialog').getByRole('alert')).toContainText("pm.ahp.json can't be merged into Hiring a senior engineer");
+  await expect(page.getByRole('button', { name: 'Replace their answers' })).toHaveCount(0);
 });

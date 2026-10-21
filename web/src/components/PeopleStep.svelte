@@ -1,16 +1,17 @@
 <script lang="ts">
   // Who judges the decision, what each person is asked to judge, how far
   // they've got, where their copy is, and how their answers are combined.
-  import { ApiError, api, exportUrl, type MergePolicy } from '../lib/api';
+  import { exportUrl } from '../lib/api';
   import { addEvaluator, removeEvaluator, setEvaluatorWeight } from '../lib/edits';
-  import { count, relativeTime } from '../lib/format';
+  import { relativeTime } from '../lib/format';
   import { reminder, ROLES, roleOf, statusOf, tasksFor, type Role, type Status } from '../lib/people';
   import { href } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
   import { leaves } from '../lib/tree';
   import { ALL_EVALUATORS, type Aggregation, type Evaluator } from '../lib/types';
 
-  let { session }: { session: ProjectSession } = $props();
+  let { session, onmerge }: { session: ProjectSession; onmerge: (file: File) => void } = $props();
+  let mergeInput = $state<HTMLInputElement | undefined>();
   const p = $derived(session.project);
   const everyone = $derived(session.results[ALL_EVALUATORS]);
   // Leaves people score on; measured values are entered once, by the owner.
@@ -19,12 +20,6 @@
   let newPerson = $state('');
   let notice = $state<{ id: string; text: string } | null>(null);
   let busy = $state('');
-
-  let mergeInput = $state<HTMLInputElement | undefined>();
-  let mergeFile = $state<File | null>(null);
-  let mergeConflict = $state<string[]>([]);
-  let mergeNote = $state('');
-  let mergeError = $state('');
 
   const progressOf = (id: string) => everyone?.people?.find((x) => x.id === id);
 
@@ -102,40 +97,6 @@
     } catch {
       notice = { id: e.id, text };
     }
-  }
-
-  // Brings a returned file's judgments in. Unsaved edits are saved first; if
-  // the file holds judgments for people already here, ask before replacing.
-  async function merge(existing?: MergePolicy) {
-    const file = mergeFile;
-    if (!file) return;
-    mergeError = mergeNote = '';
-    await session.flush();
-    if (session.unsaved) {
-      mergeError = 'Fix the unsaved changes first; then merge.';
-      return;
-    }
-    try {
-      const { report } = await api.mergeFile(p.id, file, existing);
-      await session.reload();
-      mergeConflict = [];
-      const who = [...report.added, ...report.replaced];
-      mergeNote =
-        who.length === 0
-          ? 'Nothing merged: the current judgments were kept.'
-          : `Merged ${count(report.judgments, 'judgment')} from ${who.join(', ')}.` +
-            (report.dropped.length ? ` ${count(report.dropped.length, 'judgment')} about options or criteria no longer in this decision ${report.dropped.length === 1 ? 'was' : 'were'} left out.` : '');
-      mergeFile = null;
-    } catch (err) {
-      if (err instanceof ApiError && err.code === 'evaluator-exists') {
-        mergeConflict = (err.details as { evaluators: string[] }).evaluators;
-      } else {
-        mergeConflict = []; // the question no longer applies
-        mergeError = `${file.name} couldn't be merged: ${err instanceof Error ? err.message : err}`;
-        mergeFile = null;
-      }
-    }
-    if (mergeInput) mergeInput.value = '';
   }
 
   function statusText(s: Status): string {
@@ -272,10 +233,11 @@
     <section>
       <header>
         <h3>Collecting answers</h3>
-        <p class="muted small">When someone sends their file back, merge it here. Their answers replace any they made before.</p>
+        <p class="muted small">When someone sends their file back, merge it here. You'll see whose answers it holds before anything changes.</p>
       </header>
       <div class="remote">
         <button class="btn" onclick={() => mergeInput?.click()}>Merge returned answers</button>
+        <span class="small muted">or drop the file anywhere on this page</span>
         <input
           bind:this={mergeInput}
           type="file"
@@ -284,22 +246,11 @@
           tabindex="-1"
           aria-label="Returned decision file to merge"
           onchange={() => {
-            mergeFile = mergeInput?.files?.[0] ?? null;
-            merge();
+            const file = mergeInput?.files?.[0];
+            if (mergeInput) mergeInput.value = '';
+            if (file) onmerge(file);
           }}
         />
-        {#if mergeConflict.length}
-          <div class="confirm" role="alert">
-            <span>
-              {mergeConflict.join(', ')} already {mergeConflict.length === 1 ? 'has' : 'have'} judgments here. Replace them with the ones in
-              {mergeFile?.name}, or keep the current ones?
-            </span>
-            <button class="btn" onclick={() => merge('replace')}>Replace</button>
-            <button class="btn quiet" onclick={() => merge('skip')}>Keep current</button>
-          </div>
-        {/if}
-        {#if mergeNote}<p class="small" role="status">{mergeNote}</p>{/if}
-        {#if mergeError}<p class="small rust" role="alert">{mergeError}</p>{/if}
       </div>
     </section>
   {/if}
@@ -461,15 +412,10 @@
     margin-top: -1.25rem;
   }
   .remote {
-    display: grid;
-    gap: 0.5rem;
-    justify-items: start;
-  }
-  .confirm {
     display: flex;
-    gap: 0.6rem;
-    align-items: center;
     flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
   }
   .methods {
     display: grid;

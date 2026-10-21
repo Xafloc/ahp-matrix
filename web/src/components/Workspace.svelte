@@ -3,8 +3,12 @@
   import { scoreProgress, weighProgress } from '../lib/progress';
   import { href, type Step } from '../lib/router.svelte';
   import type { ProjectSession } from '../lib/session.svelte';
-  import { ALL_EVALUATORS } from '../lib/types';
+  import { ALL_EVALUATORS, type MergeReport, type Project } from '../lib/types';
+  import { api } from '../lib/api';
+  import { mergedText, undoMerge } from '../lib/returned';
   import Mark from './Mark.svelte';
+  import MergeDialog from './MergeDialog.svelte';
+  import Toast from './Toast.svelte';
   import PeopleStep from './PeopleStep.svelte';
   import Results from './Results.svelte';
   import Score from './Score.svelte';
@@ -36,6 +40,45 @@
     { id: 'sensitivity' as Step, label: 'What if', detail: 'How robust is the winner?', done: false },
   ]);
 
+  // Merging returned answers: from the People step's button, or a file dropped anywhere.
+  let merging = $state<File | null>(null);
+  let dragging = $state(false);
+  let toast = $state<{ text: string; undo?: { before: Project; version: number } } | null>(null);
+  const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files');
+
+  async function startMerge(file: File) {
+    await session.flush();
+    if (session.unsaved) {
+      toast = { text: 'Fix the unsaved changes first; then merge.' };
+      return;
+    }
+    merging = file;
+  }
+
+  async function merged(r: { project: Project; report: MergeReport; before: Project }) {
+    merging = null;
+    await session.reload();
+    toast = { text: mergedText(r.report), undo: r.report.judgments ? { before: r.before, version: r.project.version } : undefined };
+  }
+
+  async function undo() {
+    const u = toast?.undo;
+    if (!u) return;
+    try {
+      await undoMerge(api, u.before, u.version);
+      await session.reload();
+      toast = { text: 'Merge undone.' };
+    } catch (e) {
+      toast = { text: `Couldn't undo: ${e instanceof Error ? e.message : e}` };
+    }
+  }
+
+  $effect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => (toast = null), toast.undo ? 20000 : 8000);
+    return () => clearTimeout(t);
+  });
+
   const saveLabel = $derived(
     {
       saved: 'All changes saved',
@@ -47,7 +90,25 @@
   );
 </script>
 
-<div class="shell">
+<div
+  class="shell"
+  role="presentation"
+  ondragover={(e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragging = true;
+  }}
+  ondragleave={(e) => {
+    if (!e.relatedTarget) dragging = false;
+  }}
+  ondrop={(e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragging = false;
+    const file = e.dataTransfer?.files[0];
+    if (file) startMerge(file);
+  }}
+>
   <header class="bar no-print">
     <a class="home" href="#/" title="All decisions" aria-label="All decisions"><Mark size={26} /></a>
     <input
@@ -103,7 +164,7 @@
     {#if step === 'setup'}
       <Setup {session} />
     {:else if step === 'people'}
-      <PeopleStep {session} />
+      <PeopleStep {session} onmerge={startMerge} />
     {:else if step === 'weigh'}
       <Weigh {session} {sub} />
     {:else if step === 'score'}
@@ -115,6 +176,18 @@
     {/if}
   </main>
 </div>
+
+{#if dragging}
+  <div class="drop no-print" aria-hidden="true">
+    <p>Drop to merge returned answers into <strong>{p.name}</strong></p>
+  </div>
+{/if}
+{#if merging}
+  <MergeDialog target={{ id: p.id, name: p.name }} file={merging} onclose={() => (merging = null)} ondone={merged} />
+{/if}
+{#if toast}
+  <Toast text={toast.text} action={toast.undo ? 'Undo' : ''} onaction={undo} ondismiss={() => (toast = null)} />
+{/if}
 
 <style>
   .shell {
@@ -238,6 +311,22 @@
     grid-area: content;
     padding: 2rem clamp(1rem, 3vw, 3rem) 4rem;
     min-width: 0;
+  }
+  .drop {
+    position: fixed;
+    inset: 0.75rem;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    border: 2px dashed var(--brass);
+    border-radius: var(--radius-m);
+    background: color-mix(in oklab, var(--paper) 88%, transparent);
+    pointer-events: none;
+  }
+  .drop p {
+    font-size: 1.15rem;
+    max-width: 24rem;
+    text-align: center;
   }
   @media (max-width: 820px) {
     .shell {

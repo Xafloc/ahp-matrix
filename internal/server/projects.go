@@ -40,7 +40,8 @@ type projectSummary struct {
 	Ranking      []rankedName `json:"ranking"` // best first
 	Completeness float64      `json:"completeness"`
 	Consistent   bool         `json:"consistent"`
-	Error        string       `json:"error,omitempty"` // the file could not be read
+	Received     bool         `json:"received,omitempty"` // a copy someone sent to be judged
+	Error        string       `json:"error,omitempty"`    // the file could not be read
 }
 
 type rankedName struct {
@@ -77,6 +78,7 @@ func summarize(e store.Entry) projectSummary {
 	sum := projectSummary{
 		ID: p.ID, File: e.File, Name: p.Name, Description: p.Description, UpdatedAt: p.UpdatedAt,
 		Alternatives: len(p.Alternatives), Criteria: len(p.Criteria), Ranking: []rankedName{},
+		Received: p.Packet != nil,
 	}
 	res, err := model.Compute(p, model.AllEvaluators)
 	if err != nil {

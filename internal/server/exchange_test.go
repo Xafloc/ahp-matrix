@@ -224,3 +224,17 @@ func TestMergeRecordsTheReturn(t *testing.T) {
 		}
 	}
 }
+
+func TestLibraryMarksReceivedCopies(t *testing.T) {
+	h, _ := newTestServer(t)
+	owner := decode[*model.Project](t, request(t, h, "POST", "/api/projects", strings.NewReader(`{"fromSample":"hiring"}`)).Body.Bytes())
+	packet := readAll(t, request(t, h, "GET", "/api/projects/"+owner.ID+"/export.ahp.json?evaluator=pm", nil).Body)
+	copy := decode[*model.Project](t, upload(t, h, "/api/import/ahp", "copy.ahp.json", packet).Body.Bytes())
+
+	list := decode[struct{ Projects []projectSummary }](t, request(t, h, "GET", "/api/projects", nil).Body.Bytes())
+	for _, s := range list.Projects {
+		if want := s.ID == copy.ID; s.Received != want {
+			t.Errorf("%s (%s): received = %v, want %v", s.Name, s.ID, s.Received, want)
+		}
+	}
+}
